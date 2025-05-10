@@ -11,6 +11,7 @@
 		"includes": [
 			"**",
 			"!bun.lock",
+			"!renovate.json",
 			"!**/node_modules/**",
 			"!**/dist/**",
 			"!**/build/**",
