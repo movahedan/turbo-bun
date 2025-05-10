@@ -1,0 +1,59 @@
+name: PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: 🔍 Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 - Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚀 - Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.11
+
+      - name: 🗃️ - Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📦 - Install dependencies
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        run: |
+          bun install -E --no-save
+          bun install -g --frozen-lockfile @biomejs/biome@2.0.0-beta.2
+          bun install -g --frozen-lockfile turbo@2.5.3
+
+      - name: ✨ - Biome check
+        run: bun run check .
+
+      - name: 🔍 - Type check
+        run: bun run check-types
+
+      - name: 🧪 - Test
+        run: bun run test
+
+      - name: 🏗️ - Build
+        run: bun run build
+
+      - name: 📝 - Check for changeset
+        if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release/')
+        run: |
+          if [ -z "$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep '.changeset/')" ]; then
+            echo "No changeset found. Please add a changeset by running 'bun run changesets add'"
+            exit 1
+          fi 
