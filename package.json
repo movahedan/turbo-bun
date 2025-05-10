@@ -2,12 +2,12 @@
 	"name": "kitchen-sink",
 	"private": true,
 	"scripts": {
-		"build": "turbo run build",
-		"clean": "turbo run clean",
-		"dev": "turbo run dev",
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
+		"clean": "turbo run clean",
+		"dev": "turbo run dev",
 		"test": "turbo run test",
+		"build": "turbo run build",
 		"check-types": "turbo run check-types",
 		"cleanup": "rm -rf node_modules && rm -rf ./**/*/node_modules"
 	},
@@ -18,16 +18,12 @@
 		"typescript": "5.8.3"
 	},
 	"overrides": {
-		"@types/node": "22.15.17",
 		"@types/react": "18.3.21",
 		"@types/react-dom": "18.3.7",
 		"typescript": "5.8.3",
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
 		"vite": "5.4.19"
-	},
-	"engines": {
-		"node": "22.15.0"
 	},
 	"packageManager": "bun@1.2.11",
 	"workspaces": [
