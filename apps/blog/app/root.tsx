@@ -8,7 +8,7 @@ import {
 import { Analytics } from "@vercel/analytics/react";
 import "./styles.css";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
 			<head>
