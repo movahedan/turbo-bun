@@ -18,7 +18,7 @@
 		"typescript": "5.8.3"
 	},
 	"overrides": {
-		"@types/node": "22.15.3",
+		"@types/node": "22.15.17",
 		"@types/react": "18.3.18",
 		"@types/react-dom": "18.3.5",
 		"typescript": "5.8.3",
@@ -27,7 +27,7 @@
 		"vite": "5.4.19"
 	},
 	"engines": {
-		"node": "22.11.0"
+		"node": "22.15.0"
 	},
 	"packageManager": "bun@1.2.11",
 	"workspaces": [
