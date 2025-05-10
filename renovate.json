@@ -22,15 +22,6 @@
 			"matchStrings": ["{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"]
 		}
 	],
-	"matchSourceUrls": [
-		"https://github.com/conventional-changelog/commitlint",
-		"https://github.com/facebook/react",
-		"https://github.com/storybookjs/storybook",
-		"https://github.com/tailwindlabs/tailwindcss",
-		"https://github.com/vitest-dev/vitest",
-		"https://github.com/vercel/turbo",
-		"https://github.com/vercel/turborepo"
-	],
 	"automergeType": "pr",
 	"major": {
 		"dependencyDashboardApproval": true
