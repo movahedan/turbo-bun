@@ -19,8 +19,12 @@
 			"datasourceTemplate": "npm",
 			"depNameTemplate": "@biomejs/biome",
 			"fileFormat": "json",
-			"managerFilePatterns": ["/(^|/)biome.json?$/"],
-			"matchStrings": ["{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"]
+			"managerFilePatterns": [
+				"/(^|/)biome.json?$/"
+			],
+			"matchStrings": [
+				"{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"
+			]
 		}
 	],
 	"automergeType": "pr",
@@ -33,7 +37,9 @@
 	"lockFileMaintenance": {
 		"enabled": true,
 		"automerge": true,
-		"schedule": ["before 3am on monday"]
+		"schedule": [
+			"before 3am on monday"
+		]
 	},
 	"separateMultipleMajor": true,
 	"separateMinorPatch": false,
@@ -50,8 +56,10 @@
 	"osvVulnerabilityAlerts": true,
 	"packageRules": [
 		{
-			"matchPackagePatterns": ["^@repo/"],
-			"enabled": false
+			"enabled": false,
+			"matchPackageNames": [
+				"/^@repo//"
+			]
 		},
 		{
 			"matchPackageNames": [
@@ -63,27 +71,45 @@
 			"groupName": "React"
 		},
 		{
-			"matchDepTypes": ["devDependencies"],
-			"matchUpdateTypes": ["patch", "minor", "major"],
+			"matchDepTypes": [
+				"devDependencies"
+			],
+			"matchUpdateTypes": [
+				"patch",
+				"minor",
+				"major"
+			],
 			"groupName": "devDependencies (non-major)"
 		},
 		{
-			"matchDepTypes": ["dependencies"],
-			"matchUpdateTypes": ["patch", "minor", "major"],
+			"matchDepTypes": [
+				"dependencies"
+			],
+			"matchUpdateTypes": [
+				"patch",
+				"minor",
+				"major"
+			],
 			"groupName": "dependencies (non-major)"
 		},
 		{
-			"matchFileNames": ["packages/*/package.json"],
+			"matchFileNames": [
+				"packages/*/package.json"
+			],
 			"groupName": "shared packages",
 			"groupSlug": "shared-packages"
 		},
 		{
-			"matchFileNames": ["apps/*/package.json"],
+			"matchFileNames": [
+				"apps/*/package.json"
+			],
 			"groupName": "apps",
 			"groupSlug": "apps"
 		},
 		{
-			"matchSourceUrls": ["https://github.com/**"],
+			"matchSourceUrls": [
+				"https://github.com/**"
+			],
 			"prBodyDefinitions": {
 				"OpenSSF": "[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/{{sourceRepo}}/badge)](https://securityscorecards.dev/viewer/?uri=github.com/{{sourceRepo}})"
 			},
