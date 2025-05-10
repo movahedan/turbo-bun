@@ -1,0 +1,92 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"branchPrefix": "renovate/",
+	"extends": [
+		"config:recommended",
+		":pinAllExceptPeerDependencies",
+		"customManagers:biomeVersions",
+		":dependencyDashboard",
+		":semanticPrefixFixDepsChoreOthers",
+		"group:monorepos",
+		"group:recommended",
+		"replacements:all",
+		"workarounds:all"
+	],
+	"customManagers": [
+		{
+			"customType": "jsonata",
+			"datasourceTemplate": "npm",
+			"depNameTemplate": "@biomejs/biome",
+			"fileFormat": "json",
+			"managerFilePatterns": ["/(^|/)biome.json?$/"],
+			"matchStrings": ["{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"]
+		}
+	],
+	"matchSourceUrls": [
+		"https://github.com/conventional-changelog/commitlint",
+		"https://github.com/facebook/react",
+		"https://github.com/storybookjs/storybook",
+		"https://github.com/tailwindlabs/tailwindcss",
+		"https://github.com/vitest-dev/vitest",
+		"https://github.com/vercel/turbo",
+		"https://github.com/vercel/turborepo"
+	],
+	"automergeType": "pr",
+	"major": {
+		"dependencyDashboardApproval": true
+	},
+	"vulnerabilityAlerts": {
+		"enabled": true
+	},
+	"lockFileMaintenance": {
+		"automerge": true
+	},
+	"separateMultipleMajor": true,
+	"separateMinorPatch": false,
+	"configMigration": true,
+	"minor": {
+		"automerge": true
+	},
+	"patch": {
+		"automerge": true
+	},
+	"pin": {
+		"automerge": true
+	},
+	"osvVulnerabilityAlerts": true,
+	"packageRules": [
+		{
+			"matchPackageNames": [
+				"react",
+				"react-dom",
+				"@types/react",
+				"@types/react-dom"
+			],
+			"groupName": "React"
+		},
+		{
+			"matchDepTypes": ["devDependencies"],
+			"matchUpdateTypes": ["patch", "minor", "major"],
+			"groupName": "devDependencies (non-major)"
+		},
+		{
+			"matchDepTypes": ["dependencies"],
+			"matchUpdateTypes": ["patch", "minor", "major"],
+			"groupName": "dependencies (non-major)"
+		},
+		{
+			"matchSourceUrls": ["https://github.com/**"],
+			"prBodyDefinitions": {
+				"OpenSSF": "[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/{{sourceRepo}}/badge)](https://securityscorecards.dev/viewer/?uri=github.com/{{sourceRepo}})"
+			},
+			"prBodyColumns": [
+				"Package",
+				"Type",
+				"Update",
+				"Change",
+				"Pending",
+				"OpenSSF"
+			]
+		}
+	]
+}

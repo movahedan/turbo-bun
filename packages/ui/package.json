@@ -40,12 +40,12 @@
 		"preset": "@repo/jest-presets/browser"
 	},
 	"devDependencies": {
-		"@jest/globals": "^29.7.0",
+		"@jest/globals": "29.7.0",
 		"@repo/jest-presets": "*",
 		"@repo/typescript-config": "*",
-		"@types/node": "^22.15.3",
-		"bunchee": "^6.4.0",
-		"jest": "^29.7.0",
+		"@types/node": "22.15.3",
+		"bunchee": "6.4.0",
+		"jest": "29.7.0",
 		"typescript": "5.8.2"
 	},
 	"peerDependencies": {
