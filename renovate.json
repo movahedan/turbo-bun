@@ -1,6 +1,7 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"branchPrefix": "renovate/",
+	"rangeStrategy": "bump",
 	"extends": [
 		"config:recommended",
 		":pinAllExceptPeerDependencies",
@@ -30,7 +31,9 @@
 		"enabled": true
 	},
 	"lockFileMaintenance": {
-		"automerge": true
+		"enabled": true,
+		"automerge": true,
+		"schedule": ["before 3am on monday"]
 	},
 	"separateMultipleMajor": true,
 	"separateMinorPatch": false,
@@ -64,6 +67,16 @@
 			"matchDepTypes": ["dependencies"],
 			"matchUpdateTypes": ["patch", "minor", "major"],
 			"groupName": "dependencies (non-major)"
+		},
+		{
+			"matchPaths": ["packages/*/package.json"],
+			"groupName": "shared packages",
+			"groupSlug": "shared-packages"
+		},
+		{
+			"matchPaths": ["apps/*/package.json"],
+			"groupName": "apps",
+			"groupSlug": "apps"
 		},
 		{
 			"matchSourceUrls": ["https://github.com/**"],
