@@ -1,0 +1,93 @@
+name: Release PR
+
+on:
+  workflow_run:
+    workflows: ["PR Review"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  validate-release:
+    name: Validate Release PR
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.11
+
+      - name: 🗃️ Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+              
+      - name: 📦 Install dependencies
+        run: |
+          bun install -E --no-save
+          bun install -g --frozen-lockfile @biomejs/biome@2.0.0-beta.2
+          bun install -g --frozen-lockfile turbo@2.5.3
+          bun install -g --frozen-lockfile @changesets/cli@2.29.3
+
+      - name: 🔍 Verify changeset contents
+        run: |
+          echo "::group::📋 Changeset Contents"
+          bunx changeset status
+          echo "::endgroup::"
+          
+          # Verify changeset format and content
+          if ! bunx changeset status | grep -q "No changesets found"; then
+            echo "✅ Changesets found and validated"
+          else
+            echo "❌ No changesets found"
+            exit 1
+          fi
+
+      - name: 🏷️ Version packages
+        run: |
+          echo "::group::📦 Versioning Packages"
+          bunx changeset version
+          echo "::endgroup::"
+
+      - name: 📝 Commit version changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "chore(release): version bump
+
+          $(bunx changeset status | sed 's/^/- /')
+          
+          [skip ci]"
+          git push
+
+      - name: 🚀 Create Release PR
+        run: |
+          echo "::group::📦 Publishing Packages"
+          bunx changeset publish
+          echo "::endgroup::"
+          
+          # Create GitHub Release
+          echo "::group::🏷️ Creating GitHub Release"
+          VERSION=$(node -p "require('./package.json').version")
+          gh release create "v$VERSION" \
+            --title "Release v$VERSION" \
+            --notes "$(bunx changeset status | sed 's/^/- /')" \
+            --target main
+          echo "::endgroup::"
