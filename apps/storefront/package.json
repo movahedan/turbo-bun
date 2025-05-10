@@ -1,30 +1,26 @@
 {
-  "name": "storefront",
-  "version": "0.0.0",
-  "type": "module",
-  "private": true,
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev -p 3002",
-    "lint": "next lint",
-    "check-types": "tsc --noEmit",
-    "start": "next start"
-  },
-  "dependencies": {
-    "@repo/logger": "*",
-    "@repo/ui": "*",
-    "next": "^15.3.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@next/eslint-plugin-next": "^15.3.0",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
-    "@types/node": "^22.15.3",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "eslint": "^9.26.0",
-    "typescript": "5.8.2"
-  }
+	"name": "storefront",
+	"version": "0.0.0",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"build": "next build",
+		"dev": "next dev -p 3002",
+		"check-types": "tsc --noEmit",
+		"start": "next start"
+	},
+	"dependencies": {
+		"@repo/logger": "*",
+		"@repo/ui": "*",
+		"next": "^15.3.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "*",
+		"@types/node": "^22.15.3",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"typescript": "5.8.2"
+	}
 }
