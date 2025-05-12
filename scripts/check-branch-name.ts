@@ -1,20 +1,12 @@
-import { spawnSync } from "node:child_process";
-
-// Get current branch name from git
-const getCurrentBranch = () => {
-	const result = spawnSync("git", ["branch", "--show-current"], {
-		encoding: "utf-8",
-	});
-	return result.stdout.trim();
-};
+import { git } from "./git-command";
 
 const branchName =
 	process.env.GITHUB_HEAD_REF ||
 	process.env.GITHUB_REF?.replace("refs/heads/", "") ||
-	getCurrentBranch() ||
+	git(["branch", "--show-current"]).stdout.trim() ||
 	"";
 
-const branchPrefixes = [
+const validBranchPrefixes = [
 	"release",
 
 	"feature",
@@ -29,23 +21,10 @@ const branchPrefixes = [
 	"renovate",
 ] as const;
 
-// Branch naming patterns
-const patterns = branchPrefixes.reduce(
-	(acc, prefix) => {
-		acc[prefix] = new RegExp(`^${prefix}/([a-z0-9-]+)$`);
-		return acc;
-	},
-	{} as Record<(typeof branchPrefixes)[number], RegExp>,
-);
-
-const isValidBranchName = (name: string): boolean => {
-	return Object.values(patterns).some((pattern) => pattern.test(name));
-};
-
-if (!isValidBranchName(branchName)) {
+const showHelp = () => {
 	console.error("❌ Invalid branch name!");
 	console.error("\nBranch name should follow one of these patterns:");
-	for (const prefix of branchPrefixes) {
+	for (const prefix of validBranchPrefixes) {
 		if (prefix === "release") {
 			console.error(`- ${prefix}/1.0.0`);
 		} else {
@@ -53,7 +32,24 @@ if (!isValidBranchName(branchName)) {
 		}
 	}
 	process.exit(1);
+};
+
+// Branch naming patterns
+const patterns = validBranchPrefixes.reduce(
+	(acc, prefix) => {
+		acc[prefix] = new RegExp(`^${prefix}/([a-z0-9-]+)$`);
+		return acc;
+	},
+	{} as Record<(typeof validBranchPrefixes)[number], RegExp>,
+);
+
+const isValidBranchName = (name: string): boolean => {
+	return Object.values(patterns).some((pattern) => pattern.test(name));
+};
+
+if (isValidBranchName(branchName)) {
+	console.log("✅ Branch name is valid!");
+	process.exit(0);
 }
 
-console.log("✅ Branch name is valid!");
-process.exit(0);
+showHelp();

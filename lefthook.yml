@@ -11,14 +11,16 @@ pre-commit:
       glob: "*.{ts,tsx}"
       run: bun run check-types
 
+commit-msg:
+  commands:
+    commitlint:
+      run: bunx commitlint --edit {1}
+
 pre-push:
   parallel: true
   commands:
     branch-name:
       run: bun run scripts/check-branch-name.ts
-    typescript:
-      glob: "*.{ts,tsx}"
-      run: bun run check-types
     test:
       run: bun run test
     build:
