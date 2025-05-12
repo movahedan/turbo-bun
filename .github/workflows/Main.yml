@@ -1,0 +1,101 @@
+name: Build and Deploy
+
+on:
+  workflow_run:
+    workflows: ["Check"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Packages
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.11
+
+      - name: 🗃️ Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📦 Install dependencies
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        run: |
+          bun install -E --no-save
+          bun install -g --frozen-lockfile @biomejs/biome@2.0.0-beta.2
+          bun install -g --frozen-lockfile turbo@2.5.3
+          bun install -g --frozen-lockfile @changesets/cli@2.29.3
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            apps/**
+            packages/**
+
+      - name: 🔍 Get Changed Packages
+        id: changed
+        run: |
+          echo "::group::📋 Changed Packages"
+          # Get changed packages from the changed-files action
+          CHANGED_PACKAGES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "^(apps|packages)/[^/]+/" | cut -d/ -f1,2 | sort -u)
+          
+          # Store for later use
+          echo "packages<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_PACKAGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "Changed packages:"
+          echo "$CHANGED_PACKAGES"
+          echo "::endgroup::"
+
+      - name: 🏗️ Build Changed Packages
+        run: |
+          echo "::group::🏗️ Building Packages"
+          for pkg in ${{ steps.changed.outputs.packages }}; do
+            echo "Building $pkg..."
+            bun run build --filter=$pkg
+          done
+          echo "::endgroup::"
+
+      - name: 🐳 Build and Push Docker Images
+        run: |
+          echo "::group::🐳 Building Docker Images"
+          for pkg in ${{ steps.changed.outputs.packages }}; do
+            if [ -f "$pkg/Dockerfile" ]; then
+              echo "Building Docker image for $pkg..."
+              docker build -t your-registry/$pkg:${{ github.sha }} -t your-registry/$pkg:latest $pkg
+              docker push your-registry/$pkg:${{ github.sha }}
+              docker push your-registry/$pkg:latest
+            fi
+          done
+          echo "::endgroup::"
+
+      - name: 🚀 Deploy to Environment
+        run: |
+          echo "::group::🚀 Deploying Packages"
+          for pkg in ${{ steps.changed.outputs.packages }}; do
+            if [ -f "$pkg/deploy.sh" ]; then
+              echo "Deploying $pkg..."
+              bash $pkg/deploy.sh
+            fi
+          done
+          echo "::endgroup::"
