@@ -13,7 +13,7 @@
 		"changesets": "bunx --install=force --bun @changesets/cli"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0-beta.2",
+		"@biomejs/biome": "2.0.0-beta.3",
 		"@changesets/cli": "2.29.3",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
