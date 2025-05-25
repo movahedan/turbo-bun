@@ -70,7 +70,9 @@
 			],
 			"groupName": "React monorepo",
 			"groupSlug": "react-monorepo",
-			"matchUpdateTypes": ["major"],
+			"matchUpdateTypes": [
+				"major"
+			],
 			"enabled": true,
 			"dependencyDashboardApproval": true,
 			"prCreation": "not-pending",
@@ -78,17 +80,21 @@
 			"prBodyNotes": [
 				"This is a major update of React. Please review the [React migration guide](https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024) for breaking changes."
 			],
-			"matchPaths": ["**/package.json"]
+			"matchFileNames": [
+				"**/package.json"
+			]
 		},
 		{
 			"matchDepTypes": [
 				"devDependencies"
 			],
-			"matchUpdateTypes": ["major"],
+			"matchUpdateTypes": [
+				"minor"
+			],
 			"enabled": true,
 			"dependencyDashboardApproval": true,
 			"prCreation": "not-pending",
-			"stabilityDays": 3
+			"minimumReleaseAge": "3 days"
 		},
 		{
 			"matchFileNames": [
@@ -96,7 +102,9 @@
 			],
 			"groupName": "shared packages",
 			"groupSlug": "shared-packages",
-			"matchUpdateTypes": ["minor"],
+			"matchUpdateTypes": [
+				"minor"
+			],
 			"dependencyDashboardApproval": true
 		},
 		{
@@ -105,7 +113,9 @@
 			],
 			"groupName": "apps",
 			"groupSlug": "apps",
-			"matchUpdateTypes": ["minor"],
+			"matchUpdateTypes": [
+				"minor"
+			],
 			"dependencyDashboardApproval": true
 		},
 		{
