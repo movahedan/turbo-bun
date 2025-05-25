@@ -21,8 +21,8 @@
 		"repo:cleanup": "bun run scripts/cleanup.ts"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0-beta.3",
-		"@changesets/cli": "2.29.3",
+		"@biomejs/biome": "2.0.0-beta.4",
+		"@changesets/cli": "2.29.4",
 		"@commitlint/cli": "^19.8.1",
 		"@commitlint/config-conventional": "^19.8.1",
 		"bun": "^1.2.14",
@@ -33,7 +33,7 @@
 		"typescript": "5.8.3"
 	},
 	"overrides": {
-		"@types/react": "18.3.21",
+		"@types/react": "18.3.22",
 		"@types/react-dom": "18.3.7",
 		"typescript": "5.8.3",
 		"react": "18.3.1",
