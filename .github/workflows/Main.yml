@@ -49,14 +49,14 @@ jobs:
         with:
           files: |
             apps/**
-            packages/**
+            packages/ui/**
 
       - name: 🔍 Get Changed Packages
         id: changed
         run: |
           echo "::group::📋 Changed Packages"
           # Get changed packages from the changed-files action
-          CHANGED_PACKAGES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "^(apps|packages)/[^/]+/" | cut -d/ -f1,2 | sort -u)
+          CHANGED_PACKAGES=$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | grep -E "^(apps/[^/]+|packages/ui)/" | cut -d/ -f1,2 | sort -u)
           
           # Store for later use
           echo "packages<<EOF" >> $GITHUB_OUTPUT
@@ -76,15 +76,22 @@ jobs:
           done
           echo "::endgroup::"
 
+      - name: 🐳 Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: 🐳 Build and Push Docker Images
         run: |
           echo "::group::🐳 Building Docker Images"
           for pkg in ${{ steps.changed.outputs.packages }}; do
             if [ -f "$pkg/Dockerfile" ]; then
               echo "Building Docker image for $pkg..."
-              docker build -t your-registry/$pkg:${{ github.sha }} -t your-registry/$pkg:latest $pkg
-              docker push your-registry/$pkg:${{ github.sha }}
-              docker push your-registry/$pkg:latest
+              docker build -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:${{ github.sha }} -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:latest $pkg
+              docker push ${{ secrets.DOCKER_REGISTRY }}/$pkg:${{ github.sha }}
+              docker push ${{ secrets.DOCKER_REGISTRY }}/$pkg:latest
             fi
           done
           echo "::endgroup::"
@@ -93,9 +100,13 @@ jobs:
         run: |
           echo "::group::🚀 Deploying Packages"
           for pkg in ${{ steps.changed.outputs.packages }}; do
-            if [ -f "$pkg/deploy.sh" ]; then
+            if [ -f "$pkg/Dockerfile" ]; then
               echo "Deploying $pkg..."
-              bash $pkg/deploy.sh
+              # Add your deployment commands here
+              # For example, if using Kubernetes:
+              # kubectl set image deployment/$pkg $pkg=${{ secrets.DOCKER_REGISTRY }}/$pkg:${{ github.sha }}
+              # kubectl rollout restart deployment/$pkg
             fi
           done
           echo "::endgroup::"
+          

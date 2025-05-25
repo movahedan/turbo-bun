@@ -17,6 +17,9 @@
 				"!.next/cache/**"
 			]
 		},
+		"start": {
+			"dependsOn": ["^build"]
+		},
 		"test": {
 			"outputs": ["coverage/**"],
 			"dependsOn": []
