@@ -23,11 +23,11 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.4",
 		"@changesets/cli": "2.29.4",
-		"@commitlint/cli": "^19.8.1",
-		"@commitlint/config-conventional": "^19.8.1",
-		"bun": "^1.2.14",
+		"@commitlint/cli": "19.8.1",
+		"@commitlint/config-conventional": "19.8.1",
+		"bun": "1.2.14",
 		"bunx": "0.1.0",
-		"chalk": "^5.4.1",
+		"chalk": "5.4.1",
 		"lefthook": "1.11.12",
 		"turbo": "2.5.3",
 		"typescript": "5.8.3"
