@@ -76,11 +76,13 @@
 				"@types/react",
 				"@types/react-dom"
 			],
-			"matchUpdateTypes": ["major"],
+			"matchUpdateTypes": [
+				"major"
+			],
 			"enabled": true,
 			"dependencyDashboardApproval": true,
 			"prCreation": "not-pending",
-			"stabilityDays": 3
+			"minimumReleaseAge": "3 days"
 		},
 		{
 			"matchDepTypes": [
