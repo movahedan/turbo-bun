@@ -4,9 +4,9 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "node dist/index.js",
-		"dev": "tsup --watch --onSuccess \"node dist/index.cjs\"",
-		"build": "tsup",
+		"start": "bun dist/index.cjs",
+		"dev": "tsup src/index.ts --watch",
+		"build": "tsup src/index.ts",
 		"check-types": "tsc --noEmit",
 		"test": "jest --detectOpenHandles"
 	},

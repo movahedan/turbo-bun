@@ -1,0 +1,53 @@
+name: Deploy Release
+
+on:
+  workflow_run:
+    workflows: ["Release PR"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  setup:
+    uses: ./.github/workflows/_setup.yml
+
+  deploy:
+    name: Deploy Changed Packages
+    needs: setup
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Verify changeset contents
+        run: |
+          echo "::group::📋 Changeset Contents"
+          bunx changeset status
+          echo "::endgroup::"
+          
+          # Verify changeset format and content
+          if ! bunx changeset status | grep -q "No changesets found"; then
+            echo "✅ Changesets found and validated"
+          else
+            echo "❌ No changesets found"
+            exit 1
+          fi
+
+      - name: 🏷️ Version packages
+        run: |
+          echo "::group::📦 Versioning Packages"
+          bunx changeset version
+          echo "::endgroup::"
+
+      - name: 📝 Commit version changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "chore(release): version bump
+
+          $(bunx changeset status | sed 's/^/- /')
+          
+          [skip ci]"
+          git push

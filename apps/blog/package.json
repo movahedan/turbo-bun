@@ -7,11 +7,13 @@
 	"scripts": {
 		"build": "remix vite:build",
 		"dev": "remix vite:dev",
+		"start": "remix-serve ./build/server/index.js",
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@remix-run/node": "2.16.6",
 		"@remix-run/react": "2.16.6",
+		"@remix-run/serve": "^2.16.7",
 		"@remix-run/server-runtime": "2.16.6",
 		"@repo/ui": "*",
 		"@vercel/analytics": "1.5.0",
