@@ -67,6 +67,26 @@
 			"prTitle": "{{#if isMajor}}Major{{else}}Minor{{/if}} update React to {{newVersion}}",
 			"prBodyNotes": [
 				"{{#if isMajor}}This is a major update of React. Please review the [React migration guide](https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024) for breaking changes.{{/if}}"
+			]
+		},
+		{
+			"matchPackageNames": [
+				"react",
+				"react-dom",
+				"@types/react",
+				"@types/react-dom"
+			],
+			"matchUpdateTypes": [
+				"major"
+			],
+			"enabled": true,
+			"dependencyDashboardApproval": true,
+			"prCreation": "not-pending",
+			"minimumReleaseAge": "3 days"
+		},
+		{
+			"matchDepTypes": [
+				"devDependencies"
 			],
 			"matchUpdateTypes": ["major"],
 			"enabled": true,
