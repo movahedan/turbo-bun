@@ -88,9 +88,7 @@
 			"matchDepTypes": [
 				"devDependencies"
 			],
-			"matchUpdateTypes": [
-				"minor"
-			],
+			"matchUpdateTypes": ["minor"],
 			"enabled": true,
 			"dependencyDashboardApproval": true,
 			"prCreation": "not-pending",

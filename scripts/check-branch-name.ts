@@ -37,13 +37,16 @@ const showHelp = () => {
 // Branch naming patterns
 const patterns = validBranchPrefixes.reduce(
 	(acc, prefix) => {
-		acc[prefix] = new RegExp(`^${prefix}/([a-z0-9-]+)$`);
+		acc[prefix] = new RegExp(`^${prefix}/([a-z0-9.-]+)$`);
 		return acc;
 	},
 	{} as Record<(typeof validBranchPrefixes)[number], RegExp>,
 );
 
 const isValidBranchName = (name: string): boolean => {
+	console.log(name);
+	console.log(Object.values(patterns).some((pattern) => pattern.test(name)));
+
 	return Object.values(patterns).some((pattern) => pattern.test(name));
 };
 
