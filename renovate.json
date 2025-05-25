@@ -13,20 +13,6 @@
 		"replacements:all",
 		"workarounds:all"
 	],
-	"customManagers": [
-		{
-			"customType": "jsonata",
-			"datasourceTemplate": "npm",
-			"depNameTemplate": "@biomejs/biome",
-			"fileFormat": "json",
-			"managerFilePatterns": [
-				"/(^|/)biome.json?$/"
-			],
-			"matchStrings": [
-				"{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"
-			]
-		}
-	],
 	"automergeType": "pr",
 	"major": {
 		"dependencyDashboardApproval": true
@@ -54,6 +40,10 @@
 		"automerge": true
 	},
 	"osvVulnerabilityAlerts": true,
+	"workspaces": {
+		"enabled": true,
+		"matchPaths": ["apps/*/package.json", "packages/*/package.json"]
+	},
 	"packageRules": [
 		{
 			"enabled": false,
@@ -68,43 +58,39 @@
 				"@types/react",
 				"@types/react-dom"
 			],
-			"groupName": "React"
-		},
-		{
-			"matchDepTypes": [
-				"devDependencies"
+			"groupName": "React",
+			"groupSlug": "react",
+			"commitMessageTopic": "React",
+			"commitMessageAction": "update",
+			"commitMessageExtra": "to {{newVersion}}",
+			"commitMessageSuffix": "{{#if isMajor}} (major){{/if}}",
+			"prTitle": "{{#if isMajor}}Major{{else}}Minor{{/if}} update React to {{newVersion}}",
+			"prBodyNotes": [
+				"{{#if isMajor}}This is a major update of React. Please review the [React migration guide](https://react.dev/blog/2024/02/15/react-labs-what-we-have-been-working-on-february-2024) for breaking changes.{{/if}}"
 			],
-			"matchUpdateTypes": [
-				"patch",
-				"minor",
-				"major"
-			],
-			"groupName": "devDependencies (non-major)"
-		},
-		{
-			"matchDepTypes": [
-				"dependencies"
-			],
-			"matchUpdateTypes": [
-				"patch",
-				"minor",
-				"major"
-			],
-			"groupName": "dependencies (non-major)"
+			"matchUpdateTypes": ["major"],
+			"enabled": true,
+			"dependencyDashboardApproval": true,
+			"prCreation": "not-pending",
+			"stabilityDays": 3
 		},
 		{
 			"matchFileNames": [
 				"packages/*/package.json"
 			],
 			"groupName": "shared packages",
-			"groupSlug": "shared-packages"
+			"groupSlug": "shared-packages",
+			"matchUpdateTypes": ["minor"],
+			"dependencyDashboardApproval": true
 		},
 		{
 			"matchFileNames": [
 				"apps/*/package.json"
 			],
 			"groupName": "apps",
-			"groupSlug": "apps"
+			"groupSlug": "apps",
+			"matchUpdateTypes": ["major"],
+			"dependencyDashboardApproval": true
 		},
 		{
 			"matchSourceUrls": [
@@ -120,6 +106,28 @@
 				"Change",
 				"Pending",
 				"OpenSSF"
+			]
+		},
+		{
+			"matchPaths": ["package.json"],
+			"matchUpdateTypes": ["minor"],
+			"enabled": true,
+			"dependencyDashboardApproval": true,
+			"prCreation": "not-pending",
+			"stabilityDays": 3
+		}
+	],
+	"customManagers": [
+		{
+			"customType": "jsonata",
+			"datasourceTemplate": "npm",
+			"depNameTemplate": "@biomejs/biome",
+			"fileFormat": "json",
+			"managerFilePatterns": [
+				"/(^|/)biome.json?$/"
+			],
+			"matchStrings": [
+				"{\"currentValue\": $split($.\"$schema\",(\"/\"))[-2]}"
 			]
 		}
 	]
