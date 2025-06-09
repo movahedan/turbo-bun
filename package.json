@@ -21,7 +21,7 @@
 		"repo:cleanup": "bun run scripts/setup/cleanup.ts"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0-beta.5",
+		"@biomejs/biome": "2.0.0-beta.6",
 		"@changesets/cli": "2.29.4",
 		"@commitlint/cli": "19.8.1",
 		"@commitlint/config-conventional": "19.8.1",
