@@ -22,7 +22,7 @@ jobs:
       - name: 🚀 Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: 1.2.11
+          bun-version: 1.2.15
 
       - name: 🗃️ Cache Bun dependencies
         uses: actions/cache@v4
