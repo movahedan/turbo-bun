@@ -11,10 +11,10 @@
 		"check-types": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@remix-run/node": "2.16.6",
-		"@remix-run/react": "2.16.6",
-		"@remix-run/serve": "2.16.7",
-		"@remix-run/server-runtime": "2.16.6",
+		"@remix-run/node": "2.16.8",
+		"@remix-run/react": "2.16.8",
+		"@remix-run/serve": "2.16.8",
+		"@remix-run/server-runtime": "2.16.8",
 		"@repo/ui": "*",
 		"@vercel/analytics": "1.5.0",
 		"@vercel/remix": "2.16.6",
@@ -23,7 +23,7 @@
 		"react-dom": "18.3.1"
 	},
 	"devDependencies": {
-		"@remix-run/dev": "2.16.6",
+		"@remix-run/dev": "2.16.8",
 		"@types/react": "18.3.23",
 		"@types/react-dom": "18.3.7",
 		"autoprefixer": "10.4.21",
