@@ -9,7 +9,7 @@ pre-commit:
       stage_fixed: true
     typescript:
       glob: "*.{ts,tsx}"
-      run: bun run check-types
+      run: bun run check-types --affected
 
 commit-msg:
   commands:
@@ -22,6 +22,6 @@ pre-push:
     branch-name:
       run: bun run scripts/check-branch-name.ts
     test:
-      run: bun run test
+      run: bun run test --affected
     build:
-      run: bun run build
+      run: bun run build --affected
