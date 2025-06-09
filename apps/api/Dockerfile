@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.14 AS base
+FROM oven/bun:1.2.14-alpine AS base
 RUN bun install -g turbo@2.5.3
 
 FROM base AS turbo
@@ -32,9 +32,8 @@ COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app/ .
 RUN bun run build --filter=api
 
-FROM turbo AS runner
+FROM oven/bun:1.2.14-alpine AS runner
 WORKDIR /app
-RUN mkdir -p .turbo/cache && chmod -R 777 .turbo
 RUN addgroup --system --gid 1001 runner-group
 RUN adduser --system --uid 1001 runner-user
 RUN chown -R runner-user:runner-group /app
@@ -48,4 +47,5 @@ USER runner-user
 EXPOSE 5001
 ENV NODE_ENV=production
 ENV PORT=5001
-CMD ["bun", "run", "start", "--filter=api"]
+
+CMD ["bun", "run", "./apps/api/dist/index.cjs"]
