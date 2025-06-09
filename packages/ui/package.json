@@ -48,7 +48,7 @@
 		"jest": "29.7.0",
 		"typescript": "5.8.3"
 	},
-	"peerDependencies": {
+	"dependencies": {
 		"@types/react": "18.3.21",
 		"@types/react-dom": "18.3.7",
 		"react": "18.3.1",

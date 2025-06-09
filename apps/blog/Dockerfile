@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.14 AS base
+FROM oven/bun:1.2.14-alpine AS base
 RUN bun install -g turbo@2.5.3
 
 FROM base AS turbo
