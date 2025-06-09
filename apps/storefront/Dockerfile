@@ -1,5 +1,5 @@
 FROM oven/bun:1.2.15-alpine AS base
-RUN bun install -g turbo@2.5.3
+RUN bun install -g turbo@2.5.4
 
 FROM base AS turbo
 WORKDIR /app
