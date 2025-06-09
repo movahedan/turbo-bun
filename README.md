@@ -1,38 +1,58 @@
-# Turborepo kitchen sink starter
+# 🚀 Turborepo Starter
 
-This Turborepo starter is maintained by the Turborepo core team.
+[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Jest](https://img.shields.io/badge/Jest-C21325?style=flat&logo=jest&logoColor=white)](https://jestjs.io)
 
-This example also shows how to use [Workspace Configurations](https://turborepo.com/docs/core-concepts/monorepos/configuring-workspaces).
+> A comprehensive Turborepo starter maintained by Soheil Movahedan, showcasing workspace configurations and modern web development practices.
 
-## Using this example
+## 📋 Table of Contents
 
-Run the following command:
+- [Features](#-features)
+- [Getting Started](#-getting-started)
+- [Project Structure](#-project-structure)
+- [Development Tools](#-development-tools)
+- [Contributing](#-contributing)
+
+## ✨ Features
+
+- 🏗️ Full-stack monorepo setup
+- 🔄 Workspace configurations
+- 📦 Multiple app frameworks
+- 🛠️ Shared utilities and components
+- 🔒 TypeScript support throughout
+
+## 🚀 Getting Started
+
+### Quick Start
 
 ```sh
 npx create-turbo@latest -e kitchen-sink
 ```
 
-## What's inside?
-
-This Turborepo includes the following packages and apps:
+## 📁 Project Structure
 
 ### Apps and Packages
 
-- `api`: an [Express](https://expressjs.com/) server
-- `storefront`: a [Next.js](https://nextjs.org/) app
-- `admin`: a [Vite](https://vitejs.dev/) single page app
-- `blog`: a [Remix](https://remix.run/) blog
-- `@repo/jest-presets`: Jest configurations
-- `@repo/logger`: isomorphic logger (a small wrapper around console.log)
-- `@repo/ui`: a dummy React UI library (which contains `<CounterButton>` and `<Link>` components)
-- `@repo/typescript-config`: tsconfig.json's used throughout the monorepo
+| Name | Description | Tech Stack |
+|------|-------------|------------|
+| `api` | Backend server | [Express](https://expressjs.com/) |
+| `storefront` | E-commerce frontend | [Next.js](https://nextjs.org/) |
+| `admin` | Admin dashboard | [Vite](https://vitejs.dev/) |
+| `blog` | Content platform | [Remix](https://remix.run/) |
+| `@repo/jest-presets` | Testing configuration | Jest |
+| `@repo/logger` | Logging utility | TypeScript |
+| `@repo/ui` | Shared UI components | React |
+| `@repo/typescript-config` | TypeScript configuration | TypeScript |
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+## 🛠️ Development Tools
 
-### Utilities
+This Turborepo comes with a robust set of development tools:
 
-This Turborepo has some additional tools already setup for you:
+- **TypeScript** - For static type checking
+- **Biome** - For code formatting and linting
+- **Jest** - For comprehensive testing
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [Biome](https://next.biomejs.dev/) [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
-- [Jest](https://jestjs.io) test runner for all things JavaScript
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
