@@ -34,7 +34,7 @@
 		"@jest/globals": "29.7.0",
 		"@repo/jest-presets": "*",
 		"@repo/typescript-config": "*",
-		"bunchee": "6.5.2",
+		"bunchee": "6.5.3",
 		"jest": "29.7.0",
 		"typescript": "5.8.3"
 	}
