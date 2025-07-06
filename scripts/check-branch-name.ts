@@ -7,6 +7,7 @@ const branchName =
 	"";
 
 const validBranchPrefixes = [
+	"main",
 	"release",
 
 	"feature",
@@ -44,9 +45,12 @@ const patterns = validBranchPrefixes.reduce(
 );
 
 const isValidBranchName = (name: string): boolean => {
+	if (name === "main") {
+		return true;
+	}
+
 	console.log(name);
 	console.log(Object.values(patterns).some((pattern) => pattern.test(name)));
-
 	return Object.values(patterns).some((pattern) => pattern.test(name));
 };
 
