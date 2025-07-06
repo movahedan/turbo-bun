@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
 		ignoreDuringBuilds: true,
 	},
 	// Enable hot reload in Docker containers
-	webpack: (config, { dev }) => {
+	webpack: (
+		config: { watchOptions: { poll: number; aggregateTimeout: number } },
+		{ dev }: { dev: boolean },
+	) => {
 		if (dev) {
 			config.watchOptions = {
 				poll: 1000,

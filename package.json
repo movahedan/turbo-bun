@@ -38,6 +38,7 @@
 		"@commitlint/cli": "19.8.1",
 		"@commitlint/config-conventional": "19.8.1",
 		"chalk": "5.4.1",
+		"jest-environment-jsdom": "29.7.0",
 		"lefthook": "1.11.16",
 		"turbo": "2.5.4",
 		"typescript": "5.8.3"

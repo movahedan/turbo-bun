@@ -4,14 +4,9 @@
 		"composite": true,
 		"noEmit": false,
 		"emitDeclarationOnly": true,
-		"types": ["node"]
+		"types": ["node", "jest"],
+		"outDir": "./dist"
 	},
-	"references": [
-		{
-			"path": "./tsconfig.build.json"
-		},
-		{
-			"path": "./tsconfig.test.json"
-		}
-	]
+	"include": ["src/*.ts", "src/**/*.ts"],
+	"exclude": ["src/*.test.ts", "src/**/*.test.ts", "dist", "node_modules"]
 }

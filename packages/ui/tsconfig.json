@@ -6,12 +6,11 @@
 		"noEmit": false,
 		"emitDeclarationOnly": true,
 		"composite": true,
-		"types": ["jest", "node"],
+		"types": ["node", "jest", "jsdom"],
 		"baseUrl": ".",
 		"paths": {
 			"@repo/utils/*": ["../utils/src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "../utils/src/*.ts"],
-	"exclude": ["dist", "build", "node_modules"]
+	"include": ["src/**/*.ts", "src/**/*.tsx", "../utils/src/*.ts"]
 }
