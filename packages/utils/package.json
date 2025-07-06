@@ -1,0 +1,36 @@
+{
+	"name": "@repo/utils",
+	"version": "0.0.1",
+	"private": true,
+	"license": "MIT",
+	"sideEffects": false,
+	"type": "module",
+	"scripts": {
+		"build": "bun run ./prebuild.ts && tsc --project tsconfig.build.json",
+		"dev": "tsc --watch",
+		"start": "tsc --watch",
+		"check-types": "tsc --noEmit",
+		"test": "jest"
+	},
+	"jest": {
+		"preset": "@repo/jest-presets/node"
+	},
+	"dependencies": {
+		"clsx": "2.1.0",
+		"tailwind-merge": "2.2.2",
+		"@repo/jest-presets": "workspace:*",
+		"@repo/typescript-config": "workspace:*"
+	},
+	"exports": {
+		"./cn": {
+			"import": {
+				"types": "./dist/cn.ts.d.mts",
+				"default": "./dist/cn.ts.mjs"
+			},
+			"require": {
+				"types": "./dist/cn.ts.d.ts",
+				"default": "./dist/cn.ts.js"
+			}
+		}
+	}
+}

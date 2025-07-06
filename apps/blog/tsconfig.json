@@ -18,8 +18,18 @@
 		"paths": {
 			"~/*": ["./app/*"]
 		},
-
-		// Vite takes care of building everything, not tsc.
 		"noEmit": true
-	}
+	},
+	"composite": true,
+	"references": [
+		{
+			"path": "../../packages/logger"
+		},
+		{
+			"path": "../../packages/ui"
+		},
+		{
+			"path": "../../packages/utils"
+		}
+	]
 }

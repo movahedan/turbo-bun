@@ -12,6 +12,7 @@
 		"ts-jest": "29.3.4"
 	},
 	"devDependencies": {
+		"@types/jest": "29.5.14",
 		"jest-environment-jsdom": "29.7.0"
 	}
 }

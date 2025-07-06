@@ -3,8 +3,21 @@
 	"compilerOptions": {
 		"lib": ["dom", "ES2015"],
 		"sourceMap": true,
-		"types": ["jest", "node"]
+		"noEmit": false,
+		"emitDeclarationOnly": true,
+		"composite": true,
+		"types": ["jest", "node"],
+		"rootDir": "../../",
+		"baseUrl": ".",
+		"paths": {
+			"@repo/utils/*": ["../utils/src/*"]
+		}
 	},
-	"include": ["."],
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"../utils/src/**/*.ts",
+		"../utils/src/**/*.tsx"
+	],
 	"exclude": ["dist", "build", "node_modules"]
 }

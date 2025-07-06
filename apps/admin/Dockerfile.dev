@@ -1,0 +1,14 @@
+FROM repo-dev-base:latest
+
+WORKDIR /app
+
+# Set environment variables for development
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Expose the specific port for this app
+EXPOSE 3001
+
+# Start the admin app in development mode
+CMD ["bun", "run", "dev", "--filter=admin"] 

@@ -4,36 +4,15 @@
 	"private": true,
 	"license": "MIT",
 	"sideEffects": false,
+	"type": "module",
 	"files": [
 		"dist/**",
 		"dist"
 	],
-	"exports": {
-		"./counter-button": {
-			"import": {
-				"types": "./dist/es/counter-button.d.mts",
-				"default": "./dist/es/counter-button.mjs"
-			},
-			"require": {
-				"types": "./dist/cjs/counter-button.d.ts",
-				"default": "./dist/cjs/counter-button.js"
-			}
-		},
-		"./link": {
-			"import": {
-				"types": "./dist/es/link.d.mts",
-				"default": "./dist/es/link.mjs"
-			},
-			"require": {
-				"types": "./dist/cjs/link.d.ts",
-				"default": "./dist/cjs/link.js"
-			}
-		}
-	},
 	"scripts": {
-		"build": "bunchee",
+		"build": "bun run ./prebuild.ts && bunx bunchee",
 		"dev": "bunchee --watch",
-		"start": "bunchee",
+		"start": "bunchee --watch",
 		"check-types": "tsc --noEmit",
 		"test": "jest"
 	},
@@ -42,16 +21,51 @@
 	},
 	"devDependencies": {
 		"@jest/globals": "29.7.0",
-		"@repo/jest-presets": "*",
-		"@repo/typescript-config": "*",
+		"@repo/jest-presets": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
 		"bunchee": "6.5.4",
 		"jest": "29.7.0",
 		"typescript": "5.8.3"
 	},
 	"dependencies": {
+		"@repo/utils": "workspace:*",
+		"@radix-ui/react-slot": "1.2.3",
 		"@types/react": "18.3.23",
 		"@types/react-dom": "18.3.7",
+		"class-variance-authority": "^0.7.1",
 		"react": "18.3.1",
 		"react-dom": "18.3.1"
+	},
+	"exports": {
+		"./button": {
+			"import": {
+				"types": "./dist/button/button.d.mts",
+				"default": "./dist/button/button.mjs"
+			},
+			"require": {
+				"types": "./dist/button/button.d.ts",
+				"default": "./dist/button/button.js"
+			}
+		},
+		"./link": {
+			"import": {
+				"types": "./dist/link/link.d.mts",
+				"default": "./dist/link/link.mjs"
+			},
+			"require": {
+				"types": "./dist/link/link.d.ts",
+				"default": "./dist/link/link.js"
+			}
+		},
+		"./counter-button": {
+			"import": {
+				"types": "./dist/counter-button/counter-button.d.mts",
+				"default": "./dist/counter-button/counter-button.mjs"
+			},
+			"require": {
+				"types": "./dist/counter-button/counter-button.d.ts",
+				"default": "./dist/counter-button/counter-button.js"
+			}
+		}
 	}
 }

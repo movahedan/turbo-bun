@@ -12,7 +12,7 @@
 		"editor.defaultFormatter": "biomejs.biome"
 	},
 	"[jsonc]": {
-		"editor.defaultFormatter": "biomejs.biome"
+		"editor.defaultFormatter": "vscode.json-language-features"
 	},
 	"[html]": {
 		"editor.defaultFormatter": "biomejs.biome"
@@ -39,5 +39,9 @@
 		"storefront",
 		"blog",
 		"ui"
-	]
+	],
+	"typescript.preferences.useAliasesForRenames": false,
+	"typescript.preferences.includePackageJsonAutoImports": "on",
+	"typescript.workspaceSymbols.scope": "allOpenProjects",
+	"typescript.enablePromptUseWorkspaceTsdk": true
 }

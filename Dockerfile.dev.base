@@ -1,0 +1,8 @@
+FROM oven/bun:1.2.15 AS base
+WORKDIR /app
+
+RUN bun install -g turbo@2.5.4
+
+COPY . .
+
+RUN bun install

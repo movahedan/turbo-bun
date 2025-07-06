@@ -1,0 +1,144 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
+{
+	"name": "Repo",
+	// Use the new development compose files for hot reload support
+	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
+	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
+	"dockerComposeFile": ["../docker-compose.yml", "../docker-compose.dev.yml"],
+	// The 'service' property is the name of the service for the container that VS Code should
+	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
+	"service": "repo-dev-base",
+	// The optional 'workspaceFolder' property is the path VS Code should open by default when
+	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
+	"workspaceFolder": "/app",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": true,
+			"upgradePackages": true,
+			"username": "automatic",
+			"userUid": "automatic",
+			"userGid": "automatic"
+		},
+		"ghcr.io/devcontainers/features/git:1": {
+			"version": "latest",
+			"ppa": true
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {
+			"installDirectlyFromGitHubRelease": true,
+			"version": "latest"
+		},
+		"ghcr.io/shyim/devcontainers-features/bun:0": "latest",
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": ["3001", "3002", "3003", "3004", "3005"],
+	"portsAttributes": {
+		"3001": {
+			"label": "Admin (React + Vite)",
+			"onAutoForward": "ask"
+		},
+		"3002": {
+			"label": "Blog (Remix + Vite)",
+			"onAutoForward": "ask"
+		},
+		"3003": {
+			"label": "Storefront (Next.js)",
+			"onAutoForward": "ask"
+		},
+		"3004": {
+			"label": "API (Express)",
+			"onAutoForward": "ask"
+		}
+	},
+	// Uncomment the next line if you want start specific services in your Docker Compose config.
+	"runServices": ["admin", "blog", "storefront", "api"],
+	// Uncomment the next line to run commands after the container is created.
+	"postCreateCommand": "bun install",
+	// Keep containers running for better development experience
+	"shutdownAction": "stopCompose",
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.vscode-typescript-next",
+				"YoavBls.pretty-ts-errors",
+				"steoates.autoimport",
+				"oven.bun-vscode",
+				"github.vscode-github-actions",
+				"lokalise.i18n-ally",
+				"maptz.camelcasenavigation",
+				"streetsidesoftware.code-spell-checker",
+				"biomejs.biome",
+				"vivaxy.vscode-conventional-commits",
+				"ms-azuretools.vscode-docker"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"biome.lsp.trace.server": "verbose",
+				"biome.requireConfigFile": true,
+				"biome.enabled": true,
+				"editor.codeActionsOnSave": {
+					"source.fixAll.biome": "explicit",
+					"source.organizeImports.biome": "explicit"
+				},
+				"editor.defaultFormatter": "biomejs.biome",
+				"[json]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[jsonc]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[html]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[css]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[typescript]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[typescriptreact]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[javascript]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[javascriptreact]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"conventionalCommits.scopes": [
+					"repo",
+					"admin",
+					"api",
+					"storefront",
+					"blog",
+					"ui"
+				],
+				"typescript.preferences.useAliasesForRenames": false,
+				"typescript.preferences.includePackageJsonAutoImports": "on",
+				"typescript.workspaceSymbols.scope": "allOpenProjects",
+				"typescript.enablePromptUseWorkspaceTsdk": true,
+				// Hot reload optimization settings
+				"files.watcherExclude": {
+					"**/.git/objects/**": true,
+					"**/.git/subtree-cache/**": true,
+					"**/node_modules/**": true,
+					"**/.turbo/**": true,
+					"**/.next/**": true,
+					"**/dist/**": true
+				},
+				"search.exclude": {
+					"**/node_modules": true,
+					"**/.turbo": true,
+					"**/.next": true,
+					"**/dist": true
+				}
+			}
+		}
+	}
+}

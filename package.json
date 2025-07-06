@@ -12,6 +12,18 @@
 		"build": "turbo run build",
 		"start": "turbo run start",
 		"check-types": "turbo run check-types",
+		"//app": "//////////////////////////////////////////////////////////////",
+		"dev:admin": "turbo run dev --filter=admin",
+		"dev:blog": "turbo run dev --filter=blog",
+		"dev:storefront": "turbo run dev --filter=storefront",
+		"dev:api": "turbo run dev --filter=api",
+		"//docker": "////////////////////////////////////////////////////////////",
+		"docker:dev": "docker-compose -f docker-compose.dev.yml up",
+		"docker:dev:admin": "docker-compose -f docker-compose.dev.yml up admin",
+		"docker:dev:blog": "docker-compose -f docker-compose.dev.yml up blog",
+		"docker:dev:storefront": "docker-compose -f docker-compose.dev.yml up storefront",
+		"docker:dev:api": "docker-compose -f docker-compose.dev.yml up api",
+		"docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
 		"//changesets": "////////////////////////////////////////////////////////",
 		"changesets": "bunx --install=force --bun @changesets/cli",
 		"//repo": "//////////////////////////////////////////////////////////////",
@@ -36,7 +48,8 @@
 		"typescript": "5.8.3",
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
-		"vite": "6.3.5"
+		"vite": "6.3.5",
+		"@radix-ui/react-slot": "1.2.3"
 	},
 	"packageManager": "bun@1.2.15",
 	"workspaces": [
