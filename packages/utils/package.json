@@ -9,7 +9,7 @@
 		"build": "bun run ./prebuild.ts && tsc",
 		"dev": "tsc --watch",
 		"start": "tsc --watch",
-		"check-types": "tsc --noEmit",
+		"check:types": "tsc --noEmit",
 		"test": "bun test"
 	},
 	"dependencies": {

@@ -247,7 +247,7 @@ bun run docker:dev:down       # Stop all containers
 # Build & Test
 bun run build                 # Build all packages
 bun run test                  # Run all tests
-bun run check-types           # Type checking
+bun run check:types           # Type checking
 bun run clean                 # Clean build artifacts
 ```
 

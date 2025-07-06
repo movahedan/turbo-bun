@@ -16,13 +16,13 @@ export async function start() {
 		await $`bun install`;
 
 		console.log(chalk.blue("🚀 Building Docker images..."));
-		await $`docker-compose build`;
+		// await $`docker compose -f docker-compose.dev.yml build`;
 
 		console.log(chalk.blue("🚀 Starting services..."));
-		await $`docker-compose up -d`;
+		await $`docker compose -f docker-compose.dev.yml up -d`;
 
 		console.log(chalk.yellow("🔍 Checking service status..."));
-		await $`docker-compose ps`;
+		await $`docker compose -f docker-compose.dev.yml ps`;
 
 		console.log(chalk.green("📱 Services are running at:"));
 		console.log(runnables.map(getLogsForRunnable).join("\n"));

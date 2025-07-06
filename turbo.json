@@ -7,8 +7,13 @@
 			"cache": false
 		},
 		"build": {
-			"inputs": ["$TURBO_DEFAULT$", ".env*"],
-			"dependsOn": ["^build"],
+			"inputs": [
+				"$TURBO_DEFAULT$",
+				".env*"
+			],
+			"dependsOn": [
+				"^build"
+			],
 			"outputs": [
 				"build/**",
 				".vercel/**",
@@ -18,17 +23,26 @@
 			]
 		},
 		"start": {
-			"dependsOn": ["^build"]
+			"dependsOn": [
+				"^build"
+			]
 		},
 		"test": {
-			"outputs": ["coverage/**"],
+			"outputs": [
+				"coverage/**"
+			],
 			"dependsOn": []
 		},
-		"check-types": {
-			"dependsOn": ["^build", "^check-types"]
+		"check:types": {
+			"dependsOn": [
+				"^build",
+				"^check:types"
+			]
 		},
 		"dev": {
-			"dependsOn": ["^build"],
+			"dependsOn": [
+				"^build"
+			],
 			"cache": false,
 			"persistent": true
 		}

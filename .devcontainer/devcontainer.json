@@ -5,7 +5,10 @@
 	// Use the new development compose files for hot reload support
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-	"dockerComposeFile": ["../docker-compose.yml", "../docker-compose.dev.yml"],
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"../docker-compose.dev.yml"
+	],
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	"service": "repo-dev-base",
@@ -38,7 +41,13 @@
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": ["3001", "3002", "3003", "3004", "3005"],
+	"forwardPorts": [
+		"3001",
+		"3002",
+		"3003",
+		"3004",
+		"3005"
+	],
 	"portsAttributes": {
 		"3001": {
 			"label": "Admin (React + Vite)",
@@ -58,7 +67,12 @@
 		}
 	},
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": ["admin", "blog", "storefront", "api"],
+	"runServices": [
+		"admin",
+		"blog",
+		"storefront",
+		"api"
+	],
 	// Uncomment the next line to run commands after the container is created.
 	"postCreateCommand": "bun install",
 	// Keep containers running for better development experience
@@ -78,7 +92,8 @@
 				"streetsidesoftware.code-spell-checker",
 				"biomejs.biome",
 				"vivaxy.vscode-conventional-commits",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"Orta.vscode-jest"
 			],
 			"settings": {
 				"editor.formatOnSave": true,
@@ -126,6 +141,17 @@
 				"typescript.preferences.includePackageJsonAutoImports": "on",
 				"typescript.workspaceSymbols.scope": "allOpenProjects",
 				"typescript.enablePromptUseWorkspaceTsdk": true,
+				// Jest settings for optimal testing experience
+				"jest.enable": true,
+				"jest.jestCommandLine": "bun test",
+				"jest.runMode": "on-demand",
+				"jest.coverageFormatter": "DefaultFormatter",
+				"jest.outputConfig": {
+					"revealOn": "run",
+					"revealWithFocus": "test-results",
+					"clearOnRun": "none",
+					"revealTerminalOn": "demand"
+				},
 				// Hot reload optimization settings
 				"files.watcherExclude": {
 					"**/.git/objects/**": true,

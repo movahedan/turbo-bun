@@ -8,7 +8,7 @@
 		"build": "remix vite:build",
 		"dev": "remix vite:dev",
 		"start": "remix-serve ./build/server/index.js",
-		"check-types": "tsc --noEmit"
+		"check:types": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@remix-run/node": "2.16.8",

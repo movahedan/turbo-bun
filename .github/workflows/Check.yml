@@ -53,7 +53,7 @@ jobs:
         run: bun run check .
 
       - name: 🔍 - Type check
-        run: bun run check-types --affected
+        run: bun run check:types --affected
 
       - name: 🧪 - Test
         run: bun run test --affected
