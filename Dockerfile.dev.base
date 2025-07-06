@@ -1,8 +1,13 @@
 FROM oven/bun:1.2.15 AS base
 WORKDIR /app
+USER dev-user
 
 RUN bun install -g turbo@2.5.4
 
-COPY . .
+COPY apps/ ./apps/
+COPY packages/ ./packages/
+COPY scripts/ ./scripts/
+COPY package.json ./package.json
+COPY bun.lock ./bun.lock
 
 RUN bun install
