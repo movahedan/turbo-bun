@@ -5,10 +5,7 @@
 	// Use the new development compose files for hot reload support
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-	"dockerComposeFile": [
-		"../docker-compose.yml",
-		"../docker-compose.dev.yml"
-	],
+	"dockerComposeFile": ["../docker-compose.yml", "../docker-compose.dev.yml"],
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	"service": "repo-dev-base",
@@ -41,13 +38,7 @@
 		}
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [
-		"3001",
-		"3002",
-		"3003",
-		"3004",
-		"3005"
-	],
+	"forwardPorts": ["3001", "3002", "3003", "3004", "3005"],
 	"portsAttributes": {
 		"3001": {
 			"label": "Admin (React + Vite)",
@@ -67,12 +58,7 @@
 		}
 	},
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": [
-		"admin",
-		"blog",
-		"storefront",
-		"api"
-	],
+	"runServices": ["admin", "blog", "storefront", "api"],
 	// Uncomment the next line to run commands after the container is created.
 	"postCreateCommand": "bun install",
 	// Keep containers running for better development experience
