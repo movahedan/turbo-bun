@@ -39,5 +39,20 @@
 		"storefront",
 		"blog",
 		"ui"
-	]
+	],
+	"typescript.preferences.useAliasesForRenames": false,
+	"typescript.preferences.includePackageJsonAutoImports": "on",
+	"typescript.workspaceSymbols.scope": "allOpenProjects",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	// Jest settings for optimal testing experience
+	"jest.enable": true,
+	"jest.jestCommandLine": "bun test",
+	"jest.runMode": "on-demand",
+	"jest.coverageFormatter": "DefaultFormatter",
+	"jest.outputConfig": {
+		"revealOn": "run",
+		"revealWithFocus": "test-results",
+		"clearOnRun": "none",
+		"revealTerminalOn": "demand"
+	}
 }

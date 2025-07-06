@@ -24,8 +24,8 @@
 			"outputs": ["coverage/**"],
 			"dependsOn": []
 		},
-		"check-types": {
-			"dependsOn": ["^build", "^check-types"]
+		"check:types": {
+			"dependsOn": ["^build", "^check:types"]
 		},
 		"dev": {
 			"dependsOn": ["^build"],

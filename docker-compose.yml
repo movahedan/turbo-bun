@@ -1,49 +1,46 @@
 services:
-  admin:
+  admin-production:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
     ports:
-      - "3001:80"
+      - "5001:80"
     environment:
-      - VITE_API_URL=http://api:3004
+      - VITE_API_URL=http://api:5004
     depends_on:
-      - api
+      - api-production
 
-  blog:
+  blog-production:
     build:
       context: .
       dockerfile: apps/blog/Dockerfile
     ports:
-      - "3002:3000"
+      - "5002:3000"
     environment:
-      - VITE_API_URL=http://api:3004
+      - VITE_API_URL=http://api:5004
     depends_on:
-      - api
+      - api-production
 
-  storefront:
+  storefront-production:
     build:
       context: .
       dockerfile: apps/storefront/Dockerfile
     ports:
-      - "3003:3000"
+      - "5003:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:3004
+      - NEXT_PUBLIC_API_URL=http://api:5004
     depends_on:
-      - api
+      - api-production
 
-  api:
+  api-production:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "3004:5001"
-    environment:
-      - NODE_ENV=development
-      - PORT=3004
+      - "5004:5001"
 
-  ui:
+  ui-production:
     build:
       context: .
       dockerfile: packages/ui/Dockerfile
-    # UI package is a library, so it doesn't need to be exposed 
+    # UI package is a library, so it doesn't need to be exposed

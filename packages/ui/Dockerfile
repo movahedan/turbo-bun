@@ -10,6 +10,7 @@ WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
 COPY ./package.json ./bun.lock ./
+
 RUN bun install
 
 FROM turbo AS pruner
@@ -17,6 +18,7 @@ WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
 COPY ./package.json ./bun.lock ./
+COPY ./scripts ./scripts
 RUN turbo prune --scope=@repo/ui --docker
 
 FROM turbo AS installer
@@ -29,6 +31,7 @@ FROM turbo AS build
 WORKDIR /app
 COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app/ .
+COPY --from=pruner /app/scripts ./scripts
 RUN bun run build --filter=@repo/ui
 
 FROM turbo AS runner

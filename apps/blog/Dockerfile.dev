@@ -1,0 +1,16 @@
+FROM repo-dev-base:latest
+
+WORKDIR /app
+USER dev-user
+
+# Set environment variables for development
+ENV NODE_ENV=development
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Expose the specific port for this app
+EXPOSE 3002
+ENV PORT=3002
+
+# Start the blog app in development mode
+CMD ["bun", "run", "dev", "--filter=blog"] 

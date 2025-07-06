@@ -4,9 +4,9 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"dev": "WATCHPACK_POLLING=true next dev --hostname 0.0.0.0",
 		"build": "next build",
-		"check-types": "tsc --noEmit",
+		"check:types": "tsc --noEmit",
 		"start": "next start"
 	},
 	"dependencies": {
@@ -17,7 +17,7 @@
 		"react-dom": "18.3.1"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "*",
+		"@repo/typescript-config": "workspace:*",
 		"@types/react": "18.3.23",
 		"@types/react-dom": "18.3.7",
 		"typescript": "5.8.3"

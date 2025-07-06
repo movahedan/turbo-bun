@@ -9,7 +9,7 @@ pre-commit:
       stage_fixed: true
     typescript:
       glob: "*.{ts,tsx}"
-      run: bun run check-types --affected
+      run: bun run check:types --affected
 
 commit-msg:
   commands:

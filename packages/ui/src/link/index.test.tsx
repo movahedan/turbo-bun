@@ -1,4 +1,3 @@
-import { describe, it } from "@jest/globals";
 import { createRoot } from "react-dom/client";
 import { Link } from ".";
 

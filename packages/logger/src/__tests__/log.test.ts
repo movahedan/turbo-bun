@@ -1,12 +1,15 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import { log } from "..";
 
-jest.spyOn(global.console, "log");
-
 describe("@repo/logger", () => {
 	it("prints a message", () => {
-		log("hello");
-		// eslint-disable-next-line no-console -- testing console
-		expect(console.log).toBeCalledWith("LOGGER: ", "hello");
+		const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+
+		try {
+			log("hello");
+			expect(consoleSpy).toHaveBeenCalledWith("LOGGER: ", "hello");
+		} finally {
+			consoleSpy.mockRestore();
+		}
 	});
 });

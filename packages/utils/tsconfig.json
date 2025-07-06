@@ -1,0 +1,12 @@
+{
+	"extends": "@repo/typescript-config/base.json",
+	"compilerOptions": {
+		"composite": true,
+		"noEmit": false,
+		"emitDeclarationOnly": true,
+		"types": ["node", "jest"],
+		"outDir": "./dist"
+	},
+	"include": ["src/*.ts", "src/**/*.ts"],
+	"exclude": ["src/*.test.ts", "src/**/*.test.ts", "dist", "node_modules"]
+}
