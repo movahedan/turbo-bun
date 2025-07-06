@@ -23,7 +23,6 @@
 		"@jest/globals": "29.7.0",
 		"@repo/jest-presets": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
-		"@repo/utils": "workspace:*",
 		"bunchee": "6.5.2",
 		"jest": "29.7.0",
 		"typescript": "5.8.3"
