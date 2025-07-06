@@ -5,9 +5,11 @@ services:
       dockerfile: Dockerfile.dev.base
     volumes:
       - .:/app:cached
+      - /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock
     command: sleep infinity
     environment:
       - NODE_ENV=development
+      - SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
     x-develop:
       watch:
         - action: rebuild
