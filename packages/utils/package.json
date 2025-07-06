@@ -9,7 +9,7 @@
 		"build": "bun run ./prebuild.ts && tsc --project tsconfig.build.json",
 		"dev": "tsc --watch",
 		"start": "tsc --watch",
-		"check-types": "tsc --noEmit",
+		"check-types": "tsc --noEmit --project tsconfig.build.json",
 		"test": "jest"
 	},
 	"jest": {
