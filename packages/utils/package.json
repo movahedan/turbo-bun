@@ -25,12 +25,12 @@
 	"exports": {
 		"./cn": {
 			"import": {
-				"types": "./dist/cn.ts.d.mts",
-				"default": "./dist/cn.ts.mjs"
+				"types": "./dist/cn.d.mts",
+				"default": "./dist/cn.mjs"
 			},
 			"require": {
-				"types": "./dist/cn.ts.d.ts",
-				"default": "./dist/cn.ts.js"
+				"types": "./dist/cn.d.ts",
+				"default": "./dist/cn.js"
 			}
 		}
 	}
