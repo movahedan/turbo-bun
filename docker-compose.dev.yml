@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.dev.base
     volumes:
       - .:/app:cached
+      - ~/.ssh:/root/.ssh:ro
       - /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock
     command: sleep infinity
     environment:
