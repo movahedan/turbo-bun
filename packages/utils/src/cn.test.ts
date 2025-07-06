@@ -1,4 +1,5 @@
 /* eslint-disable tailwindcss/no-custom-classname -- test */
+import { describe, expect, it } from "bun:test";
 import { cn } from "./cn";
 
 describe("cn (className utility)", () => {

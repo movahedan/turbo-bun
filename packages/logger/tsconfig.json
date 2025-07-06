@@ -3,7 +3,6 @@
 	"compilerOptions": {
 		"lib": ["ES2015"],
 		"outDir": "./dist",
-		"types": ["jest", "node"],
 		"composite": true,
 		"emitDeclarationOnly": true,
 		"noEmit": false

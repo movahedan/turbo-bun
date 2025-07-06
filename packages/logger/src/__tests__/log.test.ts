@@ -1,9 +1,9 @@
-import { describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it, spyOn } from "bun:test";
 import { log } from "..";
 
 describe("@repo/logger", () => {
 	it("prints a message", () => {
-		const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+		const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
 
 		try {
 			log("hello");

@@ -6,11 +6,15 @@
 		"noEmit": false,
 		"emitDeclarationOnly": true,
 		"composite": true,
-		"types": ["node", "jest", "jsdom"],
 		"baseUrl": ".",
 		"paths": {
 			"@repo/utils/*": ["../utils/src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "../utils/src/*.ts"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"../utils/src/*.ts",
+		"../test-preset/matchers.d.ts"
+	]
 }

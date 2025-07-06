@@ -1,0 +1,10 @@
+[test]
+# Enable DOM environment for React tests
+preload = ["../test-preset/happydom.ts", "../test-preset/testing-library.ts"]
+env = { NODE_ENV = "test" }
+
+# Test timeout in milliseconds
+timeout = 5000
+
+# Enable coverage reporting
+coverage = true 

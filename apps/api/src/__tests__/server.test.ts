@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from "bun:test";
 import supertest from "supertest";
 import { createServer } from "../server";
 

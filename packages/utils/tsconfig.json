@@ -4,7 +4,6 @@
 		"composite": true,
 		"noEmit": false,
 		"emitDeclarationOnly": true,
-		"types": ["node", "jest"],
 		"outDir": "./dist"
 	},
 	"include": ["src/*.ts", "src/**/*.ts"],
