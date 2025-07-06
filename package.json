@@ -18,6 +18,8 @@
 		"build": "turbo run build",
 		"start": "turbo run start",
 		"//devcontainers": "/////////////////////////////////////////////////////",
+		"dev:setup": "bun run scripts/setup/setup.dev.ts",
+		"dev:cleanup": "bun run scripts/setup/cleanup.dev.ts",
 		"dev:docker:up": "docker-compose -f docker-compose.dev.yml up -d",
 		"dev:docker:down": "docker-compose -f docker-compose.dev.yml down",
 		"dev:docker:build": "docker-compose -f docker-compose.dev.yml build",
