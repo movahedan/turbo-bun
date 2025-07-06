@@ -7,17 +7,8 @@
 		"emitDeclarationOnly": true,
 		"composite": true,
 		"types": ["jest", "node"],
-		"rootDir": "../../",
-		"baseUrl": ".",
-		"paths": {
-			"@repo/utils/*": ["../utils/src/*"]
-		}
+		"baseUrl": "."
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx",
-		"../utils/src/**/*.ts",
-		"../utils/src/**/*.tsx"
-	],
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
 	"exclude": ["dist", "build", "node_modules"]
 }
