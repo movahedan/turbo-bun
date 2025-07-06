@@ -17,10 +17,8 @@
 		"tailwind-merge": "2.2.2"
 	},
 	"devDependencies": {
-		"@jest/globals": "29.7.0",
-		"@repo/jest-presets": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
-		"jest": "29.7.0"
+		"typescript": "5.8.3"
 	},
 	"exports": {
 		"./cn": {

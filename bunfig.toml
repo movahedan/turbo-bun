@@ -23,3 +23,22 @@ dryRun = false
 
 # equivalent to `--concurrent-scripts` flag
 concurrentScripts = 16 # (cpu count or GOMAXPROCS) x2
+
+# Use exact versions for better reproducibility
+exact = true
+
+[install.scopes]
+# Configure scopes if needed
+
+[test]
+# Preload test setup for better TypeScript support
+preload = ["./scripts/test-setup.ts"]
+
+# Environment variables for tests
+env = { NODE_ENV = "test", DOM_ENV = "jsdom" }
+
+# Test timeout in milliseconds
+timeout = 5000
+
+# Enable coverage reporting
+coverage = true

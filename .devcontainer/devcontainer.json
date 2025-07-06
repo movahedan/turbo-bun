@@ -78,8 +78,7 @@
 				"streetsidesoftware.code-spell-checker",
 				"biomejs.biome",
 				"vivaxy.vscode-conventional-commits",
-				"ms-azuretools.vscode-docker",
-				"Orta.vscode-jest"
+				"ms-azuretools.vscode-docker"
 			],
 			"settings": {
 				"editor.formatOnSave": true,
@@ -127,17 +126,6 @@
 				"typescript.preferences.includePackageJsonAutoImports": "on",
 				"typescript.workspaceSymbols.scope": "allOpenProjects",
 				"typescript.enablePromptUseWorkspaceTsdk": true,
-				// Jest settings for optimal testing experience
-				"jest.enable": true,
-				"jest.jestCommandLine": "bun test",
-				"jest.runMode": "on-demand",
-				"jest.coverageFormatter": "DefaultFormatter",
-				"jest.outputConfig": {
-					"revealOn": "run",
-					"revealWithFocus": "test-results",
-					"clearOnRun": "none",
-					"revealTerminalOn": "demand"
-				},
 				// Hot reload optimization settings
 				"files.watcherExclude": {
 					"**/.git/objects/**": true,
