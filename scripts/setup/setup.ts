@@ -16,7 +16,7 @@ export async function start() {
 		await $`bun install`;
 
 		console.log(chalk.blue("🚀 Building Docker images..."));
-		// await $`docker compose -f docker-compose.dev.yml build`;
+		await $`docker compose -f docker-compose.dev.yml build`;
 
 		console.log(chalk.blue("🚀 Starting services..."));
 		await $`docker compose -f docker-compose.dev.yml up -d`;

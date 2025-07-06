@@ -13,7 +13,6 @@
 		"check:types": "turbo run check:types",
 		"check:quick": "bun run check && turbo run check:types --affected && bun run test --affected && bun run build --affected",
 		"//turbo": "/////////////////////////////////////////////////////////////",
-		"clean": "turbo run clean",
 		"dev": "turbo run dev",
 		"test": "turbo run test",
 		"build": "turbo run build",
