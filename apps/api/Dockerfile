@@ -5,17 +5,11 @@ FROM base AS turbo
 WORKDIR /app
 COPY ./turbo.json ./turbo.json
 
-FROM turbo AS dev
-WORKDIR /app
-COPY ./apps ./apps
-COPY ./packages ./packages
-COPY ./package.json ./bun.lock ./
-RUN bun install
-
 FROM turbo AS pruner
 WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
+COPY ./scripts ./scripts
 COPY ./package.json ./bun.lock ./
 RUN turbo prune --scope=api --docker
 
@@ -29,6 +23,7 @@ RUN bun install
 FROM turbo AS build
 WORKDIR /app
 COPY --from=pruner /app/out/full/ .
+COPY --from=pruner /app/scripts ./scripts
 COPY --from=installer /app/ .
 RUN bun run build --filter=api
 

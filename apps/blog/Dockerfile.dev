@@ -1,7 +1,6 @@
 FROM repo-dev-base:latest
 
 WORKDIR /app
-USER dev-user
 
 # Set environment variables for development
 ENV NODE_ENV=development
