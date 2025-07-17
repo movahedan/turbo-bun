@@ -31,7 +31,7 @@
 		"prod:docker:status": "docker-compose -f docker-compose.prod.yml ps"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.6",
+		"@biomejs/biome": "2.1.1",
 		"@changesets/cli": "2.29.5",
 		"@commitlint/cli": "19.8.1",
 		"@commitlint/config-conventional": "19.8.1",
