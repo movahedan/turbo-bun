@@ -164,41 +164,40 @@ This monorepo follows best practices for containerized development with individu
 
 ### Prerequisites
 - Docker & Docker Compose
-- Bun (for local development)
+- VS Code with Dev Containers extension
 
-### Quick Start
+### Quick Start with DevContainers (Recommended)
 
-#### Option 1: All Apps (Recommended)
+1. **Open in Dev Container:**
+   - Open project in VS Code
+   - `Ctrl+Shift+P` → `Dev Containers: Reopen in Container`
+
+2. **Start Apps from VS Code Terminal:**
 ```bash
-# Start all applications in separate containers
-bun run docker:dev
+# Start individual apps (recommended for focused development)
+bun run dev:docker:storefront  # Storefront only (localhost:3003)
+bun run dev:docker:admin       # Admin only (localhost:3001)
+bun run dev:docker:blog        # Blog only (localhost:3002)
+bun run dev:docker:api         # API only (localhost:3004)
 
-# Or using docker-compose directly
-docker-compose -f docker-compose.dev.yml up
+# Or start all apps together
+bun run dev:docker:up          # All services
 ```
 
-#### Option 2: Individual Apps
+3. **Access Applications:**
+   - **Admin**: http://localhost:3001
+   - **Blog**: http://localhost:3002
+   - **Storefront**: http://localhost:3003
+   - **API**: http://localhost:3004
+
+### Alternative: Host Development
+
 ```bash
-# Start specific applications
-bun run docker:dev:admin      # Admin only (port 3001)
-bun run docker:dev:blog       # Blog only (port 3002)
-bun run docker:dev:storefront # Storefront only (port 3003)
-bun run docker:dev:api        # API only (port 3004)
-```
+# From your host terminal (outside devcontainer):
+bun run dev:docker:storefront  # Same commands work!
 
-#### Option 3: Local Development
-```bash
-# Install dependencies
-bun install
-
-# Start all apps locally
-bun run dev
-
-# Start individual apps locally
-bun run dev:admin
-bun run dev:blog
-bun run dev:storefront
-bun run dev:api
+# Or local development (requires local Bun installation):
+bun install && bun run dev
 ```
 
 ### Container Structure
@@ -217,47 +216,71 @@ Each application has its own `Dockerfile.dev` that:
 └── api/Dockerfile.dev        # Port 3004
 ```
 
-### Benefits of Individual Containers
+### Benefits of This Setup
 
-✅ **Clean Logs**: Each app has its own log stream  
-✅ **Port Control**: Explicit port mapping for each app  
-✅ **Independent Control**: Start/stop apps individually  
+✅ **Unified Workflow**: Run all commands from VS Code terminal  
+✅ **Clean Development Environment**: Consistent across team members  
+✅ **Independent App Control**: Start/stop apps individually  
+✅ **Hot Reload**: All apps support live reloading  
 ✅ **Isolation**: One app's issues don't affect others  
-✅ **Resource Management**: Better resource allocation  
-✅ **Development Flexibility**: Work on specific apps without starting everything  
+✅ **Cross-Platform**: Works on macOS, Windows, and Linux  
+✅ **Docker Desktop Integration**: All containers visible for debugging  
 
 ### Available Scripts
 
 ```bash
-# Development
+# Docker Development (From VS Code DevContainer or Host)
+bun run dev:docker:up          # Start all apps in containers
+bun run dev:docker:storefront  # Start storefront only
+bun run dev:docker:admin       # Start admin only  
+bun run dev:docker:blog        # Start blog only
+bun run dev:docker:api         # Start API only
+bun run dev:docker:down        # Stop all containers
+bun run dev:docker:status      # Check container status
+
+# Local Development (Requires local Bun installation)
 bun run dev                    # Start all apps locally
 bun run dev:admin             # Start admin locally
 bun run dev:blog              # Start blog locally
 bun run dev:storefront        # Start storefront locally
 bun run dev:api               # Start API locally
 
-# Docker Development
-bun run docker:dev            # Start all apps in containers
-bun run docker:dev:admin      # Start admin container
-bun run docker:dev:blog       # Start blog container
-bun run docker:dev:storefront # Start storefront container
-bun run docker:dev:api        # Start API container
-bun run docker:dev:down       # Stop all containers
-
 # Build & Test
 bun run build                 # Build all packages
 bun run test                  # Run all tests
 bun run check:types           # Type checking
-bun run clean                 # Clean build artifacts
 ```
 
 ## 🛠️ Tools
 
 - **Bun** - Package manager and runtime
 - **Turbo** - Build system and task runner
-- **Docker** - Containerization
+- **Docker** - Containerization with DevContainers
 - **TypeScript** - Type safety
 - **Biome** - Code formatting and linting
+
+## 🚨 Troubleshooting
+
+### DevContainer Issues
+- **Container won't start**: Ensure Docker Desktop is running and you have enough resources allocated
+- **Permission errors**: Try rebuilding the container (`Ctrl+Shift+P` → `Dev Containers: Rebuild Container`)
+- **Port conflicts**: Check if ports 3001-3004 are already in use
+
+### App Issues
+- **App won't start**: Check container logs with `bun run dev:docker:status` and `docker logs [container-name]`
+- **Hot reload not working**: Ensure the container is running and ports are properly mapped
+- **Cross-platform errors**: Never run `bun install` on the host for containerized development
+
+### Quick Fixes
+```bash
+# Clean restart everything
+bun run dev:docker:clean
+bun run dev:docker:storefront
+
+# Check what's running
+bun run dev:docker:status
+docker ps
+```
 
 ## 📝 Best Practices
 

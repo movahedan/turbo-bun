@@ -1,89 +1,128 @@
+name: repo
+
+# Ensure all services use the same network for communication
+networks:
+  dev-network:
+    driver: bridge
+
+# Persistent volumes for better caching
+volumes:
+  node_modules:
+    driver: local
+  turbo_cache:
+    driver: local
+  bun_cache:
+    driver: local
+
 services:
-  repo-dev-base:
+  # VS Code development environment - lightweight container for dev tools
+  vscode:
     build:
       context: .
-      dockerfile: Dockerfile.dev.base
+      dockerfile: Dockerfile.vscode
     volumes:
-      - .:/app:cached
-      - ~/.ssh:/root/.ssh:ro
-      - /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock
+      # Mount entire workspace for VS Code (use environment-aware path)
+      - ${PROJECT_ROOT:-.}:/workspace:cached
+    command: sleep infinity
+    # Use init for better signal handling
+    init: true
+    networks:
+      - dev-network
+    # Only start when explicitly requested (by devcontainer)
+    profiles: ["vscode"]
+
+  # Apps runtime environment - shared container for all applications
+  apps:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      # Enable BuildKit for advanced caching
+      x-bake:
+        contexts:
+          buildkit: docker-container://buildkit
+      args:
+        - TURBO_TOKEN=${TURBO_TOKEN:-}
+        - TURBO_TEAM=${TURBO_TEAM:-}
+      # Enable BuildKit cache from environment
+      cache_from:
+        - type=gha
+      # Increase memory limits to help with node_modules I/O
+      shm_size: '1gb'
+    volumes:
+      # Use environment-aware volume mounts (works from host or devcontainer)
+      - ${PROJECT_ROOT:-.}/apps:/app/apps:cached
+      - ${PROJECT_ROOT:-.}/packages:/app/packages:cached
+      - ${PROJECT_ROOT:-.}/scripts:/app/scripts:cached
+      - ${PROJECT_ROOT:-.}/package.json:/app/package.json:cached
+      - ${PROJECT_ROOT:-.}/bun.lock:/app/bun.lock:cached
+      - ${PROJECT_ROOT:-.}/turbo.json:/app/turbo.json:cached
+      # Exclude node_modules to avoid I/O errors with Docker filesystem layers
+      - node_modules:/app/node_modules:delegated
+      - turbo_cache:/app/.turbo:delegated
+      - bun_cache:/root/.bun:delegated
     command: sleep infinity
     environment:
       - NODE_ENV=development
-      - SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
-    x-develop:
-      watch:
-        - action: rebuild
-          path: .
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    # Use init for better signal handling
+    init: true
+    networks:
+      - dev-network
 
+  # Lightweight app containers that inherit from apps runtime
   admin:
-    depends_on:
-      - repo-dev-base
-    build:
-      context: .
-      dockerfile: apps/admin/Dockerfile.dev
+    extends:
+      service: apps
     ports:
-      - "3001:80"
+      - "3001:3001"
     environment:
+      - PORT=3001
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
-    volumes:
-      - .:/app:cached
-    x-develop:
-      watch:
-        - action: rebuild
-          path: .
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    command: bun run dev --filter=admin
+    profiles: ["admin", "all"]
 
   blog:
-    depends_on:
-      - repo-dev-base
-    build:
-      context: .
-      dockerfile: apps/blog/Dockerfile.dev
+    extends:
+      service: apps
     ports:
-      - "3002:3000"
+      - "3002:3002"
     environment:
+      - PORT=3002
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
-    volumes:
-      - .:/app:cached
-    x-develop:
-      watch:
-        - action: rebuild
-          path: .
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    command: bun run dev --filter=blog
+    profiles: ["blog", "all"]
 
   storefront:
-    depends_on:
-      - repo-dev-base
-    build:
-      context: .
-      dockerfile: apps/storefront/Dockerfile.dev
+    extends:
+      service: apps
     ports:
-      - "3003:3000"
+      - "3003:3003"
     environment:
+      - PORT=3003
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
-    volumes:
-      - .:/app:cached
-    x-develop:
-      watch:
-        - action: rebuild
-          path: .
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    command: bun run dev --filter=storefront
+    profiles: ["storefront", "all"]
 
   api:
-    depends_on:
-      - repo-dev-base
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile.dev
+    extends:
+      service: apps
     ports:
-      - "3004:5001"
+      - "3004:3004"
     environment:
+      - PORT=3004
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - .:/app:cached
-    x-develop:
-      watch:
-        - action: rebuild
-          path: .
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    command: bun run dev --filter=api
+    profiles: ["api", "all"]

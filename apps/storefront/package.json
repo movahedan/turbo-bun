@@ -4,12 +4,17 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "WATCHPACK_POLLING=true next dev --hostname 0.0.0.0",
+		"dev": "next dev --hostname 0.0.0.0 --port 3003",
 		"build": "next build",
 		"check:types": "tsc --noEmit",
 		"start": "next start"
 	},
 	"dependencies": {
+		"@next/swc-linux-arm64-gnu": "15.4.2",
+		"@next/swc-linux-arm64-musl": "15.4.2",
+		"@next/swc-linux-x64-gnu": "15.4.2",
+		"@next/swc-wasm-nodejs": "15.4.2",
+		"@next/swc-wasm-web": "15.4.2",
 		"@repo/logger": "*",
 		"@repo/ui": "*",
 		"next": "15.3.5",

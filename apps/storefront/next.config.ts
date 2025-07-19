@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
+
 	// Enable hot reload in Docker containers
 	webpack: (
 		config: { watchOptions: { poll: number; aggregateTimeout: number } },
