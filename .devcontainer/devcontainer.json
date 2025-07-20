@@ -5,7 +5,7 @@
 	// Use the new development compose files for hot reload support
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-	"dockerComposeFile": ["../docker-compose.dev.yml"],
+	"dockerComposeFile": ["docker-compose.dev.yml"],
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
 	"service": "vscode",
@@ -33,7 +33,8 @@
 			"userGid": "automatic"
 		}
 	},
-	// Mount Docker socket for Docker-from-Docker
+	// Mount Docker socket for Docker-from-Docker (Linux/macOS)
+	// Windows uses Docker Desktop with different connection method
 	"mounts": [
 		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
@@ -47,16 +48,10 @@
 	"remoteUser": "vscode",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [],
-	// "portsAttributes": {
-	// 	"3001": { "label": "Admin (React + Vite)", "onAutoForward": "silent" },
-	// 	"3002": { "label": "Blog (Remix + Vite)", "onAutoForward": "silent" },
-	// 	"3003": { "label": "Storefront (Next.js)", "onAutoForward": "silent" },
-	// 	"3004": { "label": "API (Express)", "onAutoForward": "silent" }
-	// },
 	// Start only the vscode service (app containers managed separately)
 	"runServices": ["vscode"],
-	// Setup Docker permissions for non-root access
-	"postCreateCommand": "sudo chmod 666 /var/run/docker.sock && sudo usermod -aG docker $USER || true && bun install && bun run dev:up",
+	// Setup Docker permissions and start development environment
+	"postCreateCommand": "bash .devcontainer/scripts/setup-docker.sh",
 	// Keep containers running for better development experience
 	"shutdownAction": "stopCompose",
 	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
