@@ -6,6 +6,10 @@
 
 echo "Setting up Docker permissions..."
 
+# Install Turbo globally
+RUN bun install -g turbo@2.5.4
+
+
 # Check if Docker socket exists (Linux/macOS)
 if [ -S /var/run/docker.sock ]; then    
     # Set socket permissions for non-root access

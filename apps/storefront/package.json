@@ -11,8 +11,8 @@
 		"postinstall": "bun scripts/install-swc-binary.ts"
 	},
 	"dependencies": {
-		"@repo/logger": "*",
-		"@repo/ui": "*",
+		"@repo/logger": "workspace:*",
+		"@repo/ui": "workspace:*",
 		"next": "15.3.5",
 		"react": "18.3.1",
 		"react-dom": "18.3.1"

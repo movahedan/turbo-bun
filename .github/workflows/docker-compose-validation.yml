@@ -22,29 +22,48 @@ jobs:
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          no-cache: true
+          bun-version: 1.2.15
+
+      - name: 🗃️ Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+  
       - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔍 Validate Production Docker Compose
+      - name: 🔍 Validate Production Docker Compose Config
         run: |
-          echo "::group::🔍 Validating Production Docker Compose"
-          docker compose config
-          echo "✅ Production Docker Compose is valid"
+          echo "::group::🔍 Validating Production Docker Compose Config"
+          bun run prod:compose config
+          echo "✅ Production Docker Compose Config is valid"
           echo "::endgroup::"
 
-      - name: 🔍 Validate Development Docker Compose
+      - name: 🔍 Validate Development Docker Compose Config
         run: |
-          echo "::group::🔍 Validating Development Docker Compose"
-          docker compose -f .devcontainer/docker-compose.dev.yml config
-          echo "✅ Development Docker Compose is valid"
+          echo "::group::🔍 Validating Development Docker Compose Config"
+          bun run dev:compose config
+          echo "✅ Development Docker Compose Config is valid"
           echo "::endgroup::"
 
       - name: 🏗️ Test Production Build
         run: |
           echo "::group::🏗️ Testing Production Build"
           # Build production images without cache to test build process
-          docker compose build --no-cache --parallel
+          bun run prod:compose build --no-cache --parallel
           echo "✅ Production builds completed successfully"
           echo "::endgroup::"
 
@@ -52,19 +71,19 @@ jobs:
         run: |
           echo "::group::🧪 Testing Production Services"
           # Start services in background
-          docker compose up -d
+          bun run prod:compose up -d
           
           # Wait for services to start
           sleep 30
           
           # Check service status
-          docker compose ps
+          bun run prod:compose ps
           
           # Test service health (basic connectivity)
           for service in admin-production blog-production storefront-production api-production; do
             echo "Testing $service..."
             # Get the port mapping for the service
-            port=$(docker compose port $service 80 2>/dev/null | cut -d: -f2 || docker compose port $service 3000 2>/dev/null | cut -d: -f2 || docker compose port $service 5001 2>/dev/null | cut -d: -f2)
+            port=$(bun run prod:compose port $service 80 2>/dev/null | cut -d: -f2 || bun run prod:compose port $service 3000 2>/dev/null | cut -d: -f2 || bun run prod:compose port $service 5001 2>/dev/null | cut -d: -f2)
             if [ -n "$port" ]; then
               echo "Service $service is accessible on port $port"
               # Test basic connectivity (don't fail if service doesn't respond, just log)
@@ -73,62 +92,12 @@ jobs:
               echo "⚠️ Could not determine port for $service"
             fi
           done
-          
-          # Clean up
-          docker compose down
-          echo "✅ Production services test completed"
-          echo "::endgroup::"
-
-      - name: 🔄 Test Multiple Instances
-        run: |
-          echo "::group::🔄 Testing Multiple DevContainer Instances"
-          # Test that multiple instances can run simultaneously
-          COMPOSE_PROJECT_NAME=test-1 docker compose -f .devcontainer/docker-compose.dev.yml --profile all up -d
-          COMPOSE_PROJECT_NAME=test-2 docker compose -f .devcontainer/docker-compose.dev.yml --profile all up -d
-          
-          # Check both instances are running
-          echo "Instance 1:"
-          COMPOSE_PROJECT_NAME=test-1 docker compose -f .devcontainer/docker-compose.dev.yml ps
-          echo "Instance 2:"
-          COMPOSE_PROJECT_NAME=test-2 docker compose -f .devcontainer/docker-compose.dev.yml ps
-          
-          # Clean up
-          COMPOSE_PROJECT_NAME=test-1 docker compose -f .devcontainer/docker-compose.dev.yml down
-          COMPOSE_PROJECT_NAME=test-2 docker compose -f .devcontainer/docker-compose.dev.yml down
-          echo "✅ Multiple instances test completed"
-          echo "::endgroup::"
 
       - name: 🧹 Cleanup
         if: always()
         run: |
           echo "::group::🧹 Cleaning up Docker resources"
-          docker compose down --remove-orphans || true
+          bun run prod:compose down --remove-orphans || true
           docker system prune -f || true
           echo "✅ Cleanup completed"
-          echo "::endgroup::"
-
-  security-scan:
-    name: 🔒 Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🐳 Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 🔒 Scan Docker Images
-        run: |
-          echo "::group::🔒 Scanning Docker Images for Vulnerabilities"
-          # Build and scan each service
-          for service in admin blog storefront api; do
-            if [ -f "apps/$service/Dockerfile" ]; then
-              echo "Scanning $service..."
-              docker build -t $service:test apps/$service
-              # Note: In a real setup, you'd use a proper security scanner like Trivy
-              # trivy image $service:test
-              echo "✅ $service scan completed"
-            fi
-          done
-          echo "✅ Security scan completed"
           echo "::endgroup::"

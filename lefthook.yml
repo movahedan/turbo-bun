@@ -21,7 +21,5 @@ pre-push:
   commands:
     branch-name:
       run: bun run scripts/check-branch-name.ts
-    test:
-      run: bun run test --affected
-    build:
-      run: bun run build --affected
+    check:
+      run: bun run check:quick

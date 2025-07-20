@@ -36,7 +36,9 @@ class DevContainerTester {
 
 		const dockerAvailability = await this.testDockerAvailability();
 		if (!dockerAvailability) {
-			console.log(chalk.yellow("🔄 Skipping tests due to Docker daemon not accessible"));
+			console.log(
+				chalk.yellow("🔄 Skipping tests due to Docker daemon not accessible"),
+			);
 			throw new Error("Docker daemon not accessible");
 		}
 
@@ -45,7 +47,7 @@ class DevContainerTester {
 		await this.testHotReload();
 		await this.testMultipleInstances();
 		await this.testProductionCompose();
-		
+
 		// Only cleanup if not keeping services running
 		if (!keepRunning) {
 			await this.testCleanup();
@@ -72,7 +74,7 @@ class DevContainerTester {
 
 					return true;
 				}
-				
+
 				this.addResult(
 					testName,
 					"SKIP",
@@ -97,25 +99,39 @@ class DevContainerTester {
 	private async testDevContainerBuild() {
 		const testName = "DevContainer Build";
 		try {
-					console.log(chalk.yellow("🔨 Building DevContainer..."));
-		const { exitCode } =
-			await $`docker compose -f .devcontainer/docker-compose.dev.yml build`;
+			console.log(chalk.yellow("🔨 Building DevContainer..."));
+			const { exitCode } =
+				await $`docker compose -f .devcontainer/docker-compose.dev.yml build`;
 
 			if (exitCode !== 0) {
-				this.addResult(testName, "FAIL", "DevContainer development image build failed");
+				this.addResult(
+					testName,
+					"FAIL",
+					"DevContainer development image build failed",
+				);
 			} else {
-				this.addResult(testName, "PASS", "DevContainer development image build succeeded");
+				this.addResult(
+					testName,
+					"PASS",
+					"DevContainer development image build succeeded",
+				);
 			}
 		} catch (error) {
-			this.addResult(testName, "FAIL", error instanceof Error ? error.message : "DevContainer build error");
+			this.addResult(
+				testName,
+				"FAIL",
+				error instanceof Error ? error.message : "DevContainer build error",
+			);
 		}
 	}
 
 	private async testServiceHealthChecks() {
 		const testName = "Service Health Checks";
 		try {
-			console.log(chalk.yellow("🚀 Starting services and monitoring health..."));
-			
+			console.log(
+				chalk.yellow("🚀 Starting services and monitoring health..."),
+			);
+
 			// Start all services
 			await $`bun run dev:down`;
 			await $`bun run dev:up`;
@@ -125,40 +141,44 @@ class DevContainerTester {
 			await setTimeout(20000); // Give more time for health checks
 
 			// Get health status from docker ps
-			const { stdout } = await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all ps`;
-			
+			const { stdout } =
+				await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all ps`;
+
 			const services = this.parseDockerPsOutput(stdout.toString());
 			const healthResults = this.analyzeServiceHealth(services);
 
 			// Check if we have any healthy services and no unhealthy ones
-			if (healthResults.healthyServices.length > 0 && healthResults.unhealthyServices.length === 0) {
+			if (
+				healthResults.healthyServices.length > 0 &&
+				healthResults.unhealthyServices.length === 0
+			) {
 				this.addResult(
-					testName, 
-					"PASS", 
-					`Services are healthy: ${healthResults.healthyServices.join(", ")}`
+					testName,
+					"PASS",
+					`Services are healthy: ${healthResults.healthyServices.join(", ")}`,
 				);
 			} else {
-				const unhealthyServices = healthResults.unhealthyServices.map(s => `${s.name} (${s.status})`);
-				const startingServices = services.filter(s => s.status === "starting").map(s => s.name);
-				
+				const unhealthyServices = healthResults.unhealthyServices.map(
+					(s) => `${s.name} (${s.status})`,
+				);
+				const startingServices = services
+					.filter((s) => s.status === "starting")
+					.map((s) => s.name);
+
 				if (unhealthyServices.length > 0) {
 					this.addResult(
 						testName,
 						"FAIL",
-						`Unhealthy services: ${unhealthyServices.join(", ")}`
+						`Unhealthy services: ${unhealthyServices.join(", ")}`,
 					);
 				} else if (startingServices.length > 0) {
 					this.addResult(
 						testName,
 						"SKIP",
-						`Services still starting: ${startingServices.join(", ")}`
+						`Services still starting: ${startingServices.join(", ")}`,
 					);
 				} else {
-					this.addResult(
-						testName,
-						"FAIL",
-						"No services are healthy"
-					);
+					this.addResult(testName, "FAIL", "No services are healthy");
 				}
 			}
 
@@ -166,34 +186,41 @@ class DevContainerTester {
 			console.log(chalk.blue("\n📊 Service Health Status:"));
 			console.log("=".repeat(50));
 			for (const service of services) {
-				const icon = service.status === "healthy" ? "✅" : service.status === "starting" ? "🔄" : "❌";
-				const color = service.status === "healthy" ? chalk.green : service.status === "starting" ? chalk.yellow : chalk.red;
-				console.log(`${icon} ${color(service.name)}: ${service.status} ${service.port ? `(${service.port})` : ""}`);
+				const icon =
+					service.status === "healthy"
+						? "✅"
+						: service.status === "starting"
+							? "🔄"
+							: "❌";
+				const color =
+					service.status === "healthy"
+						? chalk.green
+						: service.status === "starting"
+							? chalk.yellow
+							: chalk.red;
+				console.log(
+					`${icon} ${color(service.name)}: ${service.status} ${service.port ? `(${service.port})` : ""}`,
+				);
 			}
-
 		} catch (error) {
-			this.addResult(
-				testName,
-				"FAIL",
-				`Health check test error: ${error}`,
-			);
+			this.addResult(testName, "FAIL", `Health check test error: ${error}`);
 		}
 	}
 
 	private parseDockerPsOutput(output: string): ServiceHealth[] {
-		const lines = output.trim().split('\n');
+		const lines = output.trim().split("\n");
 		const services: ServiceHealth[] = [];
 
 		for (const line of lines) {
-			if (line.includes('NAME') || line.includes('----')) continue; // Skip header
-			
+			if (line.includes("NAME") || line.includes("----")) continue; // Skip header
+
 			// Look for health status patterns in the line
 			const nameMatch = line.match(/^(\S+)/);
 			if (!nameMatch) continue;
-			
+
 			const name = nameMatch[1];
 			let healthStatus: "healthy" | "unhealthy" | "starting" | "none" = "none";
-			
+
 			// Check for health status patterns
 			if (line.includes("(healthy)")) {
 				healthStatus = "healthy";
@@ -212,7 +239,7 @@ class DevContainerTester {
 			services.push({
 				name,
 				status: healthStatus,
-				port
+				port,
 			});
 		}
 
@@ -234,7 +261,7 @@ class DevContainerTester {
 		return {
 			allHealthy: unhealthyServices.length === 0 && healthyServices.length > 0,
 			healthyServices,
-			unhealthyServices
+			unhealthyServices,
 		};
 	}
 
@@ -287,11 +314,7 @@ class DevContainerTester {
 				);
 			}
 		} catch (error) {
-			this.addResult(
-				testName,
-				"FAIL",
-				`Multiple instances error: ${error}`,
-			);
+			this.addResult(testName, "FAIL", `Multiple instances error: ${error}`);
 		}
 	}
 
@@ -325,14 +348,12 @@ class DevContainerTester {
 			console.log("   • Blog: http://localhost:3002");
 			console.log("   • Storefront: http://localhost:3003");
 			console.log("   • API: http://localhost:3004");
-			console.log(chalk.yellow("💡 Use 'bun run dev:down' to stop services when done"));
+			console.log(
+				chalk.yellow("💡 Use 'bun run dev:down' to stop services when done"),
+			);
 			this.addResult(testName, "PASS", "Services kept running for development");
 		} catch (error) {
-			this.addResult(
-				testName,
-				"SKIP",
-				`Keep running error: ${error}`,
-			);
+			this.addResult(testName, "SKIP", `Keep running error: ${error}`);
 		}
 	}
 
@@ -423,7 +444,9 @@ if (args.includes("--help") || args.includes("-h")) {
 	console.log("  bun run scripts/setup/test-devcontainer.ts [options]");
 	console.log("");
 	console.log(chalk.yellow("Options:"));
-	console.log("  --keep-running, -k    Keep services running after tests complete");
+	console.log(
+		"  --keep-running, -k    Keep services running after tests complete",
+	);
 	console.log("  --help, -h            Show this help message");
 	console.log("");
 	console.log(chalk.yellow("Examples:"));
