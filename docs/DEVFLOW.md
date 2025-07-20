@@ -11,6 +11,9 @@ This document covers the actual development workflow and processes for the Turbo
 
 ## 🚀 Development Commands
 ```bash
+bun run setup          # Complete development environment setup
+bun run cleanup        # Clean everything and start fresh
+
 bun run dev:up
 bun run dev:down
 bun run dev:build

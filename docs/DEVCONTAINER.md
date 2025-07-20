@@ -47,6 +47,8 @@ The project uses VS Code DevContainers to provide a consistent, isolated develop
    ```
 
 3. **Open in Dev Container**:
+   - `bun run setup`          # Complete development environment setup
+   - `bun run cleanup`        # Clean everything and start fresh
    - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
    - Type "Dev Containers: Reopen in Container"
    - Select the command
