@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "remix vite:build",
-		"dev": "remix vite:dev",
+		"dev": "remix vite:dev --host 0.0.0.0",
 		"start": "remix-serve ./build/server/index.js",
 		"check:types": "tsc --noEmit"
 	},

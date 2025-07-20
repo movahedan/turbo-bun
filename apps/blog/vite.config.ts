@@ -8,7 +8,6 @@ installGlobals();
 export default defineConfig({
 	plugins: [remix(), tsconfigPaths()],
 	server: {
-		host: "0.0.0.0",
 		port: Number.isNaN(Number(process.env.PORT))
 			? 3002
 			: Number(process.env.PORT),

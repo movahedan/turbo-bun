@@ -175,13 +175,13 @@ This monorepo follows best practices for containerized development with individu
 2. **Start Apps from VS Code Terminal:**
 ```bash
 # Start individual apps (recommended for focused development)
-bun run dev:docker:storefront  # Storefront only (localhost:3003)
-bun run dev:docker:admin       # Admin only (localhost:3001)
-bun run dev:docker:blog        # Blog only (localhost:3002)
-bun run dev:docker:api         # API only (localhost:3004)
+bun run dev:storefront  # Storefront only (localhost:3003)
+bun run dev:admin       # Admin only (localhost:3001)
+bun run dev:blog        # Blog only (localhost:3002)
+bun run dev:api         # API only (localhost:3004)
 
 # Or start all apps together
-bun run dev:docker:up          # All services
+bun run dev:up          # All services
 ```
 
 3. **Access Applications:**
@@ -194,7 +194,7 @@ bun run dev:docker:up          # All services
 
 ```bash
 # From your host terminal (outside devcontainer):
-bun run dev:docker:storefront  # Same commands work!
+bun run dev:storefront  # Same commands work!
 
 # Or local development (requires local Bun installation):
 bun install && bun run dev
@@ -230,13 +230,13 @@ Each application has its own `Dockerfile.dev` that:
 
 ```bash
 # Docker Development (From VS Code DevContainer or Host)
-bun run dev:docker:up          # Start all apps in containers
-bun run dev:docker:storefront  # Start storefront only
-bun run dev:docker:admin       # Start admin only  
-bun run dev:docker:blog        # Start blog only
-bun run dev:docker:api         # Start API only
-bun run dev:docker:down        # Stop all containers
-bun run dev:docker:status      # Check container status
+bun run dev:up          # Start all apps in containers
+bun run dev:storefront  # Start storefront only
+bun run dev:admin       # Start admin only  
+bun run dev:blog        # Start blog only
+bun run dev:api         # Start API only
+bun run dev:down        # Stop all containers
+bun run dev:status      # Check container status
 
 # Local Development (Requires local Bun installation)
 bun run dev                    # Start all apps locally
@@ -267,18 +267,18 @@ bun run check:types           # Type checking
 - **Port conflicts**: Check if ports 3001-3004 are already in use
 
 ### App Issues
-- **App won't start**: Check container logs with `bun run dev:docker:status` and `docker logs [container-name]`
+- **App won't start**: Check container logs with `bun run dev:status` and `docker logs [container-name]`
 - **Hot reload not working**: Ensure the container is running and ports are properly mapped
 - **Cross-platform errors**: Never run `bun install` on the host for containerized development
 
 ### Quick Fixes
 ```bash
 # Clean restart everything
-bun run dev:docker:clean
-bun run dev:docker:storefront
+bun run dev:clean
+bun run dev:storefront
 
 # Check what's running
-bun run dev:docker:status
+bun run dev:status
 docker ps
 ```
 

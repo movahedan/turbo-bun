@@ -14,15 +14,6 @@
 	"workspaceFolder": "/workspace",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"installZsh": false,
-			"configureZshAsDefaultShell": false,
-			"installOhMyZsh": false,
-			"upgradePackages": false,
-			"username": "automatic",
-			"userUid": "automatic",
-			"userGid": "automatic"
-		},
 		"ghcr.io/devcontainers/features/git:1": {
 			"version": "latest",
 			"ppa": true
@@ -34,6 +25,15 @@
 		"ghcr.io/shyim/devcontainers-features/bun:0": "latest",
 		"ghcr.io/devcontainers/features/sshd:1": {
 			"version": "latest"
+		},
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": false,
+			"configureZshAsDefaultShell": false,
+			"installOhMyZsh": false,
+			"upgradePackages": false,
+			"username": "automatic",
+			"userUid": "automatic",
+			"userGid": "automatic"
 		}
 	},
 	// Mount Docker socket for Docker-from-Docker
@@ -59,7 +59,7 @@
 	// Start only the vscode service (app containers managed separately)
 	"runServices": ["vscode"],
 	// Setup Docker permissions for non-root access
-	"postCreateCommand": "sudo chmod 666 /var/run/docker.sock && sudo usermod -aG docker $USER || true && bun install",
+	"postCreateCommand": "sudo chmod 666 /var/run/docker.sock && sudo usermod -aG docker $USER || true && bun install && bun run dev:up",
 	// Keep containers running for better development experience
 	"shutdownAction": "stopCompose",
 	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.

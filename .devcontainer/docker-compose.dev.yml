@@ -18,7 +18,7 @@ services:
   # VS Code development environment - lightweight container for dev tools
   vscode:
     build:
-      context: .
+      context: ../
       dockerfile: Dockerfile.vscode
     volumes:
       # Mount entire workspace for VS Code (use environment-aware path)
@@ -34,7 +34,7 @@ services:
   # Apps runtime environment - shared container for all applications
   apps:
     build:
-      context: .
+      context: ../
       dockerfile: Dockerfile.dev
       # Enable BuildKit for advanced caching
       x-bake:

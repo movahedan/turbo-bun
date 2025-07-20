@@ -133,7 +133,7 @@ If you want minimal Docker contexts with Bun, you can use the Turbo Prune approa
 
 ```bash
 # This works with Bun because it creates a standalone context
-bun run dev:docker:prune:storefront
+bun run dev:prune:storefront
 ```
 
 ## 🔧 Setup Instructions
@@ -174,17 +174,17 @@ All commands work seamlessly from **either location**:
 **From VS Code DevContainer (Recommended):**
 ```bash
 # ✅ All commands work from VS Code terminal!
-bun run dev:docker:storefront  # Only storefront
-bun run dev:docker:admin       # Only admin app  
-bun run dev:docker:api         # Only API
-bun run dev:docker:up          # All services
+bun run dev:storefront  # Only storefront
+bun run dev:admin       # Only admin app  
+bun run dev:api         # Only API
+bun run dev:up          # All services
 ```
 
 **From Host Terminal (Also works):**
 ```bash
 # Same commands, same results
-bun run dev:docker:storefront  # Same containers, same ports
-bun run dev:docker:up          # Same everything
+bun run dev:storefront  # Same containers, same ports
+bun run dev:up          # Same everything
 ```
 
 ### Key Benefits:
@@ -197,26 +197,26 @@ bun run dev:docker:up          # Same everything
 
 ```bash
 # Pre-build shared packages + container (fastest)
-bun run dev:docker:turbo:build
+bun run dev:turbo:build
 
 # Force rebuild with no cache (when needed)
-bun run dev:docker:build:cache
+bun run dev:build:cache
 
 # Clean everything and start fresh
-bun run dev:docker:clean
+bun run dev:clean
 
 # Fix Docker I/O errors (nuclear option)
-bun run dev:docker:fix-io
+bun run dev:fix-io
 ```
 
 ### Turbo Prune Commands (Ultra-Optimized)
 
 ```bash
 # Build individual apps with minimal Docker context
-bun run dev:docker:prune:storefront  # Only storefront dependencies
-bun run dev:docker:prune:admin       # Only admin dependencies  
-bun run dev:docker:prune:blog        # Only blog dependencies
-bun run dev:docker:prune:api         # Only API dependencies
+bun run dev:prune:storefront  # Only storefront dependencies
+bun run dev:prune:admin       # Only admin dependencies  
+bun run dev:prune:blog        # Only blog dependencies
+bun run dev:prune:api         # Only API dependencies
 ```
 
 ## 📊 Performance Comparison
@@ -340,9 +340,9 @@ CMD ["node", "apps/storefront/server.js"]
 Add these optimized commands to your `package.json`:
 
 ```json
-"dev:docker:prune:storefront": "turbo prune storefront --docker && DOCKER_BUILDKIT=1 docker build -f apps/storefront/Dockerfile.optimized -t storefront:latest .",
-"dev:docker:prune:admin": "turbo prune admin --docker && DOCKER_BUILDKIT=1 docker build -f apps/admin/Dockerfile.optimized -t admin:latest .",
-"dev:docker:prune:api": "turbo prune api --docker && DOCKER_BUILDKIT=1 docker build -f apps/api/Dockerfile.optimized -t api:latest ."
+"dev:prune:storefront": "turbo prune storefront --docker && DOCKER_BUILDKIT=1 docker build -f apps/storefront/Dockerfile.optimized -t storefront:latest .",
+"dev:prune:admin": "turbo prune admin --docker && DOCKER_BUILDKIT=1 docker build -f apps/admin/Dockerfile.optimized -t admin:latest .",
+"dev:prune:api": "turbo prune api --docker && DOCKER_BUILDKIT=1 docker build -f apps/api/Dockerfile.optimized -t api:latest ."
 ```
 
 ## 🔍 How It Works
@@ -495,7 +495,7 @@ alias docker-nuke="docker system prune -a --volumes -f"
 
 2. **Clear Docker cache** (nuclear option):
    ```bash
-   bun run dev:docker:clean
+   bun run dev:clean
    docker system prune -a -f --volumes
    ```
 
@@ -530,7 +530,7 @@ This means you have **macOS binaries mounted into a Linux container**. This is a
 rm -rf node_modules
 
 # Use our optimized two-container setup
-bun run dev:docker:storefront  # Runs in Linux 'apps' container with correct binaries
+bun run dev:storefront  # Runs in Linux 'apps' container with correct binaries
 ```
 
 ### Docker filesystem I/O errors with node_modules?
@@ -642,4 +642,4 @@ This Docker optimization provides a **world-class development experience** with:
 
 ---
 
-**Pro tip**: Run `bun run dev:docker:storefront` from VS Code terminal and stay in your flow! 🚀 
+**Pro tip**: Run `bun run dev:storefront` from VS Code terminal and stay in your flow! 🚀 
