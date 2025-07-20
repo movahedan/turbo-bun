@@ -5,14 +5,6 @@ FROM base AS turbo
 WORKDIR /app
 COPY ./turbo.json ./turbo.json
 
-FROM turbo AS dev
-WORKDIR /app
-COPY ./apps ./apps
-COPY ./packages ./packages
-COPY ./package.json ./bun.lock ./
-
-RUN bun install
-
 FROM turbo AS pruner
 WORKDIR /app
 COPY ./apps ./apps
@@ -25,7 +17,7 @@ FROM turbo AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/bun.lock ./bun.lock
-RUN bun install
+RUN bun install --ignore-scripts
 
 FROM turbo AS build
 WORKDIR /app

@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/bun.lock ./bun.lock
 COPY --from=pruner /app/out/full/ .
-RUN bun install
+RUN bun install --ignore-scripts
 
 FROM turbo AS build
 WORKDIR /app
