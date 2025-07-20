@@ -54,7 +54,7 @@ The project uses VS Code DevContainers to provide a consistent, isolated develop
 
 4. **Setup git**:
    ```bash
-   git remote set-url origin https://github.com/movaehdan/git.git
+   git remote set-url origin <your-repository-url>
    gh auth login
    gh auth setup-git
    ```
@@ -220,7 +220,7 @@ docker compose down
 **Solutions**:
 ```bash
 # Ensure HTTPS URL format
-git remote set-url origin https://github.com/movaehdan/git.git
+git remote set-url origin <your-repository-url>
 gh auth login
 gh auth setup-git
 

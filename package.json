@@ -39,7 +39,7 @@
 		"dev:api:watch": "bun run dev:container watch api",
 		"//turbo docker optimized": "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"dev:turbo:build": "turbo run build --filter=@repo/* && bun run dev:build",
-		"dev:turbo:affected": "docker compose -f docker-compose.dev.yml --profile all up -d --build && turbo run dev --affected",
+		"dev:turbo:affected": "docker compose -f .devcontainer/docker-compose.dev.yml --profile all up -d --build && turbo run dev --affected",
 		"//prodcontainers": "/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"prod:up": "docker compose -f docker-compose.prod.yml up -d",
 		"prod:down": "docker compose -f docker-compose.prod.yml down",
