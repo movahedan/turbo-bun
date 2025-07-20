@@ -32,11 +32,13 @@ RUN mkdir -p .turbo/cache && chmod -R 777 .turbo
 RUN addgroup --system --gid 1001 runner-group
 RUN adduser --system --uid 1001 runner-user
 
+COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/ui/dist ./packages/ui/dist
+COPY --from=build --chown=runner-user:runner-group /app/packages/ui ./packages/ui
+COPY --from=build --chown=runner-user:runner-group /app/packages/utils ./packages/utils
 
 USER runner-user
 EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
-CMD ["bun", "run", "dev", "--filter=@repo/ui"]
+CMD ["bun", "run", "start", "--filter=@repo/ui"]

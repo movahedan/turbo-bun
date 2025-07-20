@@ -1,12 +1,29 @@
 {
-	"extends": "@repo/typescript-config/react-library.json",
+	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"lib": ["dom", "ES2015"],
 		"sourceMap": true,
 		"noEmit": false,
 		"emitDeclarationOnly": true,
 		"composite": true,
 		"baseUrl": ".",
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSources": false,
+		"isolatedModules": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"preserveWatchOutput": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"jsx": "react-jsx",
+		"types": ["node", "bun-types"],
 		"paths": {
 			"@repo/utils/*": ["../utils/src/*"]
 		}

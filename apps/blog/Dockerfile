@@ -22,9 +22,9 @@ RUN bun install --ignore-scripts
 
 FROM turbo AS build
 WORKDIR /app
+COPY --from=installer /app/ .
 COPY --from=pruner /app/out/full/ .
 COPY --from=pruner /app/scripts ./scripts
-COPY --from=installer /app/ .
 RUN bun run build --filter=blog
 
 FROM turbo AS runner
@@ -35,10 +35,12 @@ RUN adduser --system --uid 1001 runner-user
 
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/ui/dist ./packages/ui/dist
+COPY --from=build --chown=runner-user:runner-group /app/packages/ui ./packages/ui
 COPY --from=build --chown=runner-user:runner-group /app/apps/blog/build ./apps/blog/build
 COPY --from=build --chown=runner-user:runner-group /app/apps/blog/public ./apps/blog/public
 COPY --from=build --chown=runner-user:runner-group /app/apps/blog/package.json ./apps/blog/package.json
+COPY --from=build --chown=runner-user:runner-group /app/packages/utils ./packages/utils
+COPY --from=build --chown=runner-user:runner-group /app/packages/logger ./packages/logger
 
 USER runner-user
 EXPOSE 3000

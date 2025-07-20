@@ -35,8 +35,9 @@ RUN adduser --system --uid 1001 runner-user
 
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/ui/dist ./packages/ui/dist
-COPY --from=build --chown=runner-user:runner-group /app/packages/logger/dist ./packages/logger/dist
+COPY --from=build --chown=runner-user:runner-group /app/packages/ui ./packages/ui
+COPY --from=build --chown=runner-user:runner-group /app/packages/logger ./packages/logger
+COPY --from=build --chown=runner-user:runner-group /app/packages/utils ./packages/utils
 COPY --from=build --chown=runner-user:runner-group /app/apps/storefront/.next ./apps/storefront/.next
 COPY --from=build --chown=runner-user:runner-group /app/apps/storefront/public ./apps/storefront/public
 COPY --from=build --chown=runner-user:runner-group /app/apps/storefront/next.config.ts ./apps/storefront/next.config.ts
