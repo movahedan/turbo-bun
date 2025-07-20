@@ -65,6 +65,7 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **[DevContainer Guide](./docs/DEVCONTAINER.md)**: DevContainer setup and troubleshooting
 - **[Development Workflow](./docs/DEVFLOW.md)**: Testing, type checking, and development processes
 - **[Development Conventions](./docs/DEVCONVENTIONS.md)**: Coding standards and best practices
+- **[Quality Checklist](./docs/QUALITY_CHECKLIST.md)**: Comprehensive testing checklist for infrastructure changes
 
 ## 📦 Applications & Packages
 
