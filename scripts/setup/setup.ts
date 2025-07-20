@@ -18,6 +18,10 @@ export async function start() {
 		console.log(chalk.blue("📦 Installing dependencies..."));
 		await $`bun install`;
 
+		// Step 2.5: Sync VS Code configuration
+		console.log(chalk.blue("🎯 Syncing VS Code configuration..."));
+		await $`bun run sync:vscode`;
+
 		// Step 3: Build Docker images
 		console.log(chalk.blue("🐳 Building Docker images..."));
 		await $`bun run dev:build`;

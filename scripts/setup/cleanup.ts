@@ -131,7 +131,11 @@ async function cleanup() {
 		// await $`rm -f yarn.lock`;
 		// await $`rm -f pnpm-lock.yaml`;
 
-		// Step 10: Final verification
+		// Step 10: Clean VS Code configuration (will be recreated on setup)
+		console.log(chalk.yellow("🎯 Cleaning VS Code configuration..."));
+		await $`rm -rf .vscode`;
+
+		// Step 11: Final verification
 		console.log(chalk.yellow("🔍 Verifying cleanup..."));
 		await $`docker compose ps`;
 
