@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { execSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
 
@@ -64,11 +64,15 @@ if (swcBinary) {
 	try {
 		console.log(`Installing SWC binary for ${platform}-${arch}: ${swcBinary}`);
 
-		// Use bun to install the binary
-		execSync(`bun add ${swcBinary}@15.4.2`, {
+		// Use spawnSync with argument array to prevent command injection
+		const result = spawnSync("bun", ["add", `${swcBinary}@15.4.2`], {
 			stdio: "inherit",
 			cwd: path.resolve(__dirname, ".."),
 		});
+
+		if (result.status !== 0) {
+			throw new Error(`bun add failed with exit code ${result.status}`);
+		}
 
 		console.log("SWC binary installed successfully");
 	} catch (error) {
