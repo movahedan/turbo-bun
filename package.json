@@ -18,6 +18,7 @@
 		"build": "turbo run build",
 		"start": "turbo run start",
 		"//devcontainers": "/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
+		"dev:test-devcontainer": "bun run scripts/setup/test-devcontainer.ts",
 		"dev:container": "docker compose -f .devcontainer/docker-compose.dev.yml",
 		"dev:status": "bun run dev:container ps",
 		"dev:health": "bun run dev:container ps --format table",

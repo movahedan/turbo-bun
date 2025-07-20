@@ -3,6 +3,9 @@
 
 FROM oven/bun:1.2.18-alpine AS base
 
+# Install system dependencies including curl for health checks
+RUN apk add --no-cache curl
+
 # Install Turbo globally
 RUN bun install -g turbo@2.5.4
 

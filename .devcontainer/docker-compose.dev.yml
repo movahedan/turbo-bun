@@ -30,6 +30,12 @@ services:
       - dev-network
     # Only start when explicitly requested (by devcontainer)
     profiles: ["vscode"]
+    healthcheck:
+      test: ["CMD", "ps", "aux"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # Apps runtime environment - shared container for all applications
   apps:
@@ -69,6 +75,12 @@ services:
     init: true
     networks:
       - dev-network
+    healthcheck:
+      test: ["CMD", "ps", "aux"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # Lightweight app containers that inherit from apps runtime
   admin:
@@ -84,6 +96,12 @@ services:
       - TURBO_TEAM=${TURBO_TEAM:-}
     command: bun run dev --filter=admin
     profiles: ["admin", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   blog:
     extends:
@@ -98,6 +116,12 @@ services:
       - TURBO_TEAM=${TURBO_TEAM:-}
     command: bun run dev --filter=blog
     profiles: ["blog", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   storefront:
     extends:
@@ -112,6 +136,12 @@ services:
       - TURBO_TEAM=${TURBO_TEAM:-}
     command: bun run dev --filter=storefront
     profiles: ["storefront", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   api:
     extends:
@@ -126,3 +156,9 @@ services:
       - TURBO_TEAM=${TURBO_TEAM:-}
     command: bun run dev --filter=api
     profiles: ["api", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
