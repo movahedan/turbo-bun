@@ -1,20 +1,50 @@
+# Dependencies (CRITICAL: Never copy host node_modules to avoid cross-platform issues)
 node_modules
-.turbo
-.git
-.gitignore
+**/node_modules
+.pnpm
+npm-debug.log*
 
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.development
-.env.test
-.env.production
-.env.local.example
-.env.example
-.env.development.example
-.env.test.example
-.env.production.example
-.env.local.example
-.env.example
+# Build outputs
+dist
+build
+.next
+.turbo
+**/.turbo/cache
+**/tsconfig.tsbuildinfo
+
+# IDE and editors
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+
+# Logs
+*.log
+logs
+**/logs
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+.nyc_output
+
+# Cache directories
+.cache
+.npm
+.eslintcache

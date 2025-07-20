@@ -4,10 +4,11 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "WATCHPACK_POLLING=true next dev --hostname 0.0.0.0",
+		"dev": "next dev --hostname 0.0.0.0 --port 3003",
 		"build": "next build",
 		"check:types": "tsc --noEmit",
-		"start": "next start"
+		"start": "next start",
+		"postinstall": "bun scripts/install-swc-binary.ts"
 	},
 	"dependencies": {
 		"@repo/logger": "*",

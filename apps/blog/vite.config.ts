@@ -8,8 +8,9 @@ installGlobals();
 export default defineConfig({
 	plugins: [remix(), tsconfigPaths()],
 	server: {
-		host: "0.0.0.0",
-		port: 3000,
+		port: Number.isNaN(Number(process.env.PORT))
+			? 3002
+			: Number(process.env.PORT),
 		watch: {
 			usePolling: true,
 			interval: 1000,

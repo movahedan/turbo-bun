@@ -5,24 +5,15 @@
 	// Use the new development compose files for hot reload support
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-	"dockerComposeFile": ["../docker-compose.yml", "../docker-compose.dev.yml"],
+	"dockerComposeFile": ["docker-compose.dev.yml"],
 	// The 'service' property is the name of the service for the container that VS Code should
 	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
-	"service": "repo-dev-base",
+	"service": "vscode",
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
-	"workspaceFolder": "/app",
+	"workspaceFolder": "/workspace",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"installZsh": true,
-			"configureZshAsDefaultShell": true,
-			"installOhMyZsh": true,
-			"upgradePackages": true,
-			"username": "automatic",
-			"userUid": "automatic",
-			"userGid": "automatic"
-		},
 		"ghcr.io/devcontainers/features/git:1": {
 			"version": "latest",
 			"ppa": true
@@ -32,35 +23,35 @@
 			"version": "latest"
 		},
 		"ghcr.io/shyim/devcontainers-features/bun:0": "latest",
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers/features/sshd:1": {
-			"version": "latest"
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": false,
+			"configureZshAsDefaultShell": false,
+			"installOhMyZsh": false,
+			"upgradePackages": false,
+			"username": "automatic",
+			"userUid": "automatic",
+			"userGid": "automatic"
 		}
 	},
+	// Mount Docker socket for Docker-from-Docker (Linux/macOS)
+	// Windows uses Docker Desktop with different connection method
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	// Set PROJECT_ROOT for docker-compose volume mounting (use host path, not container path)
+	"remoteEnv": {
+		"PROJECT_ROOT": "${localWorkspaceFolder}",
+		"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+		"COMPOSE_PROJECT_NAME": "repo"
+	},
+	// Enable Docker access for devcontainer user
+	"remoteUser": "vscode",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": ["3001", "3002", "3003", "3004", "3005"],
-	"portsAttributes": {
-		"3001": {
-			"label": "Admin (React + Vite)",
-			"onAutoForward": "ask"
-		},
-		"3002": {
-			"label": "Blog (Remix + Vite)",
-			"onAutoForward": "ask"
-		},
-		"3003": {
-			"label": "Storefront (Next.js)",
-			"onAutoForward": "ask"
-		},
-		"3004": {
-			"label": "API (Express)",
-			"onAutoForward": "ask"
-		}
-	},
-	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": ["admin", "blog", "storefront", "api"],
-	// Uncomment the next line to run commands after the container is created.
-	"postCreateCommand": "bun install",
+	"forwardPorts": [],
+	// Start only the vscode service (app containers managed separately)
+	"runServices": ["vscode"],
+	// Setup Docker permissions and start development environment
+	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
 	// Keep containers running for better development experience
 	"shutdownAction": "stopCompose",
 	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
@@ -68,17 +59,18 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"anysphere.remote-containers",
 				"ms-vscode.vscode-typescript-next",
 				"YoavBls.pretty-ts-errors",
 				"steoates.autoimport",
 				"oven.bun-vscode",
 				"github.vscode-github-actions",
-				"lokalise.i18n-ally",
 				"maptz.camelcasenavigation",
 				"streetsidesoftware.code-spell-checker",
 				"biomejs.biome",
 				"vivaxy.vscode-conventional-commits",
-				"ms-azuretools.vscode-docker"
+				"ms-azuretools.vscode-docker",
+				"bierner.markdown-preview-github-styles"
 			],
 			"settings": {
 				"editor.formatOnSave": true,
@@ -128,12 +120,11 @@
 				"typescript.enablePromptUseWorkspaceTsdk": true,
 				// Hot reload optimization settings
 				"files.watcherExclude": {
-					"**/.git/objects/**": true,
-					"**/.git/subtree-cache/**": true,
 					"**/node_modules/**": true,
 					"**/.turbo/**": true,
 					"**/.next/**": true,
-					"**/dist/**": true
+					"**/dist/**": true,
+					"**/.git/**": true
 				},
 				"search.exclude": {
 					"**/node_modules": true,

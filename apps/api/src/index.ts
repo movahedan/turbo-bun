@@ -1,9 +1,9 @@
 import { log } from "@repo/logger";
 import { createServer } from "./server";
 
-const port = process.env.PORT ?? 5001;
+const port = Number(process.env.PORT) || 3004;
 const server = createServer();
 
-server.listen(port, () => {
+server.listen(port, "0.0.0.0", () => {
 	log(`api running on ${port}`);
 });
