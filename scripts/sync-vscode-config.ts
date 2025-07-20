@@ -19,9 +19,9 @@ interface ExtensionsConfig {
 // Strip comments from JSON content
 function stripComments(content: string): string {
 	return content
-		.replace(/\/\/.*$/gm, "") // Remove single-line comments
-		.replace(/\/\*[\s\S]*?\*\//g, "") // Remove multi-line comments
-		.replace(/^\s*[\r\n]/gm, ""); // Remove empty lines
+		.replace(/\/\/[^\r\n]*/g, "")
+		.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g, "")
+		.replace(/^\s*[\r\n]/gm, "");
 }
 
 // Read and parse devcontainer.json
