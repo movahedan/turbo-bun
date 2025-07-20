@@ -39,6 +39,8 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **Shared Package System**: Reusable components and utilities
 - **Modern Development Tools**: [TypeScript](https://www.typescriptlang.org/docs/), [Biome](https://biomejs.dev/docs/), [Jest](https://jestjs.io/docs/getting-started), and more
 - **Hot Reload Support**: Real-time development experience across all applications
+- **VS Code Configuration Sync**: Automatic synchronization of extensions and settings
+- **Zero-Config Setup**: New developers can start coding immediately
 
 ### Architecture
 - **Monorepo Structure**: Centralized codebase with multiple applications

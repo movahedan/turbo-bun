@@ -95,6 +95,33 @@ The DevContainer automatically installs these extensions:
 
 The DevContainer includes optimized settings defined in the [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json) file under the `customizations.vscode.settings` section.
 
+### 🎯 VS Code Configuration Sync
+
+The project automatically syncs VS Code extensions and settings from the devcontainer configuration to ensure all developers have the same development environment:
+
+#### **Automatic Sync**
+- **DevContainer Creation**: Runs automatically when the devcontainer is created
+- **Postinstall**: Runs after `bun install` for dependency updates
+- **Dependency Changes**: Automatically syncs when dependencies are updated
+
+#### **Manual Sync**
+```bash
+# Sync VS Code configuration manually
+bun run sync:vscode
+```
+
+#### **Single Source of Truth**
+All VS Code settings are managed in `.devcontainer/devcontainer.json`:
+- **Extensions**: Automatically installed in devcontainer
+- **Settings**: Applied to both devcontainer and local workspace
+- **Consistency**: Every developer gets the same experience
+
+#### **Benefits**
+- **🔄 Zero Maintenance**: No need to manually keep files in sync
+- **👥 Team Consistency**: All developers get identical VS Code setup
+- **⚡ Automatic Updates**: Changes propagate automatically
+- **🎯 TypeScript & Bun**: Modern, fast implementation
+
 ## ✨ Features
 
 ### Development Environment
