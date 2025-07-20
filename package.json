@@ -2,6 +2,9 @@
 	"name": "kitchen-sink",
 	"private": true,
 	"scripts": {
+		"//setup": "/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
+		"setup": "bun run scripts/setup/setup.ts",
+		"cleanup": "bun run scripts/setup/cleanup.ts",
 		"//biome and checks": "//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
@@ -13,7 +16,6 @@
 		"build": "turbo run build",
 		"start": "turbo run start",
 		"//devcontainers": "/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
-		"dev:setup": "bun run scripts/setup/setup.dev.ts",
 		"dev:container": "docker compose -f .devcontainer/docker-compose.dev.yml",
 		"dev:status": "bun run dev:container ps",
 		"dev:health": "bun run dev:container ps --format table",
