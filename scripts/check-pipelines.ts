@@ -56,7 +56,7 @@ async function cleanupActContainers() {
 				console.log("✅ Removed act networks");
 			}
 		} catch (error) {
-			console.warn("⚠️  Warning: act networks does not exist:", error);
+			console.warn("⚠️  Warning: act networks do not exist:", error);
 		}
 
 		console.log("✅ Act containers cleaned up successfully!");
