@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
-import { runnables } from "./config";
+import { runnables } from "./utils/config";
 
 async function cleanup() {
 	try {

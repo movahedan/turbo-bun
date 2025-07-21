@@ -441,7 +441,7 @@ if (args.includes("--help") || args.includes("-h")) {
 	console.log(chalk.blue("🧪 DevContainer Test Suite"));
 	console.log("");
 	console.log(chalk.yellow("Usage:"));
-	console.log("  bun run scripts/setup/test-devcontainer.ts [options]");
+	console.log("  bun run scripts/check-devcontainer.ts [options]");
 	console.log("");
 	console.log(chalk.yellow("Options:"));
 	console.log(
@@ -450,9 +450,9 @@ if (args.includes("--help") || args.includes("-h")) {
 	console.log("  --help, -h            Show this help message");
 	console.log("");
 	console.log(chalk.yellow("Examples:"));
-	console.log("  bun run scripts/setup/test-devcontainer.ts");
-	console.log("  bun run scripts/setup/test-devcontainer.ts --keep-running");
-	console.log("  bun run scripts/setup/test-devcontainer.ts -k");
+	console.log("  bun run scripts/check-devcontainer.ts");
+	console.log("  bun run scripts/check-devcontainer.ts --keep-running");
+	console.log("  bun run scripts/check-devcontainer.ts -k");
 	process.exit(0);
 }
 

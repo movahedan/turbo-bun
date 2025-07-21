@@ -1,6 +1,6 @@
 import { $ } from "bun";
 import chalk from "chalk";
-import { runnables } from "./config";
+import { runnables } from "./utils/config";
 
 const base = "http://localhost";
 const getLogsForRunnable = (runnable: (typeof runnables)[number]) => {

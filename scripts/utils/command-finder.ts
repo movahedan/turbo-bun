@@ -13,6 +13,7 @@ export async function findCommand(
 	commandName: CommandName | CommandConfig,
 	paths?: string[],
 	installInstructions?: string,
+	verbose?: boolean,
 ): Promise<string> {
 	// If commandName is a string, use the predefined config
 	if (typeof commandName === "string") {
@@ -34,7 +35,9 @@ export async function findCommand(
 				await $`which ${path}`.quiet();
 			}
 
-			console.log(`✅ Found ${config.name} at: ${path}`);
+			if (verbose) {
+				console.log(`✅ Found ${config.name} at: ${path}`);
+			}
 			return path;
 		} catch {
 			// Continue to next path

@@ -98,7 +98,7 @@ const script = createScript(
         long: "--verbose",
         description: "Enable verbose output",
         required: false,
-        validator: validators.boolean(),
+        validator: validators.boolean,
       },
     ],
   } as const,
@@ -171,24 +171,18 @@ validators.boolean()
 
 // Enum values
 validators.enum(["option1", "option2", "option3"])
-
-// Custom validator
-validators.custom((value) => {
-  // Your validation logic
-  return { isValid: true, error: null };
-})
 ```
 
 ### Custom Validators
 
 ```typescript
-// Create a custom validator
-const customValidator = validators.custom((value) => {
+// Create a custom validator function
+const customValidator = (value: string): boolean | string => {
   if (value.startsWith("http")) {
-    return { isValid: true, error: null };
+    return true;
   }
-  return { isValid: false, error: "Must be a valid URL" };
-});
+  return "Must be a valid URL";
+};
 
 // Use in option
 {
@@ -211,7 +205,7 @@ const dockerCmd = await findCommand("docker");
 const actCmd = await findCommand("act");
 
 // Available commands in scripts/utils/commands.ts:
-// - act, docker, git, bun, node, npm, yarn, pnpm
+// - act, docker, git, bun
 ```
 
 ### Custom Command Paths
@@ -305,7 +299,7 @@ const cmd = "./bin/act"; // This might not exist
 
 See these files for complete examples:
 
-- `scripts/test-actions.ts` - GitHub Actions testing
+- `scripts/check-pipelines.ts` - GitHub Actions testing
 - `scripts/example-script.ts` - Basic template
 
 ### Common Patterns

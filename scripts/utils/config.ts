@@ -22,9 +22,9 @@ export const runnables: Runnable[] = [
 		port: 3002,
 	},
 	{
-		key: "store",
-		label: "Store",
-		absPath: path.join(baseDir, "apps/store"),
+		key: "storefront",
+		label: "Storefront",
+		absPath: path.join(baseDir, "apps/storefront"),
 		port: 3003,
 	},
 	{

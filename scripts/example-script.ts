@@ -39,7 +39,7 @@ const script = createScript(
 				long: "--verbose",
 				description: "Enable verbose output",
 				required: false,
-				validator: validators.boolean(),
+				validator: validators.boolean,
 			},
 		],
 	} as const,
