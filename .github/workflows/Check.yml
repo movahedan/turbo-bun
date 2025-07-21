@@ -34,7 +34,7 @@ jobs:
           path: |
             ~/.bun/install/cache
             **/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
 
@@ -86,7 +86,7 @@ jobs:
           path: |
             ~/.bun/install/cache
             **/node_modules
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
   
@@ -107,11 +107,17 @@ jobs:
           echo "✅ Development Docker Compose Config is valid"
           echo "::endgroup::"
 
+      - name: 🔍 - Attach affected to github output
+        id: affected  
+        run: bun run scripts/attach-affected-to-github-output.ts
+
       - name: 🏗️ Test Production Build
         run: |
           echo "::group::🏗️ Testing Production Build"
+
           # Build production images without cache to test build process
-          bun run prod:compose build --no-cache --parallel
+          bun run prod:compose build ${{ steps.affected.outputs.packages }} --no-cache --parallel
+          
           echo "✅ Production builds completed successfully"
           echo "::endgroup::"
 
@@ -119,7 +125,7 @@ jobs:
         run: |
           echo "::group::🧪 Testing Production Services"
           # Start services in background
-          bun run prod:compose up -d
+          bun run prod:compose up ${{ steps.affected.outputs.packages }} -d
           
           # Wait for services to start
           sleep 30
@@ -128,7 +134,7 @@ jobs:
           bun run prod:compose ps
           
           # Test service health (basic connectivity)
-          for service in admin-production blog-production storefront-production api-production; do
+          for service in ${{ steps.affected.outputs.packages }}; do
             echo "Testing $service..."
             # Get the port mapping for the service
             port=$(bun run prod:compose port $service 80 2>/dev/null | cut -d: -f2 || bun run prod:compose port $service 3000 2>/dev/null | cut -d: -f2 || bun run prod:compose port $service 5001 2>/dev/null | cut -d: -f2)
@@ -145,7 +151,7 @@ jobs:
         if: always()
         run: |
           echo "::group::🧹 Cleaning up Docker resources"
-          bun run prod:compose down --remove-orphans || true
+          bun run prod:compose down ${{ steps.affected.outputs.packages }} --remove-orphans || true
           docker system prune -f || true
           echo "✅ Cleanup completed"
           echo "::endgroup::"
