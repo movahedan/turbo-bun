@@ -12,6 +12,7 @@
 		"check:types": "turbo run check:types",
 		"check:types:force": "turbo run check:types --force",
 		"check:quick": "bun run check:fix && turbo run check:types --affected && bun run test --affected && bun run build --affected",
+		"check:pipelines": "bun run scripts/check-pipelines.ts",
 		"//turbo": "/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"dev": "turbo run dev",
 		"test": "turbo run test",

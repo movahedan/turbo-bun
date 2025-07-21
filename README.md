@@ -38,6 +38,7 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **Multi-Application Architecture**: Multiple frontend and backend applications
 - **Shared Package System**: Reusable components and utilities
 - **Modular Script System**: Type-safe, reusable script utilities with automatic argument parsing and error handling
+- **GitHub Actions Local Testing**: Optimized local testing of CI/CD pipelines using the `act` tool with 97% smaller images
 - **Modern Development Tools**: [TypeScript](https://www.typescriptlang.org/docs/), [Biome](https://biomejs.dev/docs/), [Jest](https://jestjs.io/docs/getting-started), and more
 - **Hot Reload Support**: Real-time development experience across all applications
 - **VS Code Configuration Sync**: Automatic synchronization of extensions and settings
@@ -68,6 +69,7 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **[Development Workflow](./docs/3_DEVFLOW.md)**: Testing, type checking, and development processes
 - **[Development Conventions](./docs/4_DEVCONVENTIONS.md)**: Coding standards and best practices
 - **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)**: Modular script system with type-safe argument parsing and error handling
+- **[GitHub Actions Local Testing](./docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md)**: Local testing of CI/CD pipelines with optimized performance
 - **[AI Report](./docs/AI_REPORT.md)**: Automated testing and validation reports for AI assistants
 
 ## 📦 Applications & Packages
