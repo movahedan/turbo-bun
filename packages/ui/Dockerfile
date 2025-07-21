@@ -32,10 +32,11 @@ RUN mkdir -p .turbo/cache && chmod -R 777 .turbo
 RUN addgroup --system --gid 1001 runner-group
 RUN adduser --system --uid 1001 runner-user
 
+ARG MODE=444
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/ui ./packages/ui
-COPY --from=build --chown=runner-user:runner-group /app/packages/utils ./packages/utils
+COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/ui ./packages/ui
+COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/utils ./packages/utils
 
 USER runner-user
 EXPOSE 3000
