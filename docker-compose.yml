@@ -1,5 +1,7 @@
+name: repo-prod
+
 services:
-  admin-production:
+  prod-admin:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
@@ -8,9 +10,15 @@ services:
     environment:
       - VITE_API_URL=http://api:5004
     depends_on:
-      - api-production
+      - prod-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  blog-production:
+  prod-blog:
     build:
       context: .
       dockerfile: apps/blog/Dockerfile
@@ -19,9 +27,15 @@ services:
     environment:
       - VITE_API_URL=http://api:5004
     depends_on:
-      - api-production
+      - prod-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  storefront-production:
+  prod-storefront:
     build:
       context: .
       dockerfile: apps/storefront/Dockerfile
@@ -30,16 +44,28 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://api:5004
     depends_on:
-      - api-production
+      - prod-api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  api-production:
+  prod-api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
       - "5004:5001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
-  ui-production:
+  prod-ui:
     build:
       context: .
       dockerfile: packages/ui/Dockerfile

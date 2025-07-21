@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/bun.lock ./bun.lock
 COPY --from=pruner /app/out/full/ .
-RUN bun install
+RUN bun install --ignore-scripts
 
 FROM turbo AS build
 WORKDIR /app
@@ -35,8 +35,8 @@ RUN chown -R runner-user:runner-group /app
 
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/logger/dist ./packages/logger/dist
-COPY --from=build --chown=runner-user:runner-group /app/apps/api/dist ./apps/api/dist
+COPY --from=build --chown=runner-user:runner-group /app/packages/logger ./packages/logger
+COPY --from=build --chown=runner-user:runner-group /app/apps/api ./apps/api
 
 USER runner-user
 EXPOSE 5001

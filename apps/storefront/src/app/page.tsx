@@ -1,4 +1,4 @@
-import { log } from "@repo/logger";
+// import { log } from "@repo/logger";
 import { CounterButton } from "@repo/ui/counter-button";
 import { Link } from "@repo/ui/link";
 
@@ -7,7 +7,7 @@ export const metadata = {
 };
 
 export default function Store() {
-	log("Hey! This is the Store page.");
+	// log("Hey! This is the Store page.");
 
 	return (
 		<div className="container">

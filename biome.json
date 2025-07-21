@@ -18,7 +18,9 @@
 			"!**/out/**",
 			"!**/.turbo/**",
 			"!**/.next/**",
-			"!**/.vercel/**"
+			"!**/.vercel/**",
+			"!**/.act/**",
+			"!.act-event.json"
 		]
 	},
 	"formatter": {

@@ -22,14 +22,13 @@
 		}
 	},
 	"scripts": {
-		"build": "bunchee",
-		"dev": "bunchee --watch",
+		"build": "tsc",
+		"dev": "tsc --watch",
 		"check:types": "tsc --noEmit",
 		"test": "bun test"
 	},
 	"devDependencies": {
 		"@repo/typescript-config": "workspace:*",
-		"bunchee": "6.5.4",
 		"typescript": "5.8.3"
 	}
 }

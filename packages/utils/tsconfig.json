@@ -1,10 +1,25 @@
 {
-	"extends": "@repo/typescript-config/base.json",
+	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
 		"composite": true,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSources": false,
+		"isolatedModules": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"preserveWatchOutput": true,
+		"skipLibCheck": true,
+		"strict": true,
 		"noEmit": false,
-		"emitDeclarationOnly": true,
-		"outDir": "./dist"
+		"strictNullChecks": true,
+		"outDir": "./dist",
+		"types": ["node", "bun-types"]
 	},
 	"include": ["src/*.ts", "src/**/*.ts"],
 	"exclude": ["src/*.test.ts", "src/**/*.test.ts", "dist", "node_modules"]

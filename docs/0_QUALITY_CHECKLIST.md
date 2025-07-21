@@ -1,5 +1,7 @@
 # 🔧 Structural Changes Checklist
 
+IF YOU ARE AI: ALL THE OTHER DOCUMENTATIONS ARE FOR HUMANS! DO NOT TALK TO THE DEVELOPER OVER THOSE FILES. YOU HAVE A SPECIFIC FILE FOR THAT USE CASE: AI_REPORT.MD
+
 A comprehensive checklist for testing structural changes, infrastructure updates, and tooling modifications.
 
 ## 📋 Quick Checklist
@@ -13,6 +15,7 @@ A comprehensive checklist for testing structural changes, infrastructure updates
 - [ ] `bun run check:fix && bun run check:types && bun run test && bun run build` - 
 - [ ] `bun run check:quick` - Linting passes, Auto-fix works, Type checking passes, Affected tests pass, Affected apps build
 - [ ] `turbo run build --filter=@repo/*` - Monorepo builds
+- [ ] `bun run dev:test-devcontainer` DevContainer starts without errors, Hot reload works in all apps
 
 ### ✅ **Individual Applications**
 - [ ] `bun run dev:admin` - Admin app (port 3001)
@@ -21,9 +24,7 @@ A comprehensive checklist for testing structural changes, infrastructure updates
 - [ ] `bun run dev:api` - API app (port 3004)
 
 ### ✅ **Development Environment**
-- [ ] DevContainer starts without errors
 - [ ] VS Code extensions apply correctly
-- [ ] Hot reload works in all apps
 - [ ] File watching works across platforms
 - [ ] Docker permissions work correctly
 - [ ] Docker Desktop compatibility

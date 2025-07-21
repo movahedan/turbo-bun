@@ -4,10 +4,8 @@
 		"lib": ["ES2015"],
 		"outDir": "./dist",
 		"baseUrl": ".",
-		"paths": {
-			"@repo/logger": ["../packages/logger/src", "../packages/logger/dist"]
-		},
-		"types": ["node", "bun-types"]
+		"types": ["node", "bun-types"],
+		"moduleResolution": "Bundler"
 	},
 	"exclude": ["node_modules"],
 	"include": ["."]

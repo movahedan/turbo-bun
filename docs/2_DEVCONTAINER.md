@@ -63,6 +63,8 @@ The project uses VS Code DevContainers to provide a consistent, isolated develop
 
 5. **Start Development**:
    ```bash
+   # Run complete DevContainer tests
+   bun run test:devcontainer
    # The container will automatically run setup commands
    # Once ready, start your applications:
    bun run dev:up
@@ -308,6 +310,8 @@ git push
 ### Debugging Commands
 
 ```bash
+# Run complete DevContainer tests
+bun run test:devcontainer
 # Check DevContainer status
 docker ps
 
@@ -323,9 +327,9 @@ docker exec -it <container-name> /bin/bash
 
 ## 📚 Best Practices
 
-### Development Workflow
+### Development Best Practices
 
-1. **Always Use DevContainer**: Never develop outside the container
+1. **Use DevContainers**: Always develop inside the DevContainer for consistency
 2. **Regular Rebuilds**: Rebuild container when dependencies change
 3. **Resource Monitoring**: Keep an eye on Docker resource usage
 4. **Clean Development**: Use `bun run dev:clean` periodically

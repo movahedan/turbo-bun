@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { type ExportCondition, prebuild } from "../../scripts/prebuild";
+import { type ExportCondition, prebuild } from "./prebuild-utils";
 
 prebuild((srcDir: string, directories: string[]) => {
 	const componentDirs = directories

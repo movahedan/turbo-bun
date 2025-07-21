@@ -12,3 +12,6 @@ server/dist
 public/dist
 tsconfig.tsbuildinfo
 .vscode
+.act-event.json
+.act
+bin

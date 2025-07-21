@@ -18,6 +18,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 				<Links />
 			</head>
 			<body>
+				<h1>Hello World</h1>
 				{children}
 				<ScrollRestoration />
 				<Scripts />
