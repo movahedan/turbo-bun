@@ -29,7 +29,7 @@ async function cleanupActContainers() {
 				console.log("✅ Stopped running act containers");
 			}
 		} catch (error) {
-			console.warn("⚠️  Warning: act containers does not exist:", error);
+			console.warn("⚠️  Warning: act containers do not exist:", error);
 		}
 
 		try {
