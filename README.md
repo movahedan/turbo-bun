@@ -28,7 +28,7 @@
 1. **Clone and open the project in VS Code**
 2. **Open in Dev Container**: `Ctrl+Shift+P` → `Dev Containers: Reopen in Container`
 
-**For detailed setup instructions, see [DevContainer Guide](./docs/DEVCONTAINER.md), [Development Workflow](./docs/DEVFLOW.md), and [Docker Setup](./docs/DOCKER.md).**
+**For detailed setup instructions, see [DevContainer Guide](./docs/2_DEVCONTAINER.md), [Development Workflow](./docs/3_DEVFLOW.md), and [Docker Setup](./docs/1_DOCKER.md).**
 
 ## 🎯 Overview
 
@@ -37,6 +37,7 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **Full DevContainer Integration**: Complete development environment in [Docker](https://docs.docker.com/)
 - **Multi-Application Architecture**: Multiple frontend and backend applications
 - **Shared Package System**: Reusable components and utilities
+- **Modular Script System**: Type-safe, reusable script utilities with automatic argument parsing and error handling
 - **Modern Development Tools**: [TypeScript](https://www.typescriptlang.org/docs/), [Biome](https://biomejs.dev/docs/), [Jest](https://jestjs.io/docs/getting-started), and more
 - **Hot Reload Support**: Real-time development experience across all applications
 - **VS Code Configuration Sync**: Automatic synchronization of extensions and settings
@@ -61,11 +62,13 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **[VS Code Extensions](https://marketplace.visualstudio.com/)**: Pre-configured for optimal development experience
 
 ## 📚 Additional Documentation
-- **[Docker Setup](./docs/DOCKER.md)**: Detailed Docker configuration and usage
-- **[DevContainer Guide](./docs/DEVCONTAINER.md)**: DevContainer setup and troubleshooting
-- **[Development Workflow](./docs/DEVFLOW.md)**: Testing, type checking, and development processes
-- **[Development Conventions](./docs/DEVCONVENTIONS.md)**: Coding standards and best practices
-- **[Quality Checklist](./docs/QUALITY_CHECKLIST.md)**: Comprehensive testing checklist for infrastructure changes
+- **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)**: Comprehensive testing checklist for infrastructure changes
+- **[Docker Setup](./docs/1_DOCKER.md)**: Detailed Docker configuration and usage
+- **[DevContainer Guide](./docs/2_DEVCONTAINER.md)**: DevContainer setup and troubleshooting
+- **[Development Workflow](./docs/3_DEVFLOW.md)**: Testing, type checking, and development processes
+- **[Development Conventions](./docs/4_DEVCONVENTIONS.md)**: Coding standards and best practices
+- **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)**: Modular script system with type-safe argument parsing and error handling
+- **[AI Report](./docs/AI_REPORT.md)**: Automated testing and validation reports for AI assistants
 
 ## 📦 Applications & Packages
 
