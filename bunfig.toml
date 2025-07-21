@@ -31,14 +31,56 @@ exact = true
 # Configure scopes if needed
 
 [test]
-# Preload test setup for better TypeScript support
-preload = ["./scripts/test-setup.ts"]
+# Preload centralized test setup from test-preset package
+preload = ["@repo/test-preset"]
 
 # Environment variables for tests
-env = { NODE_ENV = "test", DOM_ENV = "jsdom" }
+env = { 
+	NODE_ENV = "test", 
+	DOM_ENV = "jsdom",
+	TEST_TIMEOUT = "5000"
+}
 
 # Test timeout in milliseconds
 timeout = 5000
 
 # Enable coverage reporting
 coverage = true
+
+# Watch mode configuration
+[test.watch]
+# Enable watch mode by default for development
+enabled = false
+
+# Watch specific file patterns
+patterns = [
+	"**/*.test.ts",
+	"**/*.test.tsx", 
+	"**/*.spec.ts",
+	"**/*.spec.tsx",
+	"**/*.test.js",
+	"**/*.test.jsx",
+	"**/*.spec.js",
+	"**/*.spec.jsx"
+]
+
+# Ignore patterns for watch mode
+ignore = [
+	"**/node_modules/**",
+	"**/dist/**",
+	"**/build/**",
+	"**/.turbo/**",
+	"**/coverage/**"
+]
+
+# Debounce time for file changes (in milliseconds)
+debounce = 300
+
+# Show coverage in watch mode
+coverage = false
+
+# Run tests in parallel in watch mode
+parallel = true
+
+# Clear console before each test run in watch mode
+clear = true

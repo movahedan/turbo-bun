@@ -10,7 +10,9 @@
 		"dev": "tsc --watch",
 		"start": "tsc --watch",
 		"check:types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "bun test",
+		"test:watch": "bun test --watch",
+		"test:coverage": "bun test --coverage"
 	},
 	"dependencies": {
 		"clsx": "2.1.1",

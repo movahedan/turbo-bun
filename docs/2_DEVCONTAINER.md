@@ -47,12 +47,11 @@ The project uses VS Code DevContainers to provide a consistent, isolated develop
    ```
 
 3. **Open in Dev Container**:
-   - `bun run setup`          # Complete development environment setup
-   - `bun run cleanup`        # Clean everything and start fresh
+   - `bun run setup`       # Install packages
+   - `bun run dev:checkup` # Load dev container (It takes 2 minutes)
    - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
-   - Type "Dev Containers: Reopen in Container"
-   - Select the command
-   - Wait for the container to build (first time may take 5-10 minutes)
+   - Type "Dev Containers: Reopen in Container" and select the command
+   - Wait for the container to load (Faster cause we already have a complete checkup)
 
 4. **Setup git**:
    ```bash
@@ -63,14 +62,46 @@ The project uses VS Code DevContainers to provide a consistent, isolated develop
 
 5. **Start Development**:
    ```bash
-   # Run complete DevContainer tests
-   bun run test:devcontainer
-   # The container will automatically run setup commands
-   # Once ready, start your applications:
-   bun run dev:up
+   # You have everything by now, start coding
+   # You dont know where to start? just look at the [`package.json`](../package.json).
    ```
 
 ## ⚙️ Configuration
+
+### Environment Variables
+
+Configure environment variables for the DevContainer by modifying the [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json) file under the `remoteEnv` section.
+
+### Port Forwarding
+
+**Important**: The project uses Docker Compose port mapping instead of DevContainer port forwarding to avoid conflicts with host port binding. Port forwarding is configured in [`.devcontainer/docker-compose.dev.yml`](../.devcontainer/docker-compose.dev.yml) under the `ports` section.
+
+**Why not DevContainer port forwarding?**
+- DevContainer port forwarding can block host port binding due to the Docker-from-Docker setup
+- Prevents conflicts when running multiple development environments
+- Docker-from-Docker with socket forwarding requires careful port management to avoid binding conflicts
+
+
+### GitHub Authentication
+
+**Symptoms**: "Permission denied (publickey)" or authentication failures when pushing to GitHub
+
+**Solutions**:
+```bash
+# Ensure HTTPS URL format
+git remote set-url origin <your-repository-url>
+gh auth login
+gh auth setup-git
+
+git push
+```
+
+**Why HTTPS over SSH in DevContainers?**
+- **✅ No SSH key management**: Eliminates complexity of SSH agent forwarding
+- **✅ Better DevContainer compatibility**: Works reliably in containerized environments
+- **✅ GitHub CLI integration**: Seamless authentication with `gh auth login`
+- **✅ Cross-platform**: Consistent behavior across all platforms
+
 
 ### DevContainer Configuration
 
@@ -244,26 +275,6 @@ docker compose down
 # Ctrl+Shift+X → Check installed extensions
 ```
 
-#### 6. GitHub Authentication Issues
-
-**Symptoms**: "Permission denied (publickey)" or authentication failures when pushing to GitHub
-
-**Solutions**:
-```bash
-# Ensure HTTPS URL format
-git remote set-url origin <your-repository-url>
-gh auth login
-gh auth setup-git
-
-git push
-```
-
-**Why HTTPS over SSH in DevContainers?**
-- **✅ No SSH key management**: Eliminates complexity of SSH agent forwarding
-- **✅ Better DevContainer compatibility**: Works reliably in containerized environments
-- **✅ GitHub CLI integration**: Seamless authentication with `gh auth login`
-- **✅ Cross-platform**: Consistent behavior across all platforms
-
 ### Performance Optimization
 
 #### macOS Performance
@@ -311,7 +322,7 @@ git push
 
 ```bash
 # Run complete DevContainer tests
-bun run test:devcontainer
+bun run dev:checkup
 # Check DevContainer status
 docker ps
 
@@ -355,21 +366,6 @@ docker exec -it <container-name> /bin/bash
 3. **GitHub Authentication**: Use GitHub CLI with HTTPS for secure authentication
 4. **Secrets**: Never commit secrets to DevContainer config
 5. **Updates**: Keep base images updated
-
-## 🔧 Advanced Configuration
-
-### Environment Variables
-
-Configure environment variables for the DevContainer by modifying the [`.devcontainer/devcontainer.json`](../.devcontainer/devcontainer.json) file under the `remoteEnv` section.
-
-### Port Forwarding
-
-**Important**: The project uses Docker Compose port mapping instead of DevContainer port forwarding to avoid conflicts with host port binding. Port forwarding is configured in [`.devcontainer/docker-compose.dev.yml`](../.devcontainer/docker-compose.dev.yml) under the `ports` section.
-
-**Why not DevContainer port forwarding?**
-- DevContainer port forwarding can block host port binding due to the Docker-from-Docker setup
-- Prevents conflicts when running multiple development environments
-- Docker-from-Docker with socket forwarding requires careful port management to avoid binding conflicts
 
 ## 📖 Additional Resources
 

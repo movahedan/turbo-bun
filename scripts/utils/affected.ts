@@ -1,4 +1,3 @@
-import path from "node:path";
 import { $ } from "bun";
 import { type Runnable, runnables } from "./config";
 
@@ -8,16 +7,18 @@ import { type Runnable, runnables } from "./config";
     "packages": [
       "//", // root package
       "@repo/<package-name>", // affected package
-    ]
+    ],
+		...
   }
 */
 async function getAffectedPackages(): Promise<string[]> {
-	const turboPath = path.join(process.cwd(), "node_modules", ".bin", "turbo");
+	const turboPath = `${process.cwd()}/node_modules/.bin/turbo`;
 	const affectedPackages =
 		await $`${turboPath} run build --filter="...[origin/main]" --dry-run=json`
 			.quiet()
 			.json();
 
+	// Remove root package
 	return affectedPackages.packages.slice(1);
 }
 

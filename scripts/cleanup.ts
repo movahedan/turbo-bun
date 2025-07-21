@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
-import { runnables } from "./config";
+import { runnables } from "./utils/config";
 
 async function cleanup() {
 	try {
@@ -10,8 +10,8 @@ async function cleanup() {
 
 		// Step 1: Stop and remove Docker containers
 		console.log(chalk.yellow("🐳 Stopping Docker containers..."));
-		await $`docker compose -f docker-compose.yml down -v --remove-orphans`;
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml down -v --remove-orphans`;
+		await $`docker compose -f docker-compose.yml down -v --remove-orphans --volumes`;
+		await $`docker compose -f .devcontainer/docker-compose.dev.yml down -v --remove-orphans --volumes`;
 
 		// Step 2: Remove Docker containers and volumes
 		console.log(chalk.yellow("🗑️ Removing Docker containers and volumes..."));

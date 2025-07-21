@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-import { git } from "./git-command";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
+import { git } from "./utils/git-command";
 
 // Create script with automatic error handling and type safety
 const script = createScript(

@@ -25,7 +25,10 @@
 		"build": "tsc",
 		"dev": "tsc --watch",
 		"check:types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "bun test",
+		"test:watch": "bun test --watch",
+		"test:coverage": "bun test --coverage",
+		"test:logger": "bun test --grep logger"
 	},
 	"devDependencies": {
 		"@repo/typescript-config": "workspace:*",

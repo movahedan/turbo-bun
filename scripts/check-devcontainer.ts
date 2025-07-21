@@ -6,7 +6,7 @@ import chalk from "chalk";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const keepRunning = args.includes("--keep-running") || args.includes("-k");
+const keepRunning = !args.includes("--shutdown") && !args.includes("-s");
 
 interface TestResult {
 	name: string;
@@ -42,6 +42,7 @@ class DevContainerTester {
 			throw new Error("Docker daemon not accessible");
 		}
 
+		await this.testBasicBuild();
 		await this.testDevContainerBuild();
 		await this.testServiceHealthChecks();
 		await this.testHotReload();
@@ -56,6 +57,41 @@ class DevContainerTester {
 		}
 
 		this.printResults();
+	}
+
+	private async testBasicBuild() {
+		const testName = "Basic Build";
+		try {
+			console.log(chalk.yellow("🔨 Building basic project..."));
+			const results = await Promise.all([
+				$`bun run check:fix`,
+				$`bun run test`,
+				$`bun run build`,
+			]);
+
+			const errors = results
+				.map((result) => (result.exitCode !== 0 ? result : null))
+				.filter(
+					(result): result is NonNullable<typeof result> => result !== null,
+				);
+
+			if (errors.length > 0) {
+				this.addResult(
+					testName,
+					"FAIL",
+					`Basic project build failed:\n${errors
+						.map(
+							(result) =>
+								`${result.exitCode} - ${result.text().split("\n")[0]}`,
+						)
+						.join("\n")}`,
+				);
+			} else {
+				this.addResult(testName, "PASS", "Basic project build succeeded");
+			}
+		} catch (error) {
+			this.addResult(testName, "FAIL", `Basic build error: ${error}`);
+		}
 	}
 
 	private async testDockerAvailability() {
@@ -232,8 +268,11 @@ class DevContainerTester {
 				healthStatus = "starting"; // Assume starting if Up but no health status
 			}
 
-			// Extract port information
-			const portMatch = line.match(/(\d+\.\d+\.\d+\.\d+:\d+->\d+)/);
+			// Extract port information using a safer regex pattern
+			// Match IP:port->port pattern with specific character classes
+			const portMatch = line.match(
+				/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/,
+			);
 			const port = portMatch ? portMatch[1] : undefined;
 
 			services.push({
@@ -441,7 +480,7 @@ if (args.includes("--help") || args.includes("-h")) {
 	console.log(chalk.blue("🧪 DevContainer Test Suite"));
 	console.log("");
 	console.log(chalk.yellow("Usage:"));
-	console.log("  bun run scripts/setup/test-devcontainer.ts [options]");
+	console.log("  bun run scripts/check-devcontainer.ts [options]");
 	console.log("");
 	console.log(chalk.yellow("Options:"));
 	console.log(
@@ -450,9 +489,9 @@ if (args.includes("--help") || args.includes("-h")) {
 	console.log("  --help, -h            Show this help message");
 	console.log("");
 	console.log(chalk.yellow("Examples:"));
-	console.log("  bun run scripts/setup/test-devcontainer.ts");
-	console.log("  bun run scripts/setup/test-devcontainer.ts --keep-running");
-	console.log("  bun run scripts/setup/test-devcontainer.ts -k");
+	console.log("  bun run scripts/check-devcontainer.ts");
+	console.log("  bun run scripts/check-devcontainer.ts --keep-running");
+	console.log("  bun run scripts/check-devcontainer.ts -k");
 	process.exit(0);
 }
 

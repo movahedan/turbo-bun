@@ -1,0 +1,25 @@
+{
+	"name": "@repo/test-preset",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"main": "./test-setup.ts",
+	"exports": {
+		".": "./test-setup.ts",
+		"./testing-library": "./testing-library.ts",
+		"./happydom": "./happydom.ts"
+	},
+	"scripts": {
+		"build": "echo 'No build needed for test preset'"
+	},
+	"dependencies": {
+		"@happy-dom/global-registrator": "^14.10.0",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/react": "^16.1.0",
+		"chalk": "^5.4.1"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "workspace:*",
+		"typescript": "5.8.3"
+	}
+}

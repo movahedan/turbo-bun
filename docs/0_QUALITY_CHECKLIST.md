@@ -9,13 +9,8 @@ A comprehensive checklist for testing structural changes, infrastructure updates
 ### ✅ **Core Functionality**
 - [ ] `bun run cleanup` - Complete cleanup works
 - [ ] `bun run setup` - Complete fresh setup works
-- [ ] `bun run dev:down` - All services stop
-
-### ✅ **Build & Test Pipeline**
-- [ ] `bun run check:fix && bun run check:types && bun run test && bun run build` - 
-- [ ] `bun run check:quick` - Linting passes, Auto-fix works, Type checking passes, Affected tests pass, Affected apps build
-- [ ] `turbo run build --filter=@repo/*` - Monorepo builds
-- [ ] `bun run dev:test-devcontainer` DevContainer starts without errors, Hot reload works in all apps
+- [ ] `bun run dev:checkup` DevContainer starts without errors, Hot reload works in all apps
+- [ ] `bun run check:pipeline` GitHub Actions proceeds - A bit change in workflow usually needed
 
 ### ✅ **Individual Applications**
 - [ ] `bun run dev:admin` - Admin app (port 3001)
