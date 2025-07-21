@@ -1,4 +1,4 @@
-# 🚀 Turbo Repo with DevContainer Setup
+# 🏎️ Turboobun
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -6,6 +6,17 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 
 > A comprehensive [Turborepo](https://turbo.build/repo/docs) starter with full [DevContainer](https://containers.dev/docs) support, showcasing modern monorepo development practices with [Docker](https://docs.docker.com/) containerization.
+
+
+### 🏄‍♂ Dive into the doc
+
+- **[Docker Setup](./docs/1_DOCKER.md)** and **[DevContainer Guide](./docs/2_DEVCONTAINER.md)** - Complete Docker guide
+- **[GitHub Actions Local Testing](./docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md)** - Local CI/CD pipeline testing
+- **[Development Workflow](./docs/3_DEVFLOW.md)** - Daily contribution
+- **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)** - Structured Shell scripting with bun
+- **[Development Conventions](./docs/4_DEVCONVENTIONS.md)** - Coding standards and best practices
+- **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)** - Test infrastructure changes before deployment
+- **[AI Report](./docs/AI_REPORT.md)** - Automated testing and validation for AI assistants
 
 ## 📋 Table of Contents
 
@@ -28,17 +39,15 @@
 1. **Clone and open the project in VS Code**
 2. **Open in Dev Container**: `Ctrl+Shift+P` → `Dev Containers: Reopen in Container`
 
-**For detailed setup instructions, see [DevContainer Guide](./docs/2_DEVCONTAINER.md), [Development Workflow](./docs/3_DEVFLOW.md), and [Docker Setup](./docs/1_DOCKER.md).**
-
 ## 🎯 Overview
 
 This project demonstrates a production-ready [Turborepo](https://turbo.build/repo/docs) setup with:
 
-- **Full DevContainer Integration**: Complete development environment in [Docker](https://docs.docker.com/)
+- **Full DevContainer Integration**: Optimized [DevContainer](https://containers.dev/) running on host machine
 - **Multi-Application Architecture**: Multiple frontend and backend applications
 - **Shared Package System**: Reusable components and utilities
-- **Modular Script System**: Type-safe, reusable script utilities with automatic argument parsing and error handling
-- **GitHub Actions Local Testing**: Optimized local testing of CI/CD pipelines using the `act` tool with 97% smaller images
+- **Modular BunBash Scripting**: Type-safe, Documented, and Reusable [Shell scripts with Bun](https://bun.sh/docs/runtime/shell)
+- **GitHub Actions Local Testing**: Optimized local testing of CI/CD pipelines using [Act](https://hub.docker.com/r/efrecon/act)
 - **Modern Development Tools**: [TypeScript](https://www.typescriptlang.org/docs/), [Biome](https://biomejs.dev/docs/), [Jest](https://jestjs.io/docs/getting-started), and more
 - **Hot Reload Support**: Real-time development experience across all applications
 - **VS Code Configuration Sync**: Automatic synchronization of extensions and settings
@@ -61,16 +70,6 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **[Lefthook](https://github.com/evilmartians/lefthook)**: Git hooks management
 - **[DevContainers](https://containers.dev/)**: Complete Docker-based development environment
 - **[VS Code Extensions](https://marketplace.visualstudio.com/)**: Pre-configured for optimal development experience
-
-## 📚 Additional Documentation
-- **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)**: Comprehensive testing checklist for infrastructure changes
-- **[Docker Setup](./docs/1_DOCKER.md)**: Detailed Docker configuration and usage
-- **[DevContainer Guide](./docs/2_DEVCONTAINER.md)**: DevContainer setup and troubleshooting
-- **[Development Workflow](./docs/3_DEVFLOW.md)**: Testing, type checking, and development processes
-- **[Development Conventions](./docs/4_DEVCONVENTIONS.md)**: Coding standards and best practices
-- **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)**: Modular script system with type-safe argument parsing and error handling
-- **[GitHub Actions Local Testing](./docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md)**: Local testing of CI/CD pipelines with optimized performance
-- **[AI Report](./docs/AI_REPORT.md)**: Automated testing and validation reports for AI assistants
 
 ## 📦 Applications & Packages
 
