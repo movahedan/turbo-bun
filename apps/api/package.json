@@ -8,7 +8,11 @@
 		"dev": "tsup src/index.ts --watch && bun run dist/index.cjs",
 		"build": "tsup src/index.ts --help",
 		"check:types": "tsc --noEmit",
-		"test": "bun test"
+		"test": "bun test --dom",
+		"test:watch": "bun test --watch --dom",
+		"test:coverage": "bun test --coverage --dom",
+		"test:ui": "bun test --dom --grep ui",
+		"test:integration": "bun test --dom --grep integration"
 	},
 	"dependencies": {
 		"@repo/logger": "workspace:*",

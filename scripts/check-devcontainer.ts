@@ -69,15 +69,17 @@ class DevContainerTester {
 				$`bun run build`,
 			]);
 
-			const error = results
+			const errors = results
 				.map((result) => (result.exitCode !== 0 ? result : null))
-				.filter((result) => result !== null);
+				.filter(
+					(result): result is NonNullable<typeof result> => result !== null,
+				);
 
-			if (error) {
+			if (errors.length > 0) {
 				this.addResult(
 					testName,
 					"FAIL",
-					`Basic project build failed:\n${error
+					`Basic project build failed:\n${errors
 						.map(
 							(result) =>
 								`${result.exitCode} - ${result.text().split("\n")[0]}`,
@@ -266,8 +268,11 @@ class DevContainerTester {
 				healthStatus = "starting"; // Assume starting if Up but no health status
 			}
 
-			// Extract port information
-			const portMatch = line.match(/(\d+\.\d+\.\d+\.\d+:\d+->\d+)/);
+			// Extract port information using a safer regex pattern
+			// Match IP:port->port pattern with specific character classes
+			const portMatch = line.match(
+				/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/,
+			);
 			const port = portMatch ? portMatch[1] : undefined;
 
 			services.push({
