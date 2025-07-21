@@ -6,7 +6,7 @@ import chalk from "chalk";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const keepRunning = args.includes("--keep-running") || args.includes("-k");
+const keepRunning = !args.includes("--shutdown") && !args.includes("-s");
 
 interface TestResult {
 	name: string;
@@ -42,6 +42,7 @@ class DevContainerTester {
 			throw new Error("Docker daemon not accessible");
 		}
 
+		await this.testBasicBuild();
 		await this.testDevContainerBuild();
 		await this.testServiceHealthChecks();
 		await this.testHotReload();
@@ -56,6 +57,39 @@ class DevContainerTester {
 		}
 
 		this.printResults();
+	}
+
+	private async testBasicBuild() {
+		const testName = "Basic Build";
+		try {
+			console.log(chalk.yellow("🔨 Building basic project..."));
+			const results = await Promise.all([
+				$`bun run check:fix`,
+				$`bun run test`,
+				$`bun run build`,
+			]);
+
+			const error = results
+				.map((result) => (result.exitCode !== 0 ? result : null))
+				.filter((result) => result !== null);
+
+			if (error) {
+				this.addResult(
+					testName,
+					"FAIL",
+					`Basic project build failed:\n${error
+						.map(
+							(result) =>
+								`${result.exitCode} - ${result.text().split("\n")[0]}`,
+						)
+						.join("\n")}`,
+				);
+			} else {
+				this.addResult(testName, "PASS", "Basic project build succeeded");
+			}
+		} catch (error) {
+			this.addResult(testName, "FAIL", `Basic build error: ${error}`);
+		}
 	}
 
 	private async testDockerAvailability() {
