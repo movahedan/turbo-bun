@@ -1,7 +1,7 @@
 # App Runtime Environment
 # Container focused on running the monorepo apps (admin, blog, storefront, api)
 
-FROM oven/bun:1.2.18-alpine AS base
+FROM oven/bun:1.2.19-alpine AS base
 
 # Install system dependencies including curl for health checks
 RUN apk add --no-cache curl
