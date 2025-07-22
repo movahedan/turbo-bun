@@ -15,3 +15,4 @@ tsconfig.tsbuildinfo
 .act-event.json
 .act
 bin
+out
