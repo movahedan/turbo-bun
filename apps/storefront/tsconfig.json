@@ -1,21 +1,24 @@
 {
 	"extends": "@repo/typescript-config/nextjs.json",
 	"compilerOptions": {
-		"outDir": "dist",
-		"plugins": [
-			{
-				"name": "next"
-			}
-		],
-		"baseUrl": "."
+		"outDir": "./dist",
+		"baseUrl": ".",
+		"paths": {
+			"@repo/ui": ["../../packages/ui/dist"],
+			"@repo/ui/*": ["../../packages/ui/dist/*"]
+		}
 	},
-	"include": ["src", "next.config.ts", "next-env.d.ts", ".next/types/**/*.ts"],
+	"include": [
+		"./src",
+		"./next.config.ts",
+		"./next-env.d.ts",
+		"./.next/types/**/*.ts",
+		".next/types/**/*.ts",
+		"../../packages/logger/src/**/*"
+	],
 	"references": [
 		{
-			"path": "../../packages/ui"
-		},
-		{
-			"path": "../../packages/logger"
+			"path": "../../packages/ui/tsconfig.build.json"
 		}
 	]
 }

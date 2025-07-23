@@ -1,26 +1,4 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"lib": ["ES2015"],
-		"outDir": "./dist",
-		"composite": true,
-		"declaration": true,
-		"declarationMap": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"inlineSources": false,
-		"isolatedModules": true,
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"preserveWatchOutput": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"noEmit": false,
-		"strictNullChecks": true,
-		"types": ["node", "bun-types"]
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "dist", "src/__tests__/**/*"]
+	"extends": "@repo/typescript-config/base.json",
+	"include": ["."]
 }

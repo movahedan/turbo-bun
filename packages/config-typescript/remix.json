@@ -2,16 +2,11 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"extends": "./base.json",
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ES2019"],
-		"isolatedModules": true,
-		"esModuleInterop": true,
-		"jsx": "react-jsx",
-		"moduleResolution": "Bundler",
+		"lib": ["DOM", "DOM.Iterable", "ES2022"],
+		"target": "ES2022",
+		"types": ["node", "bun-types", "@vercel/remix", "vite/client"],
 		"resolveJsonModule": true,
-		"target": "ES2019",
-		"strict": true,
-		"allowJs": true,
-		"forceConsistentCasingInFileNames": true,
-		"baseUrl": "."
+		"jsx": "react-jsx",
+		"allowJs": true
 	}
 }

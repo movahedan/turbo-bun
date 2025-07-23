@@ -3,35 +3,21 @@
 	"version": "0.0.1",
 	"type": "module",
 	"private": true,
-	"files": [
-		"dist"
-	],
-	"main": "./dist/es/index.js",
-	"module": "./dist/es/index.js",
-	"types": "./dist/es/index.d.ts",
+	"imports": {
+		"#*": "./src/*"
+	},
 	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/es/index.d.ts",
-				"default": "./dist/es/index.js"
-			},
-			"require": {
-				"types": "./dist/cjs/index.d.cts",
-				"default": "./dist/cjs/index.cjs"
-			}
-		}
+		".": "./src/index.ts"
 	},
 	"scripts": {
-		"build": "tsc",
 		"dev": "tsc --watch",
 		"check:types": "tsc --noEmit",
 		"test": "bun test",
 		"test:watch": "bun test --watch",
-		"test:coverage": "bun test --coverage",
-		"test:logger": "bun test --grep logger"
+		"test:coverage": "bun test --coverage"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "workspace:*",
-		"typescript": "5.8.3"
+		"@repo/test-preset": "workspace:*",
+		"@repo/typescript-config": "workspace:*"
 	}
 }

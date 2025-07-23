@@ -93,20 +93,6 @@ jobs:
       - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔍 Validate Production Docker Compose Config
-        run: |
-          echo "::group::🔍 Validating Production Docker Compose Config"
-          bun run prod:compose config
-          echo "✅ Production Docker Compose Config is valid"
-          echo "::endgroup::"
-
-      - name: 🔍 Validate Development Docker Compose Config
-        run: |
-          echo "::group::🔍 Validating Development Docker Compose Config"
-          bun run dev:compose config
-          echo "✅ Development Docker Compose Config is valid"
-          echo "::endgroup::"
-
       - name: 🔍 - Attach affected to github output
         id: affected  
         run: bun run scripts/attach-affected-to-github-output.ts

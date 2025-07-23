@@ -13,6 +13,7 @@ export interface ArgOption {
 	long: string;
 	description: string;
 	required?: boolean;
+	multiple?: boolean; // Allow multiple values for this option
 	validator?: (value: string) => boolean | string;
 	examples?: string[];
 }
@@ -26,7 +27,7 @@ export interface ScriptConfig {
 }
 
 export interface ParsedArgs {
-	[key: string]: string | boolean;
+	[key: string]: string | boolean | string[];
 }
 
 /**
@@ -35,9 +36,11 @@ export interface ParsedArgs {
 export type InferArgs<T extends ScriptConfig> = {
 	[K in T["options"][number] as K["long"] extends `--${infer Name}`
 		? Name
-		: never]: K["validator"] extends typeof validators.boolean
-		? boolean
-		: string;
+		: never]: K["multiple"] extends true
+		? string[]
+		: K["validator"] extends typeof validators.boolean
+			? boolean
+			: string;
 };
 
 /**
@@ -97,7 +100,16 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			);
 		}
 
-		result[option.long.replace("--", "")] = nextArg;
+		// Handle multiple values for the same option
+		const key = option.long.replace("--", "");
+		if (option.multiple) {
+			if (!result[key]) {
+				result[key] = [];
+			}
+			(result[key] as string[]).push(nextArg);
+		} else {
+			result[key] = nextArg;
+		}
 		i++; // Skip next argument since we consumed it
 	}
 

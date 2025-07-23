@@ -1,5 +1,5 @@
 import { describe, expect, it, spyOn } from "bun:test";
-import { log } from "..";
+import { log } from "./index";
 
 describe("@repo/logger", () => {
 	it("prints a message", () => {

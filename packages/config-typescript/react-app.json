@@ -2,15 +2,12 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"extends": "./base.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"declaration": false,
-		"declarationMap": false,
-		"incremental": true,
-		"jsx": "preserve",
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"module": "esnext",
-		"noEmit": true,
+		"lib": ["DOM", "DOM.Iterable", "ES2022"],
+		"target": "ES2022",
 		"resolveJsonModule": true,
-		"target": "es5"
-	}
+		"jsx": "preserve",
+		"allowJs": true,
+		"incremental": true
+	},
+	"exclude": ["node_modules", "dist"]
 }
