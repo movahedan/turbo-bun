@@ -24,8 +24,6 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: viteEntries,
-			// formats: ["es"],
-			// fileName: (_, entryName) => `${entryName}.js`,
 		},
 		rollupOptions: {
 			external: [

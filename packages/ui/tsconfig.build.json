@@ -2,8 +2,6 @@
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"composite": true,
-
-		// Output Settings
 		"noEmit": false,
 		"sourceMap": true,
 		"rootDir": "..",

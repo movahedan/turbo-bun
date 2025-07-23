@@ -10,30 +10,25 @@
 		"dist"
 	],
 	"exports": {
-		"./button": {
-			"types": "./dist/ui/src/button/button.d.ts",
-			"import": "./dist/ui/src/button/button.js",
-			"require": "./dist/ui/src/button/button.cjs"
-		},
-		"./link": {
-			"types": "./dist/ui/src/link/link.d.ts",
-			"import": "./dist/ui/src/link/link.js",
-			"require": "./dist/ui/src/link/link.cjs"
-		},
-		"./counter-button": {
-			"types": "./dist/ui/src/counter-button/counter-button.d.ts",
-			"import": "./dist/ui/src/counter-button/counter-button.js",
-			"require": "./dist/ui/src/counter-button/counter-button.cjs"
-		},
-		"./ui/src/index": {
+		".": {
 			"types": "./dist/ui/src/index.d.ts",
 			"import": "./dist/ui/src/index.js",
 			"require": "./dist/ui/src/index.cjs"
 		},
-		"./utils/src/cn": {
-			"types": "./dist/utils/src/cn.d.ts",
-			"import": "./dist/utils/src/cn.js",
-			"require": "./dist/utils/src/cn.cjs"
+		"./button/button": {
+			"types": "./dist/ui/src/button/button.d.ts",
+			"import": "./dist/ui/src/button/button.js",
+			"require": "./dist/ui/src/button/button.cjs"
+		},
+		"./link/link": {
+			"types": "./dist/ui/src/link/link.d.ts",
+			"import": "./dist/ui/src/link/link.js",
+			"require": "./dist/ui/src/link/link.cjs"
+		},
+		"./counter-button/counter-button": {
+			"types": "./dist/ui/src/counter-button/counter-button.d.ts",
+			"import": "./dist/ui/src/counter-button/counter-button.js",
+			"require": "./dist/ui/src/counter-button/counter-button.cjs"
 		}
 	},
 	"scripts": {

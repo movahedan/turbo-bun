@@ -24,9 +24,9 @@ bun add @repo/ui
 For optimal tree-shaking and bundle size:
 
 ```typescript
-import { Button } from '@repo/ui/button';
-import { Link } from '@repo/ui/link';
-import { CounterButton } from '@repo/ui/counter-button';
+import { Button } from '@repo/ui/button/button';
+import { Link } from '@repo/ui/link/link';
+import { CounterButton } from '@repo/ui/counter-button/counter-button';
 ```
 
 ### Barrel Import (Convenience)
