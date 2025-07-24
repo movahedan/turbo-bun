@@ -10,7 +10,7 @@ dist-ssr
 .cache
 server/dist
 public/dist
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 .vscode
 .act-event.json
 .act

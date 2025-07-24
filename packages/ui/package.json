@@ -9,14 +9,38 @@
 		"dist/**",
 		"dist"
 	],
+	"exports": {
+		".": {
+			"types": "./dist/ui/src/index.d.ts",
+			"import": "./dist/ui/src/index.js",
+			"require": "./dist/ui/src/index.cjs"
+		},
+		"./button/button": {
+			"types": "./dist/ui/src/button/button.d.ts",
+			"import": "./dist/ui/src/button/button.js",
+			"require": "./dist/ui/src/button/button.cjs"
+		},
+		"./link/link": {
+			"types": "./dist/ui/src/link/link.d.ts",
+			"import": "./dist/ui/src/link/link.js",
+			"require": "./dist/ui/src/link/link.cjs"
+		},
+		"./counter-button/counter-button": {
+			"types": "./dist/ui/src/counter-button/counter-button.d.ts",
+			"import": "./dist/ui/src/counter-button/counter-button.js",
+			"require": "./dist/ui/src/counter-button/counter-button.cjs"
+		}
+	},
 	"scripts": {
-		"build": "bun run ./prebuild.ts && bunchee",
-		"dev": "bunchee --watch",
-		"start": "bunchee --watch",
+		"build": "bun run ../../scripts/build-workflow.ts -p ui",
+		"build:vite": "vite build",
+		"dev": "vite build --watch",
+		"start": "vite build --watch",
 		"check:types": "tsc --noEmit",
 		"test": "bun test --dom",
 		"test:watch": "bun test --watch --dom",
-		"test:coverage": "bun test --coverage --dom"
+		"test:coverage": "bun test --coverage --dom",
+		"build-exports": "bun run build-exports.ts"
 	},
 	"dependencies": {
 		"@repo/utils": "workspace:*",
@@ -29,43 +53,12 @@
 	},
 	"devDependencies": {
 		"@happy-dom/global-registrator": "18.0.1",
+		"@repo/test-preset": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
 		"@testing-library/dom": "10.4.0",
 		"@testing-library/jest-dom": "6.6.3",
 		"@testing-library/react": "16.3.0",
-		"bunchee": "6.5.4",
-		"typescript": "5.8.3"
-	},
-	"exports": {
-		"./button": {
-			"import": {
-				"types": "./dist/button/button.d.mts",
-				"default": "./dist/button/button.mjs"
-			},
-			"require": {
-				"types": "./dist/button/button.d.ts",
-				"default": "./dist/button/button.js"
-			}
-		},
-		"./link": {
-			"import": {
-				"types": "./dist/link/link.d.mts",
-				"default": "./dist/link/link.mjs"
-			},
-			"require": {
-				"types": "./dist/link/link.d.ts",
-				"default": "./dist/link/link.js"
-			}
-		},
-		"./counter-button": {
-			"import": {
-				"types": "./dist/counter-button/counter-button.d.mts",
-				"default": "./dist/counter-button/counter-button.mjs"
-			},
-			"require": {
-				"types": "./dist/counter-button/counter-button.d.ts",
-				"default": "./dist/counter-button/counter-button.js"
-			}
-		}
+		"@vitejs/plugin-react": "4.7.0",
+		"vite": "6.3.5"
 	}
 }

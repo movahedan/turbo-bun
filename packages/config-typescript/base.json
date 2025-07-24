@@ -1,25 +1,26 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"composite": false,
-		"declaration": true,
-		"declarationMap": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"allowImportingTsExtensions": true,
-		"inlineSources": false,
-		"isolatedModules": true,
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"target": "ESNext",
-		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"preserveWatchOutput": true,
-		"skipLibCheck": true,
-		"strict": true,
+		"types": ["node", "bun-types"],
+		"composite": false,
+		"declaration": true,
+		"declarationMap": true,
 		"noEmit": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": false,
+		"inlineSources": false,
+		"isolatedModules": true,
+		"skipLibCheck": true,
+		"preserveWatchOutput": true,
+		"strict": true,
 		"strictNullChecks": true,
-		"types": ["node", "bun-types"]
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true
 	},
-	"exclude": ["node_modules", "dist"]
+	"exclude": ["**/node_modules/**", "**/dist/**", "**/.turbo/**"]
 }

@@ -9,9 +9,6 @@
 		"./testing-library": "./testing-library.ts",
 		"./happydom": "./happydom.ts"
 	},
-	"scripts": {
-		"build": "echo 'No build needed for test preset'"
-	},
 	"dependencies": {
 		"@happy-dom/global-registrator": "14.12.3",
 		"@testing-library/jest-dom": "6.6.3",
@@ -19,7 +16,6 @@
 		"chalk": "5.4.1"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "workspace:*",
-		"typescript": "5.8.3"
+		"@repo/typescript-config": "workspace:*"
 	}
 }

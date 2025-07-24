@@ -1,10 +1,16 @@
 {
-	"name": "kitchen-sink",
-	"private": true,
+	"root": true,
+	"name": "turbo-bun",
+	"version": "0.0.1",
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"scripts": {
 		"//setup": "/////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"setup": "bun run scripts/setup.ts",
 		"cleanup": "bun run scripts/cleanup.ts",
+		"cleanup:node_modules": "rm -rf ./apps/*/node_modules && rm -rf ./packages/*/node_modules",
 		"sync:vscode": "bun run scripts/sync-vscode-config.ts",
 		"//biome and checks": "//////////////////////////////////////////////////////////////////////////////////////////",
 		"check": "biome check .",
@@ -15,23 +21,14 @@
 		"check:pipelines": "bun run scripts/check-pipelines.ts",
 		"//turbo": "/////////////////////////////////////////////////////////////////////////////////////////////////////",
 		"dev": "turbo run dev",
+		"build": "turbo run build",
+		"start": "turbo run start",
 		"test": "turbo run test",
 		"test:watch": "turbo run test:watch",
 		"test:coverage": "turbo run test:coverage",
 		"test:affected": "turbo run test --affected",
 		"test:affected:watch": "turbo run test:watch --affected",
-		"test:force": "turbo run test --force",
 		"test:parallel": "turbo run test --parallel",
-		"test:ui": "turbo run test --filter=@repo/ui",
-		"test:utils": "turbo run test --filter=@repo/utils",
-		"test:logger": "turbo run test --filter=@repo/logger",
-		"test:api": "turbo run test --filter=api",
-		"test:blog": "turbo run test --filter=blog",
-		"test:storefront": "turbo run test --filter=storefront",
-		"test:admin": "turbo run test --filter=admin",
-		"build": "turbo run build",
-		"build:force": "turbo run build --force",
-		"start": "turbo run start",
 		"//devcontainers": "/////////////////////////////////////////////////////////////////////////////////////////////",
 		"dev:checkup": "bun run scripts/check-devcontainer.ts",
 		"dev:compose": "docker compose -f .devcontainer/docker-compose.dev.yml",
@@ -67,12 +64,12 @@
 		"//changesets": "////////////////////////////////////////////////////////////////////////////////////////////////",
 		"changesets": "bunx --install=force --bun @changesets/cli"
 	},
+	"packageManager": "bun@1.2.15",
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
 		"@changesets/cli": "2.29.5",
 		"@commitlint/cli": "19.8.1",
 		"@commitlint/config-conventional": "19.8.1",
-		"@repo/test-preset": "workspace:*",
 		"bun-types": "1.2.19",
 		"chalk": "5.4.1",
 		"lefthook": "1.11.16",
@@ -87,9 +84,28 @@
 		"react-dom": "19.1.0",
 		"vite": "6.3.5"
 	},
-	"packageManager": "bun@1.2.15",
-	"workspaces": [
-		"apps/*",
-		"packages/*"
+	"description": "A monorepo for Turbo and Bun",
+	"author": "Soheil Movahedan",
+	"license": "MIT",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/movahedan/turbo-bun"
+	},
+	"homepage": "https://github.com/movahedan/turbo-bun",
+	"bugs": "https://github.com/movahedan/turbo-bun/issues",
+	"keywords": [
+		"turbo",
+		"bun",
+		"monorepo",
+		"typescript",
+		"react",
+		"docker",
+		"devcontainers",
+		"git",
+		"vite"
 	]
 }

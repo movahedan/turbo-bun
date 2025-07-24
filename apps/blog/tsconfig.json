@@ -1,35 +1,17 @@
 {
-	"include": ["**/*.ts", "**/*.tsx"],
+	"extends": "@repo/typescript-config/remix.json",
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ES2022"],
-		"types": ["@vercel/remix", "vite/client"],
-		"isolatedModules": true,
-		"esModuleInterop": true,
-		"jsx": "react-jsx",
-		"module": "ESNext",
-		"moduleResolution": "Bundler",
-		"resolveJsonModule": true,
-		"target": "ES2022",
-		"strict": true,
-		"allowJs": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
 		"paths": {
-			"~/*": ["./app/*"]
-		},
-		"noEmit": true
+			"~/*": ["./app/*"],
+			"@repo/ui": ["../../packages/ui/dist/ui/src"],
+			"@repo/ui/*": ["../../packages/ui/dist/ui/src/*"]
+		}
 	},
-	"composite": true,
+	"include": ["**/*.ts", "**/*.tsx"],
 	"references": [
 		{
-			"path": "../../packages/logger"
-		},
-		{
-			"path": "../../packages/ui"
-		},
-		{
-			"path": "../../packages/utils"
+			"path": "../../packages/ui/tsconfig.build.json"
 		}
 	]
 }

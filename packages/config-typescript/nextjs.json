@@ -2,21 +2,18 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"extends": "./base.json",
 	"compilerOptions": {
+		"lib": ["DOM", "DOM.Iterable", "ES2022"],
+		"target": "ES2022",
+		"resolveJsonModule": true,
+		"jsx": "preserve",
+		"allowJs": true,
+		"incremental": true,
 		"plugins": [
 			{
 				"name": "next"
 			}
-		],
-		"allowJs": true,
-		"declaration": false,
-		"declarationMap": false,
-		"incremental": true,
-		"jsx": "preserve",
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"module": "esnext",
-		"noEmit": true,
-		"resolveJsonModule": true,
-		"target": "es5"
+		]
 	},
+	"include": ["src", "next.config.ts", "next-env.d.ts", ".next/types/**/*.ts"],
 	"exclude": ["node_modules", "dist"]
 }

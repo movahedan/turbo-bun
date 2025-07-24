@@ -5,10 +5,13 @@
 	"license": "MIT",
 	"sideEffects": false,
 	"type": "module",
+	"imports": {
+		"#*": "./src/*"
+	},
+	"exports": {
+		"./cn": "./src/cn.ts"
+	},
 	"scripts": {
-		"build": "bun run ./prebuild.ts && tsc",
-		"dev": "tsc --watch",
-		"start": "tsc --watch",
 		"check:types": "tsc --noEmit",
 		"test": "bun test",
 		"test:watch": "bun test --watch",
@@ -19,19 +22,6 @@
 		"tailwind-merge": "2.2.2"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "workspace:*",
-		"typescript": "5.8.3"
-	},
-	"exports": {
-		"./cn": {
-			"import": {
-				"types": "./dist/cn.d.mts",
-				"default": "./dist/cn.mjs"
-			},
-			"require": {
-				"types": "./dist/cn.d.ts",
-				"default": "./dist/cn.js"
-			}
-		}
+		"@repo/typescript-config": "workspace:*"
 	}
 }

@@ -1,0 +1,17 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"composite": true,
+		"noEmit": false,
+		"sourceMap": true,
+		"rootDir": "..",
+		"outDir": "./dist"
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "../utils/src/**/*"],
+	"exclude": [
+		"src/**/*.test.ts",
+		"src/**/*.test.tsx",
+		"../utils/src/**/*.test.ts",
+		"../utils/src/**/*.test.tsx"
+	]
+}

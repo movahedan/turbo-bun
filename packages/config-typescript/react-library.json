@@ -3,9 +3,6 @@
 	"extends": "./base.json",
 	"compilerOptions": {
 		"lib": ["ES2015"],
-		"module": "ESNext",
-		"target": "ESNext",
-		"jsx": "react-jsx",
-		"noEmit": true
+		"jsx": "react-jsx"
 	}
 }
