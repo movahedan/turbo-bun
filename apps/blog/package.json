@@ -29,7 +29,7 @@
 		"@types/react": "19.1.8",
 		"@types/react-dom": "19.1.6",
 		"autoprefixer": "10.4.21",
-		"vite": "6.3.5",
+		"vite": "7.0.5",
 		"vite-tsconfig-paths": "4.3.2"
 	}
 }
