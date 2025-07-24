@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 /**
- * Build Workflow Script
+ * Build Vite Library Script
  * Complete workflow: tsc → generate entries → vite build → update package.json
  */
 import { join, resolve } from "node:path";
@@ -68,18 +68,18 @@ async function getViteAndPackageExports(
 }
 
 // The main script that runs the build workflow
-export const buildWorkflow = createScript(
+export const buildViteLibrary = createScript(
 	{
-		name: "Build Workflow",
+		name: "Build Vite Library",
 		description: `Complete build workflow:
 	1. Run tsc --project tsconfig.build.json
 	2. Generate Vite entries from dist files
 	3. Run Vite build
 	4. Update package.json exports`,
-		usage: "bun run build-workflow [--package <name>] [--dry-run]",
+		usage: "bun run build-vite-library [--package <name>] [--dry-run]",
 		examples: [
-			"bun run build-workflow --package ui",
-			"bun run build-workflow --package ui --dry-run",
+			"bun run build-vite-library --package ui",
+			"bun run build-vite-library --package ui --dry-run",
 		],
 		options: [
 			{
@@ -192,7 +192,7 @@ export const buildWorkflow = createScript(
 );
 
 if (import.meta.main) {
-	buildWorkflow();
+	buildViteLibrary();
 }
 
 // Helper functions -------------------------------------------------------------------------------

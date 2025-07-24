@@ -32,7 +32,7 @@
 		}
 	},
 	"scripts": {
-		"build": "bun run ../../scripts/build-workflow.ts -p ui",
+		"build": "bun run ../../scripts/build-vite-library.ts -p ui",
 		"build:vite": "vite build",
 		"dev": "vite build --watch",
 		"start": "vite build --watch",

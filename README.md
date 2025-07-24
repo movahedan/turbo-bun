@@ -16,6 +16,7 @@
 - **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)** - Structured Shell scripting with bun
 - **[Development Conventions](./docs/4_DEVCONVENTIONS.md)** - Coding standards and best practices
 - **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)** - Test infrastructure changes before deployment
+- **[Build Vite Library](./docs/7_BUILD_VITE_LIBRARY.md)** - Complete TypeScript library build workflow
 - **[AI Report](./docs/AI_REPORT.md)** - Automated testing and validation for AI assistants
 
 ## 📋 Table of Contents
@@ -25,6 +26,7 @@
 - [Development Tools](#-development-tools)
 - [Additional Documentation](#-additional-documentation)
 - [Applications & Packages](#-applications--packages)
+- [Build System](#-build-system)
 
 ## 🚀 Getting Started
 
@@ -70,6 +72,36 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **[Lefthook](https://github.com/evilmartians/lefthook)**: Git hooks management
 - **[DevContainers](https://containers.dev/)**: Complete Docker-based development environment
 - **[VS Code Extensions](https://marketplace.visualstudio.com/)**: Pre-configured for optimal development experience
+
+## 🏗️ Build System
+
+### Advanced Library Building
+The monorepo includes a sophisticated build system for TypeScript libraries:
+
+- **[Build Vite Library Script](./docs/7_BUILD_VITE_LIBRARY.md)**: Complete workflow for building TypeScript libraries with Vite
+- **Dynamic Entry Generation**: Automatically generates Vite entries from compiled TypeScript files
+- **Package.json Integration**: Updates exports automatically based on built files
+- **Workspace Support**: Handles dependencies between workspace packages
+- **Tree-shaking Optimization**: Ensures optimal bundle sizes for consumers
+
+### Key Features
+- **TypeScript Compilation**: Full type checking and `.d.ts` generation
+- **Vite Bundling**: Optimized builds with multiple output formats (ESM, CommonJS)
+- **Source Maps**: Preserved for debugging and development
+- **Dry Run Mode**: Preview changes without making them
+- **Error Handling**: Comprehensive error reporting and cleanup
+
+### Usage Examples
+```bash
+# Build UI package with complete workflow
+bun run build-vite-library --package ui
+
+# Preview changes without making them
+bun run build-vite-library --package ui --dry-run
+
+# Build with custom configuration
+bun run build-vite-library --package ui --config ./custom-tsconfig.json
+```
 
 ## 📦 Applications & Packages
 
