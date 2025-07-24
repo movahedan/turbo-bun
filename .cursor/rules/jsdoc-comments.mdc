@@ -1,3 +1,9 @@
+---
+description: Use JSDoc comments to annotate functions and types
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
 Use JSDoc comments to annotate functions and types.
 
 Be concise in JSDoc comments, and only provide JSDoc comments if the function's behaviour is not self-evident.

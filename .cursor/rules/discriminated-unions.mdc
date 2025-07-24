@@ -1,3 +1,9 @@
+---
+description: Proactively use discriminated unions to model data with different shapes
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
 Proactively use discriminated unions to model data that can be in one of a few different shapes.
 
 For example, when sending events between environments:

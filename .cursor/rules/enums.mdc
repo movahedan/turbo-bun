@@ -1,3 +1,9 @@
+---
+description: Do not introduce new enums, use as const objects instead
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
 Do not introduce new enums into the codebase. Retain existing enums.
 
 If you require enum-like behaviour, use an `as const` object:

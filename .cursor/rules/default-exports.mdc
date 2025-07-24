@@ -1,3 +1,9 @@
+---
+description: Avoid default exports unless required by framework
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
 Unless explicitly required by the framework, do not use default exports.
 
 ```ts

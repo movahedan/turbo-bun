@@ -1,3 +1,9 @@
+---
+description: Use import type for type imports
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: true
+---
+
 Use import type whenever you are importing a type.
 
 Prefer top-level `import type` over inline `import { type ... }`.

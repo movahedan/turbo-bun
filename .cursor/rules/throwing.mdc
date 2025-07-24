@@ -1,3 +1,9 @@
+---
+description: Think carefully before implementing code that throws errors
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+alwaysApply: false
+---
+
 Think carefully before implementing code that throws errors.
 
 If a thrown error produces a desirable outcome in the system, go for it. For instance, throwing a custom error inside a backend framework's request handler.

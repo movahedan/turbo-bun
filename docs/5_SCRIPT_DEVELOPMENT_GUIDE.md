@@ -405,7 +405,7 @@ import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
-const script = createScript(
+const githubActionTest = createScript(
   {
     name: "GitHub Actions Test",
     options: [
@@ -429,7 +429,7 @@ const script = createScript(
   },
 );
 
-script();
+githubActionTest();
 ```
 
 ## 🔧 Troubleshooting

@@ -1,3 +1,9 @@
+---
+description: Use package managers to install latest library versions
+globs: ["package.json", "**/*.json"]
+alwaysApply: true
+---
+
 When installing libraries, do not rely on your own training data.
 
 Your training data has a cut-off date. You're probably not aware of all of the latest developments in the JavaScript and TypeScript world.
@@ -6,13 +12,15 @@ This means that instead of picking a version manually (via updating the `package
 
 ```bash
 # pnpm
-pnpm add -D @typescript-eslint/eslint-plugin
+pnpm add -D @biomejs/biome
 
 # yarn
-yarn add -D @typescript-eslint/eslint-plugin
+yarn add -D @biomejs/biome
 
 # npm
-npm install --save-dev @typescript-eslint/eslint-plugin
+npm install --save-dev @biomejs/biome
+
+bun install --dev @biomejs/biome
 ```
 
 This will ensure you're always using the latest version.
