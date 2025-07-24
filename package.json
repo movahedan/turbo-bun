@@ -72,7 +72,7 @@
 		"@commitlint/config-conventional": "19.8.1",
 		"bun-types": "1.2.19",
 		"chalk": "5.4.1",
-		"lefthook": "1.11.16",
+		"lefthook": "1.12.2",
 		"turbo": "2.5.5",
 		"typescript": "5.8.3"
 	},
