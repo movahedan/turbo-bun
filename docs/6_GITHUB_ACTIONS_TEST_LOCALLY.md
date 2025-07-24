@@ -85,3 +85,7 @@ sudo usermod -aG docker $USER
 - **Simple**: Single script approach
 - **Reliable**: Works with most workflows
 - **Clean**: Minimal configuration needed 
+
+---
+**For more information about Docker configuration, see [Docker Setup](./1_DOCKER.md).** 
+**For development environment setup, see [DevContainer Guide](./2_DEVCONTAINER.md).** 

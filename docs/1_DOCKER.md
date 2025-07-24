@@ -34,18 +34,10 @@ The project uses Docker for both development and production environments with:
 │   ├── Dockerfile.vscode           # VS Code container
 │   └── Dockerfile.dev              # Development base image
 └── apps/
-    ├── admin/
-    │   ├── Dockerfile              # Production build
-    │   └── Dockerfile.dev          # Development build
-    ├── blog/
-    │   ├── Dockerfile
-    │   └── Dockerfile.dev
-    ├── storefront/
-    │   ├── Dockerfile
-    │   └── Dockerfile.dev
-    └── api/
-        ├── Dockerfile
-        └── Dockerfile.dev
+    ├── admin/Dockerfile            # Production build
+    ├── blog/Dockerfile             # Production build
+    ├── storefront/Dockerfile       # Production build
+    └── api/Dockerfile              # Production build
 ```
 
 ### Services Overview
@@ -73,6 +65,7 @@ The project uses Docker for both development and production environments with:
    git clone <repository-url>
    cd <project-name>
    code .
+   bun run dev:checkup
    ```
 
 2. **Open in Dev Container**:
@@ -341,11 +334,9 @@ docker inspect <container-name>
 📁 apps/
 ├── admin/
 │   ├── Dockerfile              # Production optimized
-│   ├── Dockerfile.dev          # Development optimized
 │   └── .dockerignore           # Exclude unnecessary files
 ├── blog/
 │   ├── Dockerfile
-│   ├── Dockerfile.dev
 │   └── .dockerignore
 └── ...
 ```

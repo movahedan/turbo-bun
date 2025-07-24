@@ -376,4 +376,4 @@ docker exec -it <container-name> /bin/bash
 
 ---
 
-**For more information about Docker configuration, see [Docker Setup](./DOCKER.md).** 
+**For more information about Docker configuration, see [Docker Setup](./1_DOCKER.md).** 

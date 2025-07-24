@@ -620,4 +620,4 @@ export type { ButtonProps } from './components/Button';
 
 ---
 
-**For more information about development workflow, see [Development Guide](./DEVELOPMENT.md).** 
+**For more information about development workflow, see [Development Guide](./3_DEVFLOW.md).** 

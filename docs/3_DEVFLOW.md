@@ -77,4 +77,4 @@ git commit -m "type(scope): description
 4. Submit a pull request with a clear description
 5. Ensure all CI checks pass
 
-**For development environment setup, see [DevContainer Guide](./DEVCONTAINER.md).** 
+**For development environment setup, see [DevContainer Guide](./2_DEVCONTAINER.md).** 
