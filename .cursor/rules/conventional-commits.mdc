@@ -113,3 +113,8 @@ This fixes the intermittent Docker image errors in CI by automatically
 including service dependencies based on the actual docker-compose.yml
 configuration.
 ```
+
+## 🤔 After Making Changes
+
+After completing changes and committing them, always ask:
+> "Would you like me to push the changes to the remote repository?"
