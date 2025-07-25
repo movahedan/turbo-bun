@@ -15,7 +15,7 @@ import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
-const descriptiveNameForScript = createScript(
+export const descriptiveNameForScript = createScript(
   // keep the config inline, it's better
   {
     name: "Script Name",
@@ -40,7 +40,9 @@ const descriptiveNameForScript = createScript(
   },
 );
 
-descriptiveNameForScript();
+if(import.meta.main) {
+  descriptiveNameForScript();
+}
 ```
 
 ## Best Practices
