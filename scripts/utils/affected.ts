@@ -1,4 +1,5 @@
 import { $ } from "bun";
+import { findCommand } from "./command-finder";
 import { type Runnable, runnables } from "./config";
 
 /* Sample output of turbo command:
@@ -11,8 +12,9 @@ import { type Runnable, runnables } from "./config";
 		...
   }
 */
-async function getAffectedPackages(): Promise<string[]> {
-	const turboPath = `${process.cwd()}/node_modules/.bin/turbo`;
+export async function getAffectedPackages(): Promise<string[]> {
+	const turboPath = await findCommand("turbo");
+
 	const affectedPackages =
 		await $`${turboPath} run build --filter="...[origin/main]" --dry-run=json`
 			.quiet()

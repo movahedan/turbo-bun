@@ -1,57 +1,81 @@
+#!/usr/bin/env bun
+
 import { $ } from "bun";
 import chalk from "chalk";
-import { runnables } from "./utils/config";
+import { validators } from "./utils/arg-parser";
+import { createScript } from "./utils/create-scripts";
 
-const base = "http://localhost";
-const getLogsForRunnable = (runnable: (typeof runnables)[number]) => {
-	const label = `- ${runnable.label}:`;
-	const url = `${base}:${runnable.port}`;
-
-	return `${chalk.cyan(label)} ${chalk.bgGreen(url)}`;
-};
-
-export async function start() {
-	try {
+/**
+ * Comprehensive development environment setup script
+ * Installs dependencies, builds Docker images, and starts all services
+ */
+const setupScript = createScript(
+	{
+		name: "Development Setup",
+		description:
+			"Comprehensive development environment setup with dependency installation, Docker builds, and service startup",
+		usage: "bun run setup [options]",
+		examples: [
+			"bun run setup",
+			"bun run setup --skip-docker",
+			"bun run setup --skip-vscode",
+		],
+		options: [
+			{
+				short: "-s",
+				long: "--skip-docker",
+				description: "Skip Docker image building and service startup",
+				required: false,
+				validator: validators.boolean,
+			},
+			{
+				short: "-c",
+				long: "--skip-cleanup",
+				description: "Skip cleanup after setup",
+				required: false,
+				validator: validators.boolean,
+			},
+			{
+				short: "-v",
+				long: "--skip-vscode",
+				description: "Skip VS Code configuration sync",
+				required: false,
+				validator: validators.boolean,
+			},
+		],
+	} as const,
+	async (args: {
+		"skip-docker"?: boolean;
+		"skip-vscode"?: boolean;
+		"dry-run"?: boolean;
+	}): Promise<void> => {
 		console.log(chalk.blue("🚀 Starting comprehensive development setup..."));
-
-		// Step 2: Install dependencies
+		// Step 1: Install dependencies
 		console.log(chalk.blue("📦 Installing dependencies..."));
 		await $`bun install`;
 
-		// Step 2.5: Sync VS Code configuration
-		console.log(chalk.blue("🎯 Syncing VS Code configuration..."));
-		await $`bun run sync:vscode`;
+		// Step 2: Docker operations (unless skipped)
+		if (!args["skip-docker"]) {
+			console.log(chalk.blue("🎯 Run devcontainer setup..."));
+			await $`bun run dev:checkup`;
+		}
 
-		// Step 3: Build Docker images
-		console.log(chalk.blue("🐳 Building Docker images..."));
-		await $`bun run dev:build`;
+		// Step 3: Sync VS Code configuration (unless skipped)
+		if (!args["skip-vscode"]) {
+			console.log(chalk.blue("🎯 Syncing VS Code configuration..."));
+			await $`bun run sync:vscode`;
+		}
 
-		// Step 4: Start services
-		console.log(chalk.blue("🚀 Starting services..."));
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile vscode up -d`;
-		await $`bun run dev:up`;
-
-		// Step 5: Check service status
-		console.log(chalk.yellow("🔍 Checking service status..."));
-		await $`bun run dev:status`;
-
-		// Step 6: Wait a moment for services to fully start
-		console.log(chalk.yellow("⏳ Waiting for services to fully start..."));
-		await new Promise((resolve) => setTimeout(resolve, 5000));
-
-		// Step 7: Final status check
 		console.log(chalk.green("✅ Setup completed successfully!"));
-		console.log(chalk.green("📱 Services are running at:"));
-		console.log(runnables.map(getLogsForRunnable).join("\n"));
 
 		console.log(chalk.cyan("\n💡 Useful commands:"));
 		console.log(chalk.cyan("  - bun run dev:logs     # View all service logs"));
 		console.log(chalk.cyan("  - bun run dev:status   # Check service status"));
 		console.log(chalk.cyan("  - bun run cleanup      # Clean everything"));
-	} catch (error) {
-		console.error(chalk.red("❌ Failed to run setup:"), error);
-		process.exit(1);
-	}
-}
+	},
+	undefined,
+);
 
-start();
+if (import.meta.main) {
+	setupScript();
+}

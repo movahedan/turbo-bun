@@ -33,9 +33,9 @@
 	},
 	"scripts": {
 		"build": "bun run ../../scripts/build-vite-library.ts -p ui",
-		"build:vite": "vite build",
-		"dev": "vite build --watch",
-		"start": "vite build --watch",
+		"build:vite": "bunx --bun vite build",
+		"dev": "bunx --bun vite build --watch",
+		"start": "bunx --bun vite build --watch",
 		"check:types": "tsc --noEmit",
 		"test": "bun test --dom",
 		"test:watch": "bun test --watch --dom",

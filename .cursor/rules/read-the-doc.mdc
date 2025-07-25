@@ -1,0 +1,126 @@
+---
+alwaysApply: true
+---
+
+# 📚 Documentation-First Rule
+
+## 🎯 Core Principle
+**ALWAYS read and understand the project documentation before implementing any changes.**
+
+## 📋 Mandatory Documentation Review
+
+### **CRITICAL: Read AI Documentation First**
+- [ ] **ALWAYS** read `docs/AI_Prompt.md` for AI-specific guidelines and implementation rules
+- [ ] Follow the comprehensive documentation review process outlined in `docs/AI_Prompt.md`
+- [ ] Use `docs/AI_Prompt.md` as your primary reference for all development decisions
+
+### **Project Documentation Structure**
+The project has extensive documentation in `docs/*` that must be consulted:
+
+- `docs/AI_Prompt.md` - **PRIMARY AI REFERENCE** (MANDATORY)
+- `docs/0_QUALITY_CHECKLIST.md` - Structural change requirements
+- `docs/3_DEVFLOW.md` - Development workflow and commands
+- `docs/4_DEVCONVENTIONS.md` - Coding standards and conventions
+- `docs/planning/` - Architectural decisions and planning
+
+## 🔍 Documentation Search Strategy
+
+### **Priority Order:**
+1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY FIRST READ)
+2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
+3. **`README.md`** - Project overview and setup
+4. **Relevant feature docs** - For specific implementations
+
+### **Quick Search Commands:**
+```bash
+# Find AI-specific documentation
+find docs/ -name "*AI*" -o -name "*Prompt*"
+# Search for specific topics
+grep -r "keyword" docs/
+# Check recent documentation updates
+git log --oneline -- docs/
+```
+
+## 🚨 Critical Rules
+
+1. **ALWAYS read `docs/AI_Prompt.md` first** - This is your primary AI reference
+2. **Follow the documentation review process** outlined in `docs/AI_Prompt.md`
+3. **Use project documentation as your source of truth** for all decisions
+4. **Update relevant documentation** when making changes
+
+## 💡 Quick Reference
+
+- **Start with**: `docs/AI_Prompt.md`
+- **Quality checks**: `docs/0_QUALITY_CHECKLIST.md`
+- **Development workflow**: `docs/3_DEVFLOW.md`
+- **Coding standards**: `docs/4_DEVCONVENTIONS.md`
+- **Architecture decisions**: `docs/planning/`
+
+---
+
+**Remember**: This project has extensive, well-organized documentation. Reading and following this documentation ensures consistency, quality, and successful implementation. The documentation is your primary source of truth for all development decisions.
+
+Read all the docs and apply the solution according to your findings.
+
+The docs are inside `docs/*`
+# 📚 Documentation-First Rule
+
+## 🎯 Core Principle
+**ALWAYS read and understand the project documentation before implementing any changes.**
+
+## 📋 Mandatory Documentation Review
+
+### **CRITICAL: Read AI Documentation First**
+- [ ] **ALWAYS** read `docs/AI_Prompt.md` for AI-specific guidelines and implementation rules
+- [ ] Follow the comprehensive documentation review process outlined in `docs/AI_Prompt.md`
+- [ ] Use `docs/AI_Prompt.md` as your primary reference for all development decisions
+
+### **Project Documentation Structure**
+The project has extensive documentation in `docs/*` that must be consulted:
+
+- `docs/AI_Prompt.md` - **PRIMARY AI REFERENCE** (MANDATORY)
+- `docs/0_QUALITY_CHECKLIST.md` - Structural change requirements
+- `docs/3_DEVFLOW.md` - Development workflow and commands
+- `docs/4_DEVCONVENTIONS.md` - Coding standards and conventions
+- `docs/planning/` - Architectural decisions and planning
+
+## 🔍 Documentation Search Strategy
+
+### **Priority Order:**
+1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY FIRST READ)
+2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
+3. **`README.md`** - Project overview and setup
+4. **Relevant feature docs** - For specific implementations
+
+### **Quick Search Commands:**
+```bash
+# Find AI-specific documentation
+find docs/ -name "*AI*" -o -name "*Prompt*"
+# Search for specific topics
+grep -r "keyword" docs/
+# Check recent documentation updates
+git log --oneline -- docs/
+```
+
+## 🚨 Critical Rules
+
+1. **ALWAYS read `docs/AI_Prompt.md` first** - This is your primary AI reference
+2. **Follow the documentation review process** outlined in `docs/AI_Prompt.md`
+3. **Use project documentation as your source of truth** for all decisions
+4. **Update relevant documentation** when making changes
+
+## 💡 Quick Reference
+
+- **Start with**: `docs/AI_Prompt.md`
+- **Quality checks**: `docs/0_QUALITY_CHECKLIST.md`
+- **Development workflow**: `docs/3_DEVFLOW.md`
+- **Coding standards**: `docs/4_DEVCONVENTIONS.md`
+- **Architecture decisions**: `docs/planning/`
+
+---
+
+**Remember**: This project has extensive, well-organized documentation. Reading and following this documentation ensures consistency, quality, and successful implementation. The documentation is your primary source of truth for all development decisions.
+
+Read all the docs and apply the solution according to your findings.
+
+The docs are inside `docs/*`

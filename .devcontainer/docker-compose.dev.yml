@@ -20,11 +20,14 @@ services:
     build:
       context: ../
       dockerfile: .devcontainer/Dockerfile.vscode
+    environment:
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
     volumes:
-      - ${PROJECT_ROOT:-../}:/workspace:cached
+      - ${PROJECT_ROOT:-../}:/app:cached
       # Override with Docker volumes to exclude heavy directories
-      - node_modules:/workspace/node_modules:delegated
-      - turbo_cache:/workspace/.turbo:delegated
+      - node_modules:/app/node_modules:delegated
+      - turbo_cache:/app/.turbo:delegated
     command: sleep infinity
     # Use init for better signal handling
     init: true

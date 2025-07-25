@@ -12,7 +12,12 @@
 		// Import Settings
 		"baseUrl": "."
 	},
-	"include": [".", "../test-preset/matchers.d.ts", "../utils/src/**/*"],
+	"include": [
+		".",
+		"../test-preset/matchers.d.ts",
+		"../utils/src/**/*",
+		"vite-entries.generated.json"
+	],
 	"exclude": ["../utils/src/**/*.test.ts", "../utils/src/**/*.test.tsx"],
 	"references": [
 		{

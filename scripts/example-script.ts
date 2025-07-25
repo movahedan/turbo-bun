@@ -1,15 +1,13 @@
 #!/usr/bin/env bun
-
 /**
  * Example script demonstrating the modular argument parsing system
  * This shows how easy it is to create new scripts with consistent argument handling
  */
-
 import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
-const script = createScript(
+export const exampleScript = createScript(
 	{
 		name: "Example Script",
 		description:
@@ -60,4 +58,6 @@ const script = createScript(
 	},
 );
 
-script();
+if (import.meta.main) {
+	await exampleScript();
+}

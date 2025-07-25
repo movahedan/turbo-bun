@@ -1,5 +1,5 @@
 # App Runtime Environment
-# Container focused on running the monorepo apps (admin, blog, storefront, api)
+# Container focused on running the monorepo apps
 
 FROM oven/bun:1.2.19-alpine AS base
 
@@ -16,30 +16,17 @@ COPY package.json bun.lock turbo.json ./
 
 # Copy all workspace content
 # Bun needs the full workspace structure to resolve workspace dependencies
-COPY . .
+COPY --chown=vscode-user:vscode-user . .
 
 # Use BuildKit cache mounts for faster dependency installs
 RUN --mount=type=cache,target=/root/.bun/install/cache \
     --mount=type=cache,target=/app/node_modules/.cache \
     bun install
 
-# Setup Turbo with cache mounts and remote caching
-ARG TURBO_TOKEN
-ARG TURBO_TEAM
-ENV TURBO_TOKEN=${TURBO_TOKEN}
-ENV TURBO_TEAM=${TURBO_TEAM}
-
 # Create cache directory with proper permissions and use cache mount
 RUN --mount=type=cache,target=/app/.turbo \
     mkdir -p .turbo/cache && \
     chmod -R 777 .turbo
-
-# Pre-build shared packages (optional - commented out for faster container startup)
-# RUN --mount=type=cache,target=/app/.turbo \
-#     --mount=type=cache,target=/root/.bun/install/cache \
-#     turbo daemon start && \
-#     turbo run build --filter=@repo/ui --filter=@repo/utils --filter=@repo/logger --parallel && \
-#     turbo daemon stop
-
+    
 # Keep container running for development
 CMD ["sleep", "infinity"] 

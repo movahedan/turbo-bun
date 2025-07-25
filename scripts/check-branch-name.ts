@@ -1,11 +1,9 @@
 #!/usr/bin/env bun
-
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
 import { git } from "./utils/git-command";
 
-// Create script with automatic error handling and type safety
-const script = createScript(
+export const checkBranchName = createScript(
 	{
 		name: "Branch Name Checker",
 		description: "Validates branch names against predefined patterns",
@@ -32,7 +30,6 @@ const script = createScript(
 			},
 		],
 	} as const,
-	// Type-safe anonymous function with inferred argument types
 	async (args): Promise<void> => {
 		// In GitHub Actions, we might not have a proper branch name for pull requests
 		// Skip the check if we're in a CI environment and don't have a valid branch name
@@ -120,4 +117,6 @@ const script = createScript(
 	},
 );
 
-script();
+if (import.meta.main) {
+	await checkBranchName();
+}

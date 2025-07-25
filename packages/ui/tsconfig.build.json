@@ -3,11 +3,19 @@
 	"compilerOptions": {
 		"composite": true,
 		"noEmit": false,
+		"declaration": true,
+		"declarationMap": true,
 		"sourceMap": true,
 		"rootDir": "..",
-		"outDir": "./dist"
+		"outDir": "./dist",
+		"emitDeclarationOnly": false
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "../utils/src/**/*"],
+	"include": [
+		"vite-entries.generated.json",
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"../utils/src/**/*"
+	],
 	"exclude": [
 		"src/**/*.test.ts",
 		"src/**/*.test.tsx",

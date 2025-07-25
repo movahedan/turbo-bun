@@ -1,77 +1,14 @@
 #!/usr/bin/env bun
-
-/**
- * GitHub Actions local testing - optimized for speed
- * Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup
- *
- * Usage:
- *   bun run test:actions -e pull_request -w .github/workflows/Check.yml
- *   bun run test:actions --event push --workflow .github/workflows/Build.yml
- *   bun run test:actions:fast
- */
-
 import { $ } from "bun";
 import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
-// Cleanup function to stop and remove act containers
-async function cleanupActContainers() {
-	try {
-		console.log("\n🧹 Cleaning up act containers...");
-
-		try {
-			// Check if any act containers exist before trying to stop them
-			const runningContainers =
-				await $`docker ps -q --filter "label=com.act.container"`.text();
-			if (runningContainers.trim()) {
-				await $`docker ps -q --filter "label=com.act.container" | xargs -r docker stop`;
-				console.log("✅ Stopped running act containers");
-			}
-		} catch (error) {
-			console.warn("⚠️  Warning: act containers do not exist:", error);
-		}
-
-		try {
-			// Remove all act containers (including stopped ones)
-			const allContainers =
-				await $`docker ps -aq --filter "label=com.act.container"`.text();
-			if (allContainers.trim()) {
-				await $`docker ps -aq --filter "label=com.act.container" | xargs -r docker rm`;
-				console.log("✅ Removed act containers");
-			}
-		} catch (error) {
-			console.warn(
-				"⚠️  Warning: act containers may not have been cleaned up:",
-				error,
-			);
-		}
-
-		try {
-			// Remove act networks
-			const networks =
-				await $`docker network ls -q --filter "label=com.act.network"`.text();
-			if (networks.trim()) {
-				await $`docker network ls -q --filter "label=com.act.network" | xargs -r docker network rm`;
-				console.log("✅ Removed act networks");
-			}
-		} catch (error) {
-			console.warn("⚠️  Warning: act networks do not exist:", error);
-		}
-
-		console.log("✅ Act containers cleaned up successfully!");
-	} catch (error) {
-		console.warn(
-			"⚠️  Warning: Some containers may not have been cleaned up:",
-			error,
-		);
-	}
-}
-
-const script = createScript(
+export const checkPipelines = createScript(
 	{
 		name: "GitHub Actions Local Testing",
-		description: "Test GitHub Actions workflows locally using act",
+		description:
+			"Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
 		usage: "bun run check:pipelines -e <event> -w <workflow> [-v | --verbose]",
 		examples: [
 			"bun run check:pipelines -v --verbose -e pull_request -w .github/workflows/Check.yml",
@@ -132,4 +69,59 @@ const script = createScript(
 	},
 );
 
-script();
+if (import.meta.main) {
+	await checkPipelines();
+}
+
+// Cleanup function to stop and remove act containers
+async function cleanupActContainers() {
+	try {
+		console.log("\n🧹 Cleaning up act containers...");
+
+		try {
+			// Check if any act containers exist before trying to stop them
+			const runningContainers =
+				await $`docker ps -q --filter "label=com.act.container"`.text();
+			if (runningContainers.trim()) {
+				await $`docker ps -q --filter "label=com.act.container" | xargs -r docker stop`;
+				console.log("✅ Stopped running act containers");
+			}
+		} catch (error) {
+			console.warn("⚠️  Warning: act containers do not exist:", error);
+		}
+
+		try {
+			// Remove all act containers (including stopped ones)
+			const allContainers =
+				await $`docker ps -aq --filter "label=com.act.container"`.text();
+			if (allContainers.trim()) {
+				await $`docker ps -aq --filter "label=com.act.container" | xargs -r docker rm`;
+				console.log("✅ Removed act containers");
+			}
+		} catch (error) {
+			console.warn(
+				"⚠️  Warning: act containers may not have been cleaned up:",
+				error,
+			);
+		}
+
+		try {
+			// Remove act networks
+			const networks =
+				await $`docker network ls -q --filter "label=com.act.network"`.text();
+			if (networks.trim()) {
+				await $`docker network ls -q --filter "label=com.act.network" | xargs -r docker network rm`;
+				console.log("✅ Removed act networks");
+			}
+		} catch (error) {
+			console.warn("⚠️  Warning: act networks do not exist:", error);
+		}
+
+		console.log("✅ Act containers cleaned up successfully!");
+	} catch (error) {
+		console.warn(
+			"⚠️  Warning: Some containers may not have been cleaned up:",
+			error,
+		);
+	}
+}

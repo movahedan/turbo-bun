@@ -21,11 +21,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install bun and turbo
+RUN curl -fsSL https://bun.com/install | bash -s "bun-v1.2.15"
+RUN ~/.bun/bin/bun install -g turbo@2.5.4
+
 # Set working directory for development
-WORKDIR /workspace
+WORKDIR /app
 
 # Configure Git to handle the workspace
-RUN git config --global --add safe.directory /workspace
+RUN git config --global --add safe.directory /app
 
 # Keep container running
 CMD ["sleep", "infinity"] 

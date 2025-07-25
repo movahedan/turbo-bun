@@ -11,7 +11,7 @@
 	"service": "vscode",
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/app",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {
@@ -45,7 +45,7 @@
 		"COMPOSE_PROJECT_NAME": "repo"
 	},
 	// Enable Docker access for devcontainer user
-	"remoteUser": "vscode",
+	"remoteUser": "vscode-user",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [],
 	// Start only the vscode service (app containers managed separately)

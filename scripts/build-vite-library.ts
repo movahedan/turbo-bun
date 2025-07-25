@@ -97,6 +97,13 @@ export const buildViteLibrary = createScript(
 				validator: validators.nonEmpty,
 			},
 			{
+				short: "-g",
+				long: "--generate",
+				description: "Path to the file to generate the vite entries",
+				required: false,
+				validator: validators.nonEmpty,
+			},
+			{
 				short: "-n",
 				long: "--dry-run",
 				description: "Show what would be done without actually doing it",
@@ -111,11 +118,12 @@ export const buildViteLibrary = createScript(
 		const packageDir = join(__dirname, "../packages", packageName);
 		const packageJsonPath = join(packageDir, "package.json");
 		const distDir = join(packageDir, "dist");
-		const viteEntriesPath = join(packageDir, "vite-entries.generated.json");
 
 		const tsconfigPath = args.config || join(packageDir, "tsconfig.build.json");
 		const tsConfig: TsConfig = JSON.parse(await Bun.file(tsconfigPath).text());
 		const tsconfigRootDir = tsConfig.compilerOptions.rootDir;
+		const viteEntriesPath =
+			args.generate || join(packageDir, "vite-entries.generated.json");
 
 		console.info(`🚀 Starting build workflow for package: ${packageName}`);
 		const isDryRun = args["dry-run"] || false;
@@ -201,6 +209,7 @@ if (import.meta.main) {
 const findJsFiles = async (distDir: string) =>
 	$`find ${distDir} -name "*.js" -not -name "*.test.js" -type f`.text();
 
+// Get the absolute paths of all the js files in the dist directory
 const getJsFilesAbsolutePaths = async (distDir: string) => {
 	const files = await findJsFiles(distDir);
 
@@ -210,6 +219,7 @@ const getJsFilesAbsolutePaths = async (distDir: string) => {
 		.map((file) => file.replace(/\.js$/, ""))
 		.filter(Boolean);
 };
+
 // Get the typescript extension from the file name
 const getTsExtension = async (file: string) => {
 	try {

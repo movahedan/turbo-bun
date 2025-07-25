@@ -25,7 +25,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           no-cache: true
-          bun-version: 1.2.15
+          bun-version: 1.2.19
 
       - name: 🗃️ Cache Bun dependencies
         uses: actions/cache@v4
@@ -77,7 +77,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           no-cache: true
-          bun-version: 1.2.15
+          bun-version: 1.2.19
 
       - name: 🗃️ Cache Bun dependencies
         uses: actions/cache@v4
@@ -95,11 +95,11 @@ jobs:
 
       - name: 🔍 - Attach affected to github output
         id: affected  
-        run: bun run scripts/attach-affected-to-github-output.ts
+        run: bun run scripts/github-attach-affected.ts
 
       - name: 🔍 - Attach service ports to github output
         id: ports
-        run: bun run scripts/attach-service-ports-to-github-output.ts
+        run: bun run scripts/github-attach-service-ports.ts
 
       - name: 🏗️ Test Production Build
         run: |

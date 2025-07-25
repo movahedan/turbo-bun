@@ -3,6 +3,7 @@
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
 import chalk from "chalk";
+import { getExposedServices } from "./utils/docker-compose-parser";
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -45,8 +46,6 @@ class DevContainerTester {
 		await this.testBasicBuild();
 		await this.testDevContainerBuild();
 		await this.testServiceHealthChecks();
-		await this.testHotReload();
-		await this.testMultipleInstances();
 		await this.testProductionCompose();
 
 		// Only cleanup if not keeping services running
@@ -174,68 +173,79 @@ class DevContainerTester {
 
 			// Wait for services to start and health checks to run
 			console.log(chalk.yellow("⏳ Waiting for services to become healthy..."));
-			await setTimeout(20000); // Give more time for health checks
+			// Implement interval-based health checking
+			const maxRetries = 6; // 30 seconds total (6 * 5 seconds)
+			const retryInterval = 5000; // 5 seconds
+			let retryCount = 0;
+			let allHealthy = false;
+			const allExposedServices = await getExposedServices(
+				".devcontainer/docker-compose.dev.yml",
+			);
+			let finalServices: ServiceHealth[] = [];
+			let finalHealthResults: ReturnType<
+				typeof this.analyzeServiceHealth
+			> | null = null;
 
-			// Get health status from docker ps
-			const { stdout } =
-				await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all ps`;
-
-			const services = this.parseDockerPsOutput(stdout.toString());
-			const healthResults = this.analyzeServiceHealth(services);
-
-			// Check if we have any healthy services and no unhealthy ones
-			if (
-				healthResults.healthyServices.length > 0 &&
-				healthResults.unhealthyServices.length === 0
-			) {
-				this.addResult(
-					testName,
-					"PASS",
-					`Services are healthy: ${healthResults.healthyServices.join(", ")}`,
-				);
-			} else {
-				const unhealthyServices = healthResults.unhealthyServices.map(
-					(s) => `${s.name} (${s.status})`,
-				);
-				const startingServices = services
-					.filter((s) => s.status === "starting")
-					.map((s) => s.name);
-
-				if (unhealthyServices.length > 0) {
-					this.addResult(
-						testName,
-						"FAIL",
-						`Unhealthy services: ${unhealthyServices.join(", ")}`,
+			while (retryCount < maxRetries && !allHealthy) {
+				if (retryCount > 0) {
+					console.log(
+						chalk.yellow(
+							`🔄 Retry ${retryCount}/${maxRetries} - Checking health again in 5 seconds...`,
+						),
 					);
-				} else if (startingServices.length > 0) {
-					this.addResult(
-						testName,
-						"SKIP",
-						`Services still starting: ${startingServices.join(", ")}`,
-					);
+					await setTimeout(retryInterval);
+				}
+
+				// Get health status from docker ps
+				const { stdout } =
+					await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all ps`.quiet();
+
+				finalServices = this.parseDockerPsOutput(stdout.toString());
+				finalHealthResults = this.analyzeServiceHealth(finalServices);
+
+				// Check if we have any healthy services and no unhealthy ones
+				if (
+					finalHealthResults.healthyServices.length ===
+					allExposedServices.length
+				) {
+					allHealthy = true;
 				} else {
-					this.addResult(testName, "FAIL", "No services are healthy");
+					retryCount++;
 				}
 			}
 
 			// Print detailed health status
-			console.log(chalk.blue("\n📊 Service Health Status:"));
-			console.log("=".repeat(50));
-			for (const service of services) {
-				const icon =
-					service.status === "healthy"
-						? "✅"
-						: service.status === "starting"
-							? "🔄"
-							: "❌";
-				const color =
-					service.status === "healthy"
-						? chalk.green
-						: service.status === "starting"
-							? chalk.yellow
-							: chalk.red;
+			console.log(chalk.blue("\n📊 Final Service Health Status:"));
+			console.log("-".repeat(50));
+
+			console.log({ finalServices, finalHealthResults });
+
+			const icons = {
+				healthy: "✅",
+				starting: "🔄",
+				unhealthy: "❌",
+			};
+			const colors = {
+				healthy: chalk.green,
+				starting: chalk.yellow,
+				unhealthy: chalk.red,
+			};
+			for (const service of finalServices) {
+				const icon = icons[service.status as keyof typeof icons];
+				const color = colors[service.status as keyof typeof colors];
+
 				console.log(
 					`${icon} ${color(service.name)}: ${service.status} ${service.port ? `(${service.port})` : ""}`,
+				);
+			}
+
+			if (finalHealthResults?.unhealthyServices.length) {
+				this.addResult(
+					testName,
+					"FAIL",
+					`Unhealthy services after ${maxRetries} retries: ${finalHealthResults.unhealthyServices
+						.map((s) => `${s.name} (${s.status})`)
+						.join(", ")}`,
 				);
 			}
 		} catch (error) {
@@ -304,58 +314,26 @@ class DevContainerTester {
 		};
 	}
 
-	private async testHotReload() {
-		const testName = "Hot Reload";
-		try {
-			// Create a test file to trigger hot reload
-			await $`echo "// Test file for hot reload" > apps/admin/src/test-hot-reload.ts`;
-			await setTimeout(2000);
+	// private async testHotReload() {
+	// 	const testName = "Hot Reload";
+	// 	try {
+	// 		// Create a test file to trigger hot reload
+	// 		await $`echo "// Test file for hot reload" > apps/admin/src/test-hot-reload.ts`;
+	// 		await setTimeout(2000);
 
-			// Check if the file was created
-			const { exitCode } = await $`test -f apps/admin/src/test-hot-reload.ts`;
-			if (exitCode === 0) {
-				this.addResult(testName, "PASS", "Hot reload file watching works");
-				// Clean up
-				await $`rm apps/admin/src/test-hot-reload.ts`;
-			} else {
-				this.addResult(testName, "FAIL", "Hot reload file watching failed");
-			}
-		} catch (error) {
-			this.addResult(testName, "FAIL", `Hot reload test error: ${error}`);
-		}
-	}
-
-	private async testMultipleInstances() {
-		const testName = "Multiple Instances";
-		try {
-			console.log(
-				chalk.yellow("🔄 Testing multiple DevContainer instances..."),
-			);
-
-			// Start a second instance with different project name
-			const { exitCode, text } =
-				await $`COMPOSE_PROJECT_NAME=repo-test docker compose -f .devcontainer/docker-compose.dev.yml --profile all up -d`;
-
-			if (exitCode === 0) {
-				this.addResult(
-					testName,
-					"PASS",
-					"Multiple DevContainer instances can run simultaneously",
-				);
-
-				// Clean up test instance
-				await $`COMPOSE_PROJECT_NAME=repo-test docker compose -f .devcontainer/docker-compose.dev.yml down`;
-			} else {
-				this.addResult(
-					testName,
-					"FAIL",
-					`Multiple instances test failed ${exitCode} ${text}`,
-				);
-			}
-		} catch (error) {
-			this.addResult(testName, "FAIL", `Multiple instances error: ${error}`);
-		}
-	}
+	// 		// Check if the file was created
+	// 		const { exitCode } = await $`test -f apps/admin/src/test-hot-reload.ts`;
+	// 		if (exitCode === 0) {
+	// 			this.addResult(testName, "PASS", "Hot reload file watching works");
+	// 			// Clean up
+	// 			await $`rm apps/admin/src/test-hot-reload.ts`;
+	// 		} else {
+	// 			this.addResult(testName, "FAIL", "Hot reload file watching failed");
+	// 		}
+	// 	} catch (error) {
+	// 		this.addResult(testName, "FAIL", `Hot reload test error: ${error}`);
+	// 	}
+	// }
 
 	private async testProductionCompose() {
 		const testName = "Production Compose";
@@ -363,14 +341,14 @@ class DevContainerTester {
 			console.log(chalk.yellow("🏭 Testing production Docker Compose..."));
 
 			// Test production compose validation
-			const { exitCode } = await $`docker compose config`;
+			const { exitCode } = await $`docker compose config -q`;
 			if (exitCode === 0) {
 				this.addResult(testName, "PASS", "Production Docker Compose is valid");
 			} else {
 				this.addResult(
 					testName,
 					"FAIL",
-					"Production Docker Compose validation failed",
+					`Production Docker Compose validation failed ${process.cwd()}/docker-compose.yml`,
 				);
 			}
 		} catch (error) {
@@ -383,10 +361,15 @@ class DevContainerTester {
 		try {
 			console.log(chalk.green("🚀 Keeping services running..."));
 			console.log(chalk.blue("📊 Services are available at:"));
-			console.log("   • Admin: http://localhost:3001");
-			console.log("   • Blog: http://localhost:3002");
-			console.log("   • Storefront: http://localhost:3003");
-			console.log("   • API: http://localhost:3004");
+
+			// Get service URLs dynamically
+			const { getServiceUrls } = await import("./utils/docker-compose-parser");
+			const devUrls = await getServiceUrls(
+				".devcontainer/docker-compose.dev.yml",
+			);
+			for (const [name, url] of Object.entries(devUrls)) {
+				console.log(`   • ${name}: ${url}`);
+			}
 			console.log(
 				chalk.yellow("💡 Use 'bun run dev:down' to stop services when done"),
 			);

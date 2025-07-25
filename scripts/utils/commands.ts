@@ -33,6 +33,11 @@ export const COMMANDS = {
 		paths: ["bun"],
 		installInstructions: "Please install Bun.",
 	},
+	turbo: {
+		name: "turbo",
+		paths: ["turbo", "node_modules/.bin/turbo"],
+		installInstructions: "Please install Turbo.",
+	},
 } as const;
 
 export type CommandName = keyof typeof COMMANDS;
