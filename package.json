@@ -74,7 +74,8 @@
 		"chalk": "5.4.1",
 		"lefthook": "1.12.2",
 		"turbo": "2.5.5",
-		"typescript": "5.8.3"
+		"typescript": "5.8.3",
+		"yaml": "2.8.0"
 	},
 	"overrides": {
 		"@types/react": "19.1.8",
