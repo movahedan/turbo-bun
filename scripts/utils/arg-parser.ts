@@ -70,7 +70,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		const arg = args[i];
 		const nextArg = args[i + 1];
 		const isLastArg = !nextArg;
-		const nextArgIsOption = nextArg.startsWith("-");
+		const nextArgIsOption = !!nextArg && nextArg.startsWith("-");
 
 		// Handle help
 		if (arg === "-h" || arg === "--help") {

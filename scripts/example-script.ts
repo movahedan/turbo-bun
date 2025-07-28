@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 import { validators } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 const exampleScriptConfig = {
@@ -38,10 +37,6 @@ export const exampleScript = createScript(
 		if (args.verbose) {
 			xConsole.log("🔍 Verbose mode enabled");
 		}
-
-		// Example of using the centralized command system
-		const gitCmd = await findCommand("git");
-		xConsole.log(`✅ Found git at: ${gitCmd}`);
 
 		// Your script logic here...
 		xConsole.log("✅ Example script completed successfully!");

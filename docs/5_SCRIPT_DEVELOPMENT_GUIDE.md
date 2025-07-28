@@ -13,15 +13,12 @@ Our script system provides a consistent, type-safe way to create command-line to
 ```
 scripts/utils/
 ├── arg-parser.ts      # Argument parsing and validation
-├── command-finder.ts  # Command finding logic  
-├── commands.ts        # Centralized command configurations
 └── create-scripts.ts  # Script creation utilities
 ```
 
 ### Key Features
 
 - ✅ **Type-safe argument parsing** with automatic validation
-- ✅ **Centralized command management** for external tools
 - ✅ **Automatic error handling** with consistent messaging
 - ✅ **Modular utilities** for reuse across scripts
 - ✅ **Intuitive API** with minimal boilerplate
@@ -34,7 +31,6 @@ scripts/utils/
 #!/usr/bin/env bun
 
 import { validators } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 // Create script with automatic error handling and type safety
@@ -66,7 +62,6 @@ script();
 #!/usr/bin/env bun
 
 import { validators } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 const exampleScriptConfig = {
@@ -105,8 +100,7 @@ export const exampleScript = createScript(
       xConsole.log("🔍 Verbose mode enabled");
     }
 
-    // Example of using the centralized command system
-    const gitCmd = await findCommand("git");
+    // Your script logic here
     xConsole.log(`✅ Found git at: ${gitCmd}`);
 
     // Your script logic here...
@@ -188,20 +182,6 @@ const customValidator = (value: string): boolean | string => {
 }
 ```
 
-## 🔍 Command Finding
-
-### Using Centralized Commands
-
-```typescript
-// Find a predefined command
-const gitCmd = await findCommand("git");
-const dockerCmd = await findCommand("docker");
-const actCmd = await findCommand("act");
-
-// Available commands in scripts/utils/commands.ts:
-// - act, docker, git, bun
-```
-
 ## 📝 Console Output
 
 ### Using xConsole
@@ -225,26 +205,25 @@ async function main(args, xConsole) {
 - Integration with the script system's logging
 - Better debugging and monitoring capabilities
 
-### Custom Command Paths
+### Direct Command Execution
 
 ```typescript
-// Override paths for specific use case
-const customCmd = await findCommand("custom", ["/custom/path"], "Install instructions");
+// Use standard Node.js APIs or direct command execution
+import { $ } from "bun";
+
+const result = await $`git status`;
 ```
 
-### Adding New Commands
+### Direct Command Usage
 
-To add a new command, edit `scripts/utils/commands.ts`:
+Use Bun's built-in command execution or standard Node.js APIs:
 
 ```typescript
-export const COMMANDS = {
-  // ... existing commands
-  myTool: {
-    name: "myTool",
-    paths: ["myTool", "./bin/myTool"],
-    installInstructions: "Please install myTool: https://example.com",
-  },
-} as const;
+import { $ } from "bun";
+
+// Execute commands directly
+const result = await $`docker ps`;
+const gitStatus = await $`git status`;
 ```
 
 ## 🎨 Best Practices
@@ -325,14 +304,15 @@ async function myScript(args: InferArgs<typeof config>, xConsole)
 async function myScript(args: any): Promise<void>
 ```
 
-### 6. Command Finding
+### 6. Command Execution
 
 ```typescript
-// ✅ Good: Use centralized commands
-const gitCmd = await findCommand("git");
+// ✅ Good: Use Bun's built-in command execution
+import { $ } from "bun";
+const result = await $`git status`;
 
-// ✅ Good: Override when needed
-const customCmd = await findCommand("custom", ["/path"], "Instructions");
+// ✅ Good: Use standard Node.js APIs
+import { exec } from "child_process";
 
 // ❌ Avoid: Hardcoded paths
 const cmd = "./bin/act"; // This might not exist
@@ -354,8 +334,8 @@ See these files for complete examples:
 ```typescript
 async function main(args: { input: string; output: string }, xConsole) {
   xConsole.log(`📁 Processing: ${args.input}`);
-  
-  const gitCmd = await findCommand("git");
+
+  bun.file();
   
   // Process files...
   xConsole.log("✅ Processing completed!");
@@ -368,13 +348,11 @@ async function main(args: { input: string; output: string }, xConsole) {
 async function main(args: { target: string; clean?: boolean }, xConsole) {
   xConsole.log(`🏗️ Building target: ${args.target}`);
   
-  const bunCmd = await findCommand("bun");
-  
   if (args.clean) {
-    await $`${bunCmd} run clean`;
+    await $`bun run clean`;
   }
   
-  await $`${bunCmd} run build`;
+  await $`bun run build`;
   xConsole.log("✅ Build completed!");
 }
 ```
@@ -385,14 +363,12 @@ async function main(args: { target: string; clean?: boolean }, xConsole) {
 async function main(args: { environment: string; dryRun?: boolean }, xConsole) {
   xConsole.log(`🚀 Deploying to: ${args.environment}`);
   
-  const dockerCmd = await findCommand("docker");
-  
   if (args.dryRun) {
     xConsole.log("🔍 Dry run mode - no actual deployment");
     return;
   }
   
-  await $`${dockerCmd} build -t myapp .`;
+  await $`docker build -t myapp .`;
   xConsole.log("✅ Deployment completed!");
 }
 ```
@@ -469,8 +445,7 @@ const githubActionTest = createScript(
     ],
   } as const,
   async function main(args: { event: string; workflow: string }, xConsole) {
-    const actCmd = await findCommand("act");
-    await $`${actCmd} ${args.event} -W ${args.workflow}`;
+    await $`act ${args.event} -W ${args.workflow}`;
     xConsole.log("✅ GitHub Actions test completed!");
   },
 );

@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
 import { validators } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 const checkPipelinesConfig = {
@@ -44,11 +43,8 @@ export const checkPipelines = createScript(
 	async function main(args) {
 		console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
 
-		const actCmd = await findCommand("act", undefined, undefined, args.verbose);
-		await findCommand("docker", undefined, undefined, args.verbose);
-
 		try {
-			await $`${actCmd} ${args.event} -W ${args.workflow} -P ubuntu-latest=catthehacker/ubuntu:act-latest --quiet`;
+			await $`act ${args.event} -W ${args.workflow} -P ubuntu-latest=catthehacker/ubuntu:act-latest --quiet`;
 			if (args.verbose) {
 				console.log("✅ Success with catthehacker/ubuntu:act-latest image!");
 			}

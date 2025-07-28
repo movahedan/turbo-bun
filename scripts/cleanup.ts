@@ -5,7 +5,6 @@ import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
 import type { ScriptConfig } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 const cleanupConfig = {
@@ -24,11 +23,10 @@ const cleanup = createScript(
 
 		async function stepDocker() {
 			vConsole.log(chalk.yellow("🐳 Removing Docker containers..."));
-			const dockerCmd = await findCommand("docker");
-			await $`${dockerCmd} compose -f docker-compose.yml down --volumes`;
-			await $`${dockerCmd} compose -f docker-compose.yml rm -f --volumes`;
-			await $`${dockerCmd} compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes`;
-			await $`${dockerCmd} compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
+			await $`docker compose -f docker-compose.yml down --volumes`;
+			await $`docker compose -f docker-compose.yml rm -f --volumes`;
+			await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes`;
+			await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
 		}
 		await stepDocker();
 

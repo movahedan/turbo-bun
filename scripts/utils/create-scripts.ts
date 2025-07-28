@@ -43,7 +43,7 @@ export function createScript<
 			...cliArgs,
 		} as InferArgs<typeof defaultConfig> & InferArgs<Config>;
 
-		const c: typeof console = Object.assign(console, {
+		const c: typeof console = Object.assign({}, console, {
 			warn: (...props: Parameters<typeof console.warn>) => {
 				if (!("quiet" in args) || !args.quiet) console.warn(...props);
 			},

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
+import { $ } from "bun";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
-import { git } from "./utils/git-command";
 
 const checkBranchNameConfig = {
 	name: "Branch Name Checker",
@@ -31,10 +31,12 @@ export const checkBranchName = createScript(
 		const isCI =
 			process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
 
+		const { stdout: currentBranch } = await $`git branch --show-current`;
+
 		const branchName =
 			process.env.GITHUB_HEAD_REF ||
 			process.env.GITHUB_REF?.replace("refs/heads/", "") ||
-			git(["branch", "--show-current"]).stdout.trim() ||
+			currentBranch.toString().trim() ||
 			"";
 
 		const validBranchPrefixes = [

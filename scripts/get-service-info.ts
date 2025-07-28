@@ -13,6 +13,31 @@ import {
 	type ServiceInfo,
 } from "./utils/docker-compose-parser";
 
+/**
+ * Get services based on compose environment and filters
+ */
+const getFilteredServices = async (
+	compose: string,
+	exposedOnly: boolean,
+): Promise<ServiceInfo[]> => {
+	const allServices = await getAllServices();
+	let services: ServiceInfo[] = [];
+
+	if (compose === "dev") {
+		services = allServices.dev;
+	} else if (compose === "prod") {
+		services = allServices.prod;
+	} else {
+		services = [...allServices.dev, ...allServices.prod];
+	}
+
+	if (exposedOnly) {
+		services = services.filter((s) => s.port !== undefined);
+	}
+
+	return services;
+};
+
 export const getServiceInfo = createScript(
 	{
 		name: "Service Information Extractor",
@@ -235,31 +260,6 @@ const displayDependencies = async (
 	xConsole.log(
 		`   Dependents: ${dependents.length > 0 ? dependents.join(", ") : "None"}`,
 	);
-};
-
-/**
- * Get services based on compose environment and filters
- */
-const getFilteredServices = async (
-	compose: string,
-	exposedOnly: boolean,
-): Promise<ServiceInfo[]> => {
-	const allServices = await getAllServices();
-	let services: ServiceInfo[] = [];
-
-	if (compose === "dev") {
-		services = allServices.dev;
-	} else if (compose === "prod") {
-		services = allServices.prod;
-	} else {
-		services = [...allServices.dev, ...allServices.prod];
-	}
-
-	if (exposedOnly) {
-		services = services.filter((s) => s.port !== undefined);
-	}
-
-	return services;
 };
 
 /**

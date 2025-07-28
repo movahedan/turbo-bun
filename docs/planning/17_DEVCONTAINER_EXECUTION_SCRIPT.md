@@ -87,7 +87,6 @@ Based on the project documentation and codebase analysis:
 // Existing patterns in scripts/utils/
 interface ScriptPatterns {
   argumentParsing: "modular-arg-parser";
-  commandFinding: "centralized-command-finder";
   errorHandling: "withErrorHandling-wrapper";
   scriptCreation: "createScript-utility";
 }
@@ -369,7 +368,6 @@ bun run devcontainer  # Automated DevContainer opening
 #### 2. Script Integration
 ```typescript
 // Integrate with existing script patterns
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 import { validators } from "./utils/arg-parser";
 ```

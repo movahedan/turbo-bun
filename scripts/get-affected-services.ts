@@ -1,5 +1,4 @@
 import { $ } from "bun";
-import { findCommand } from "./utils/command-finder";
 import { getAllServices } from "./utils/docker-compose-parser";
 
 /* Sample output of turbo command:
@@ -13,10 +12,8 @@ import { getAllServices } from "./utils/docker-compose-parser";
   }
 */
 export async function getAffectedPackages(): Promise<string[]> {
-	const turboPath = await findCommand("turbo");
-
 	const affectedPackages =
-		await $`${turboPath} run build --filter="...[origin/main]" --dry-run=json`
+		await $`turbo run build --filter="...[origin/main]" --dry-run=json`
 			.quiet()
 			.json();
 
