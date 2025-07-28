@@ -91,7 +91,7 @@ The project uses Docker for both development and production environments with:
 # Container Management
 bun run dev:up              # Start all containers
 bun run dev:down            # Stop all containers
-bun run dev:status          # Check container status
+bun run dev:compose ps      # Check container status
 bun run dev:logs            # View application logs
 bun run dev:clean           # Clean containers and volumes
 
@@ -290,7 +290,7 @@ sudo chmod 666 /var/run/docker.sock
 
 ```bash
 # Check container status
-bun run dev:status
+bun run dev:compose ps
 
 # View container logs
 bun run dev:logs

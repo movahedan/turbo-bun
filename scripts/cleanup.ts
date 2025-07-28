@@ -66,9 +66,8 @@ const cleanup = createScript(
 			for (const directory of directories) {
 				const dirPath = path.resolve(process.cwd(), directory.path);
 
-				for (const artifact of developmentArtifacts) {
-					const artifactPath = path.join(dirPath, artifact);
-					removeFile(artifactPath);
+				for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
+					removeFile(path.join(dirPath, ARTIFACT));
 				}
 			}
 		}
@@ -110,7 +109,7 @@ if (import.meta.main) {
 	cleanup();
 }
 
-const developmentArtifacts = [
+const DEVELOPMENT_ARTIFACT = [
 	".bun",
 	"dist",
 	"build",

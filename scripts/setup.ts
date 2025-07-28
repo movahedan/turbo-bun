@@ -61,9 +61,9 @@ const setup = createScript(setupConfig, async function main(args, xConsole) {
 	xConsole.log(chalk.green("✅ Setup completed successfully!"));
 
 	xConsole.log(chalk.cyan("\n💡 Useful commands:"));
-	xConsole.log(chalk.cyan("  - bun run dev:logs     # View all service logs"));
-	xConsole.log(chalk.cyan("  - bun run dev:status   # Check service status"));
-	xConsole.log(chalk.cyan("  - bun run cleanup      # Clean everything"));
+	xConsole.log(chalk.cyan(" - bun run dev:compose logs -f # View all logs"));
+	xConsole.log(chalk.cyan(" - bun run dev:compose ps # Check service status"));
+	xConsole.log(chalk.cyan(" - bun run cleanup # Clean everything"));
 });
 
 if (import.meta.main) {
