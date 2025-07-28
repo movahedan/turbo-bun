@@ -20,21 +20,21 @@ The project implements a layered setup architecture:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Development Environment                  │
 ├─────────────────────────────────────────────────────────────┤
-│  🔧 Local Development Layer (Required)                    │
-│  ├── Dependencies (bun install)                          │
-│  ├── Code Quality (biome, typescript)                    │
-│  ├── Testing (jest, turbo)                               │
-│  └── Build System (turbo, vite)                          │
+│  🔧 Local Development Layer (Required)                      │
+│  ├── Dependencies (bun install)                             │
+│  ├── Code Quality (biome, typescript)                       │
+│  ├── Testing (jest, turbo)                                  │
+│  └── Build System (turbo, vite)                             │
 ├─────────────────────────────────────────────────────────────┤
-│  🐳 DevContainer Layer (Optional)                         │
-│  ├── Docker Services (admin, blog, storefront, api)       │
-│  ├── Development Tools (act, docker-compose)              │
-│  └── Health Monitoring & Logging                          │
+│  🐳 DevContainer Layer (Optional)                           │
+│  ├── Docker Services (admin, blog, storefront, api)         │
+│  ├── Development Tools (act, docker-compose)                │
+│  └── Health Monitoring & Logging                            │
 ├─────────────────────────────────────────────────────────────┤
-│  🎯 CI/CD Layer (Optional)                               │
-│  ├── GitHub Actions Testing (act)                         │
-│  ├── Branch Validation (commitlint)                       │
-│  └── Quality Gates (sonarqube)                           │
+│  🎯 CI/CD Layer (Optional)                                  │
+│  ├── GitHub Actions Testing (act)                           │
+│  ├── Branch Validation (commitlint)                         │
+│  └── Quality Gates (sonarqube)                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 

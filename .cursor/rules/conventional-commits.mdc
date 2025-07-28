@@ -37,6 +37,15 @@ Based on `commitlint.config.ts`, use these types:
 - **Header max length**: 72 characters
 - **Scope**: Optional but recommended for clarity
 
+## ⚠️ CRITICAL: Subject Case Requirement
+
+**ALWAYS use lowercase for the subject line!** This is the most common mistake that causes commitlint to fail.
+
+✅ **Correct**: `feat: add new feature`
+❌ **Incorrect**: `feat: Add New Feature`
+
+The subject must be in lowercase to pass commitlint validation.
+
 ## 📊 Common Scopes
 
 Based on repository patterns and VS Code settings:
@@ -78,12 +87,21 @@ chore(deps): update dependency lefthook to v1.12.2
 
 ## 🚫 Common Mistakes to Avoid
 
-- Using title case in subject (`Fix Docker Issues` ❌)
+- **Using title case in subject** (`Fix Docker Issues` ❌) - **MOST COMMON ERROR**
 - Missing scope when it adds clarity
 - Trailing periods in subject
 - Using types not in the allowed list
 - Subject longer than 72 characters
 - Using past tense instead of imperative mood
+
+## 🚨 COMMITLINT FAILURE PREVENTION
+
+Before committing, always check:
+1. **Subject is lowercase** - This is the #1 cause of commitlint failures
+2. **Type is lowercase** - `feat`, not `Feat`
+3. **Scope is lowercase** - `ci`, not `CI`
+4. **No trailing period** in subject
+5. **Subject under 72 characters**
 
 ## 📝 Body Guidelines
 

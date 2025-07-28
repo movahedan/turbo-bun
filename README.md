@@ -1,11 +1,19 @@
 # 🏎️ Turboobun - Modern Monorepo Starter
 
-[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
+[![Turborepo](https://img.shields.io/badge/Turborepo-EF4444?style=flat&logo=turborepo&logoColor=white)](https://turbo.build/repo)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Shell Scripting](https://img.shields.io/badge/Shell_Scripting-4EAA25?style=flat&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Dev Container](https://img.shields.io/badge/Dev_Container-2496ED?style=flat&logo=docker&logoColor=white)](https://containers.dev)
+[![Act](https://img.shields.io/badge/Act-2088FF?style=flat&logo=github-actions&logoColor=white)](https://github.com/nektos/act)
 [![Renovate](https://img.shields.io/badge/Renovate-enabled-brightgreen)](https://docs.renovatebot.com)
-[![SonarQube](https://img.shields.io/badge/SonarQube-enabled-brightgreen)](https://docs.sonarsource.com)
+[![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 [![Jest](https://img.shields.io/badge/Jest-C21325?style=flat&logo=jest&logoColor=white)](https://jestjs.io)
+[![Lefthook](https://img.shields.io/badge/Lefthook-000000?style=flat&logo=git&logoColor=white)](https://github.com/evilmartians/lefthook)
+[![SonarQube](https://img.shields.io/badge/SonarQube-enabled-brightgreen)](https://docs.sonarsource.com)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev)
+[![Cursor](https://img.shields.io/badge/Cursor-00D4AA?style=flat&logo=cursor&logoColor=white)](https://cursor.sh)
 
 > **Turboobun** is a comprehensive production-ready [Turborepo](https://turbo.build/repo/docs) with [Bun](https://bun.com/) template that demonstrates modern development practices with a sophisticated toolchain integrated with [DevContainer](https://containers.dev/docs). It's designed for teams building complex applications with shared components.
 
