@@ -6,6 +6,7 @@ import { $ } from "bun";
 import chalk from "chalk";
 import type { ScriptConfig } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
+import { getAllDirectories } from "./utils/get-all-directories";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",
@@ -21,30 +22,6 @@ const cleanup = createScript(
 	async (_, vConsole): Promise<void> => {
 		vConsole.log(chalk.blue("🧹 Starting comprehensive cleanup..."));
 
-		function getAllDirectories(
-			baseDir: string,
-		): { name: string; path: string }[] {
-			const directories: { name: string; path: string }[] = [
-				{ name: "root", path: "." },
-			];
-
-			const appsDir = path.join(baseDir, "apps");
-			if (fs.existsSync(appsDir)) {
-				const apps = fs.readdirSync(appsDir);
-				for (const app of apps) {
-					directories.push({ name: app, path: `apps/${app}` });
-				}
-			}
-			const packagesDir = path.join(baseDir, "packages");
-			if (fs.existsSync(packagesDir)) {
-				const packages = fs.readdirSync(packagesDir);
-				for (const pkg of packages) {
-					directories.push({ name: pkg, path: `packages/${pkg}` });
-				}
-			}
-
-			return directories;
-		}
 		function removeFile(filePath: string) {
 			if (fs.existsSync(filePath)) {
 				fs.rmSync(filePath, { recursive: true, force: true });
@@ -77,10 +54,7 @@ const cleanup = createScript(
 
 		async function stepNodeModules() {
 			vConsole.log(chalk.yellow("📦 Cleaning node_modules in directories..."));
-			await $`rm -rf ./apps/**/node_modules`.nothrow();
-			await $`rm -rf ./packages/**/node_modules`.nothrow();
-			await $`rm -rf ./node_modules/*`.nothrow();
-			await $`rm -rf ./node_modules/.bin/*`.nothrow();
+			await $`find . -type d -name "node_modules" -exec rm -rf {} +`.nothrow();
 		}
 		await stepNodeModules();
 

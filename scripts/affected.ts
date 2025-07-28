@@ -1,5 +1,6 @@
 import { $ } from "bun";
 import { getAllServices } from "./utils/docker-compose-parser";
+import { getAllDirectories } from "./utils/get-all-directories";
 
 /* Sample output of turbo command:
   {
@@ -34,13 +35,18 @@ async function getAffectedServices(
 ): Promise<AffectedService[]> {
 	const keys = await getAffectedPackages();
 	const allServices = await getAllServices();
+	const allDirectories = getAllDirectories(process.cwd());
 
 	const affectedServices: AffectedService[] = [];
 
 	// Check dev services
 	if (mode === "dev" || mode === "all") {
 		for (const service of allServices.dev) {
-			const serviceKey = service.name === "ui" ? "@repo/ui" : service.name;
+			const isPackage = allDirectories.find(
+				(d) => d.path.includes("packages") && d.path.includes(service.name),
+			);
+
+			const serviceKey = isPackage ? `@repo/${service.name}` : service.name;
 			if (keys.some((k: string) => k === serviceKey)) {
 				affectedServices.push({
 					name: service.name,
@@ -54,9 +60,12 @@ async function getAffectedServices(
 	// Check prod services
 	if (mode === "prod" || mode === "all") {
 		for (const service of allServices.prod) {
-			const serviceKey = service.name.replace(/^prod-/, "");
-			const packageKey = serviceKey === "ui" ? "@repo/ui" : serviceKey;
-			if (keys.some((k: string) => k === packageKey)) {
+			const isPackage = allDirectories.find(
+				(d) => d.path.includes("packages") && d.path.includes(service.name),
+			);
+
+			const serviceKey = isPackage ? `@repo/${service.name}` : service.name;
+			if (keys.some((k: string) => k === serviceKey.replace(/^prod-/, ""))) {
 				affectedServices.push({
 					name: service.name,
 					environment: "prod",
