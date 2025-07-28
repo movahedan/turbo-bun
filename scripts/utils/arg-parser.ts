@@ -92,11 +92,11 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			const consideredTrue = isLastArg || nextArgIsOption;
 
 			const nextArgIsTrue =
-				nextArg.toLowerCase().toString() === "true" ||
-				nextArg.toLowerCase().toString() === "1";
+				nextArg?.toLowerCase().toString() === "true" ||
+				nextArg?.toLowerCase().toString() === "1";
 			const nextArgIsFalse =
-				nextArg.toLowerCase().toString() === "false" ||
-				nextArg.toLowerCase().toString() === "0";
+				nextArg?.toLowerCase().toString() === "false" ||
+				nextArg?.toLowerCase().toString() === "0";
 
 			if (!consideredTrue && !nextArgIsTrue && !nextArgIsFalse) {
 				throw new Error(
