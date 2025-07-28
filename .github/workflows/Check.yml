@@ -95,11 +95,17 @@ jobs:
 
       - name: 🔍 - Attach affected to github output
         id: affected  
-        run: bun run scripts/ci-attach-affected.ts
+        run: |
+          echo "::group::🔍 Getting affected packages"
+          bun run scripts/ci-attach-affected.ts
+          echo "::endgroup::"
 
       - name: 🔍 - Attach service ports to github output
         id: ports
-        run: bun run scripts/ci-attach-service-ports.ts
+        run: |
+          echo "::group::🔍 Getting service ports"
+          bun run scripts/ci-attach-service-ports.ts
+          echo "::endgroup::"
 
       - name: 🏗️ Test Production Build
         run: |
@@ -114,6 +120,13 @@ jobs:
       - name: 🧪 Test Production Services
         run: |
           echo "::group::🧪 Testing Production Services"
+          
+          # Check if we have any affected packages
+          if [ -z "${{ steps.affected.outputs.packages }}" ]; then
+            echo "No affected packages to test"
+            exit 0
+          fi
+          
           # Start services in background
           bun run prod:compose up ${{ steps.affected.outputs.packages }} -d
           
@@ -127,10 +140,10 @@ jobs:
           for service in ${{ steps.affected.outputs.packages }}; do
             echo "Testing $service..."
             
-            # Get port from the ports output
-            port=$(echo '${{ steps.ports.outputs.service-ports }}' | jq -r ".$service // empty")
+            # Get port from the ports output - use proper jq syntax with quotes
+            port=$(echo '${{ steps.ports.outputs.service-ports }}' | jq -r --arg service "$service" '.[$service] // empty' 2>/dev/null || echo "")
             
-            if [ -n "$port" ] && [ "$port" != "null" ]; then
+            if [ -n "$port" ] && [ "$port" != "null" ] && [ "$port" != "" ]; then
               echo "Service $service is accessible on port $port"
               # Test basic connectivity (don't fail if service doesn't respond, just log)
               curl -s --max-time 5 http://localhost:$port > /dev/null && echo "✅ $service is responding" || echo "⚠️ $service is not responding (may be normal for some services)"
