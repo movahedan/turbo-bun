@@ -72,11 +72,25 @@ export async function parseDockerCompose(composePath: string): Promise<{
 			// Parse port mapping
 			if (service.ports && service.ports.length > 0) {
 				const portMapping = service.ports[0];
-				const [hostPort, containerPort] = portMapping.split(":");
 
-				serviceInfo.hostPort = Number.parseInt(hostPort, 10);
-				serviceInfo.containerPort = Number.parseInt(containerPort, 10);
-				serviceInfo.port = serviceInfo.hostPort; // Use host port as default
+				if (/^\d+$/.test(portMapping)) {
+					// Single number format (e.g., "8080")
+					const port = Number.parseInt(portMapping, 10);
+					serviceInfo.hostPort = port;
+					serviceInfo.containerPort = port;
+					serviceInfo.port = port; // Use the same port for host and container
+				} else if (/^\d+:\d+$/.test(portMapping)) {
+					// Host:Container format (e.g., "8080:80")
+					const [hostPort, containerPort] = portMapping.split(":");
+					serviceInfo.hostPort = Number.parseInt(hostPort, 10);
+					serviceInfo.containerPort = Number.parseInt(containerPort, 10);
+					serviceInfo.port = serviceInfo.hostPort; // Use host port as default
+				} else {
+					// Unsupported format - log warning but don't fail
+					console.warn(
+						`Unsupported port format for service ${serviceName}: ${portMapping}`,
+					);
+				}
 			}
 
 			services.push(serviceInfo);
