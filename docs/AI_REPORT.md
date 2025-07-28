@@ -25,7 +25,7 @@ bun run dev:up
 COMPOSE_PROJECT_NAME=repo-test bun run dev:container --profile all up -d
 
 # Check both instances
-bun run dev:status
+bun run dev:compose ps
 COMPOSE_PROJECT_NAME=repo-test bun run dev:container ps
 
 # Clean up test instance

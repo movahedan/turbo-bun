@@ -1,8 +1,3 @@
----
-description: Conventional commits
-globs: ["*"]
-alwaysApply: true
----
 
 # Conventional Commits Standards
 
@@ -116,5 +111,17 @@ configuration.
 
 ## 🤔 After Making Changes
 
-After completing changes and committing them, always ask:
+After completing changes and committing them, render these results after reviewing developer's changes in the git commit message:
+
+- Committed Changes
+- Key Improvements Made
+
+ always ask:
+> "Would you like me to push the changes to the remote repository?"
+
+Note: Direct command execution (e.g., Bun's $ or Node.js exec) is now preferred over centralized command finding utilities.
+
+- Key Improvements Made
+
+ always ask:
 > "Would you like me to push the changes to the remote repository?"

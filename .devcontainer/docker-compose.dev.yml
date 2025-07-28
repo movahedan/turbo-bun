@@ -1,17 +1,17 @@
 name: repo
 
-# Ensure all services use the same network for communication
 networks:
   dev-network:
     driver: bridge
 
-# Persistent volumes for better caching
 volumes:
   node_modules:
     driver: local
   turbo_cache:
     driver: local
   bun_cache:
+    driver: local
+  vscode_cache:
     driver: local
 
 services:
@@ -20,17 +20,21 @@ services:
     build:
       context: ../
       dockerfile: .devcontainer/Dockerfile.vscode
+    environment:
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
     volumes:
-      - ${PROJECT_ROOT:-../}:/workspace:cached
-      # Override with Docker volumes to exclude heavy directories
-      - node_modules:/workspace/node_modules:delegated
-      - turbo_cache:/workspace/.turbo:delegated
+      - ${PROJECT_ROOT:-../}:/app:cached
+      # Override volumes
+      - node_modules:/app/node_modules:delegated
+      - turbo_cache:/app/.turbo:delegated
+      - bun_cache:/root/.bun:delegated
+      - vscode_cache:/app/.vscode:delegated
     command: sleep infinity
     # Use init for better signal handling
     init: true
     networks:
       - dev-network
-    # Only start when explicitly requested (by devcontainer)
     profiles: ["vscode"]
     healthcheck:
       test: ["CMD", "ps", "aux"]
@@ -64,10 +68,11 @@ services:
       - ${PROJECT_ROOT:-../}/package.json:/app/package.json:cached
       - ${PROJECT_ROOT:-../}/bun.lock:/app/bun.lock:cached
       - ${PROJECT_ROOT:-../}/turbo.json:/app/turbo.json:cached
-      # Exclude node_modules to avoid I/O errors with Docker filesystem layers
+      # Override volumes
       - node_modules:/app/node_modules:delegated
       - turbo_cache:/app/.turbo:delegated
       - bun_cache:/root/.bun:delegated
+      - vscode_cache:/app/.vscode:delegated
     command: sleep infinity
     environment:
       - NODE_ENV=development
@@ -83,16 +88,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
-  # Turbo test container
-  test:
-    extends:
-      service: apps
-    environment:
-      - TURBO_TOKEN=${TURBO_TOKEN:-}
-      - TURBO_TEAM=${TURBO_TEAM:-}
-    command: bun run test:watch
-    profiles: ["test", "all"]
 
   # Lightweight app containers that inherit from apps runtime
   admin:

@@ -417,7 +417,6 @@ This will show what would be generated without making actual changes.
 
 - **[Development Workflow](./3_DEVFLOW.md)** - Daily development practices
 - **[Script Development Guide](./5_SCRIPT_DEVELOPMENT_GUIDE.md)** - Creating custom scripts
-- **[Development Conventions](./4_DEVCONVENTIONS.md)** - Coding standards
 - **[Quality Checklist](./0_QUALITY_CHECKLIST.md)** - Testing before deployment
 
 ---

@@ -1,7 +1,7 @@
 {
-	"ui/src/index": "/workspace/packages/ui/src/index.ts",
-	"ui/src/button/button": "/workspace/packages/ui/src/button/button.tsx",
-	"ui/src/link/link": "/workspace/packages/ui/src/link/link.tsx",
-	"ui/src/counter-button/counter-button": "/workspace/packages/ui/src/counter-button/counter-button.tsx",
-	"utils/src/cn": "/workspace/packages/utils/src/cn.ts"
+	"ui/src/index": "/app/packages/ui/src/index.ts",
+	"ui/src/button/button": "/app/packages/ui/src/button/button.tsx",
+	"ui/src/link/link": "/app/packages/ui/src/link/link.tsx",
+	"ui/src/counter-button/counter-button": "/app/packages/ui/src/counter-button/counter-button.tsx",
+	"utils/src/cn": "/app/packages/utils/src/cn.ts"
 }

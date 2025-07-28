@@ -5,9 +5,9 @@
 	"sideEffects": false,
 	"type": "module",
 	"scripts": {
-		"build": "remix vite:build",
-		"dev": "remix vite:dev --host 0.0.0.0",
-		"start": "remix-serve ./build/server/index.js",
+		"build": "bunx --bun remix vite:build",
+		"dev": "bunx --bun remix vite:dev --host 0.0.0.0",
+		"start": "bunx --bun remix-serve ./build/server/index.js",
 		"check:types": "tsc --noEmit"
 	},
 	"dependencies": {

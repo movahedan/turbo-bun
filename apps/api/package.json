@@ -5,8 +5,8 @@
 	"private": true,
 	"scripts": {
 		"start": "bun dist/index.cjs",
-		"dev": "tsup src/index.ts --watch && bun run dist/index.cjs",
-		"build": "tsup src/index.ts --help",
+		"dev": "tsup src/index.ts --watch",
+		"build": "tsup src/index.ts",
 		"check:types": "tsc --noEmit",
 		"test": "bun test --dom",
 		"test:watch": "bun test --watch --dom",

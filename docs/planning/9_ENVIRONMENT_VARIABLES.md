@@ -789,7 +789,6 @@ bun run env:audit:logs
 
 ## 🔗 Related Documentation
 
-- [Development Conventions](./4_DEVCONVENTIONS.md) - Coding standards and security guidelines
 - [Docker Setup](./1_DOCKER.md) - Container environment configuration
 - [DevContainer Guide](./2_DEVCONTAINER.md) - Development environment setup
 - [Testing Guide](./TESTING.md) - Environment testing procedures

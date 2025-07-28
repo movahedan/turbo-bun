@@ -1,18 +1,9 @@
-/**
- * Reusable argument parsing utilities for scripts
- * Provides modular argument parsing, validation, and help generation
- */
-
-// Import Bun types for file operations
-declare const Bun: {
-	file(path: string): { size: number };
-};
-
 export interface ArgOption {
 	short: string;
 	long: string;
 	description: string;
 	required?: boolean;
+	defaultValue?: string | boolean | number;
 	multiple?: boolean; // Allow multiple values for this option
 	validator?: (value: string) => boolean | string;
 	examples?: string[];
@@ -22,26 +13,44 @@ export interface ScriptConfig {
 	name: string;
 	description: string;
 	usage: string;
-	examples: readonly string[] | string[];
-	options: readonly ArgOption[] | ArgOption[];
+	examples: readonly string[];
+	options: readonly ArgOption[];
 }
 
+type ScriptConfigOptions = Pick<ScriptConfig, "options">;
+
 export interface ParsedArgs {
-	[key: string]: string | boolean | string[];
+	[key: string]: string | boolean | string[] | undefined;
 }
+
+type InferArgName<T extends ArgOption> = T["long"] extends `--${infer Name}`
+	? Name
+	: never;
+
+type InferArgValue<T extends ArgOption> = T["multiple"] extends true
+	? string[]
+	: T["validator"] extends typeof validators.boolean
+		? boolean
+		: string;
+
+type RequiredOptions<T extends ScriptConfigOptions> = {
+	[K in T["options"][number] as K["required"] extends true
+		? InferArgName<K>
+		: never]: InferArgValue<K>;
+};
+
+type OptionalOptions<T extends ScriptConfigOptions> = {
+	[K in T["options"][number] as K["required"] extends true
+		? never
+		: InferArgName<K>]?: InferArgValue<K>;
+};
 
 /**
  * Type utility to infer argument types from ScriptConfig
+ * Combines required and optional options
  */
-export type InferArgs<T extends ScriptConfig> = {
-	[K in T["options"][number] as K["long"] extends `--${infer Name}`
-		? Name
-		: never]: K["multiple"] extends true
-		? string[]
-		: K["validator"] extends typeof validators.boolean
-			? boolean
-			: string;
-};
+export type InferArgs<T extends ScriptConfigOptions> = RequiredOptions<T> &
+	OptionalOptions<T>;
 
 /**
  * Parse command line arguments based on script configuration
@@ -60,6 +69,8 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
 		const nextArg = args[i + 1];
+		const isLastArg = !nextArg;
+		const nextArgIsOption = !!nextArg && nextArg.startsWith("-");
 
 		// Handle help
 		if (arg === "-h" || arg === "--help") {
@@ -78,12 +89,29 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			option.validator === undefined ||
 			option.validator === validators.boolean
 		) {
-			result[option.long.replace("--", "")] = true;
+			const consideredTrue = isLastArg || nextArgIsOption;
+
+			const nextArgIsTrue =
+				nextArg.toLowerCase().toString() === "true" ||
+				nextArg.toLowerCase().toString() === "1";
+			const nextArgIsFalse =
+				nextArg.toLowerCase().toString() === "false" ||
+				nextArg.toLowerCase().toString() === "0";
+
+			if (!consideredTrue && !nextArgIsTrue && !nextArgIsFalse) {
+				throw new Error(
+					`❌ Error: ${option.short}/${option.long} is a boolean flag and cannot be used with a value ${nextArg}.`,
+				);
+			}
+
+			result[option.long.replace("--", "")] =
+				consideredTrue || nextArgIsTrue || !nextArgIsFalse;
+
 			continue;
 		}
 
 		// Handle value options
-		if (!nextArg || nextArg.startsWith("-")) {
+		if (isLastArg || nextArgIsOption) {
 			throw new Error(
 				`❌ Error: ${option.short}/${option.long} requires a value`,
 			);
@@ -102,14 +130,13 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 
 		// Handle multiple values for the same option
 		const key = option.long.replace("--", "");
-		if (option.multiple) {
-			if (!result[key]) {
-				result[key] = [];
-			}
-			(result[key] as string[]).push(nextArg);
-		} else {
+		if (!option.multiple) {
 			result[key] = nextArg;
+		} else {
+			result[key] = (result[key] || []) as string[];
+			result[key];
 		}
+
 		i++; // Skip next argument since we consumed it
 	}
 
@@ -119,6 +146,14 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			throw new Error(
 				`❌ Error: ${option.short}/${option.long} is required. Use -h for help.`,
 			);
+		}
+	});
+
+	// Set default values for options that are not required
+	config.options.forEach((option) => {
+		const key = option.long.replace("--", "");
+		if (!option.required && !result[key]) {
+			result[key] = option.defaultValue as InferArgValue<typeof option>;
 		}
 	});
 
@@ -196,3 +231,40 @@ export const validators = {
 	 */
 	boolean: () => true,
 };
+
+export const defaultConfig = {
+	options: [
+		{
+			short: "-v",
+			long: "--verbose",
+			description: "Enable verbose output",
+			required: false,
+			defaultValue: true,
+			validator: validators.boolean,
+		},
+		{
+			short: "-q",
+			long: "--quiet",
+			description: "Disable all of warns, still show errors",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-d",
+			long: "--dry-run",
+			description: "Run the script without making any changes",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-h",
+			long: "--help",
+			description: "Show help message for the script",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+	],
+} as const satisfies Pick<ScriptConfig, "options">;

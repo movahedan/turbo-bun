@@ -12,7 +12,6 @@ Use the modular script development system for command-line tools with automatic 
 #!/usr/bin/env bun
 
 import { validators } from "./utils/arg-parser";
-import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
 export const descriptiveNameForScript = createScript(
@@ -46,12 +45,6 @@ if(import.meta.main) {
 ```
 
 ## Best Practices
-
-### ✅ Good: Use centralized command finding
-```ts
-const gitCmd = await findCommand("git");
-const dockerCmd = await findCommand("docker");
-```
 
 ### ✅ Good: Let createScript handle errors
 ```ts
@@ -114,16 +107,16 @@ const customValidator = (value: string): boolean | string => {
 
 ## Command Finding
 
-Use centralized commands from `scripts/utils/commands.ts`:
+Use direct command execution using Bun's $ or Node.js exec:
 
 ```ts
 // Predefined commands
-const gitCmd = await findCommand("git");
-const dockerCmd = await findCommand("docker");
-const actCmd = await findCommand("act");
+const gitCmd = Bun.spawnSync(["git", "version"]);
+const dockerCmd = Bun.spawnSync(["docker", "--version"]);
+const actCmd = Bun.spawnSync(["act", "--version"]);
 
 // Custom paths
-const customCmd = await findCommand("custom", ["/custom/path"], "Install instructions");
+const customCmd = Bun.spawnSync(["custom", "version"]);
 ```
 
 ## Script Configuration

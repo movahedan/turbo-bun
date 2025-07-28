@@ -97,95 +97,99 @@ export const buildViteLibrary = createScript(
 				validator: validators.nonEmpty,
 			},
 			{
-				short: "-n",
-				long: "--dry-run",
-				description: "Show what would be done without actually doing it",
+				short: "-g",
+				long: "--generate",
+				description: "Path to the file to generate the vite entries",
 				required: false,
-				validator: validators.boolean,
+				validator: validators.nonEmpty,
 			},
 		],
 	} as const,
-	async (args) => {
+	async function main(args, vConsole) {
 		const packageName = args.package;
 
 		const packageDir = join(__dirname, "../packages", packageName);
 		const packageJsonPath = join(packageDir, "package.json");
 		const distDir = join(packageDir, "dist");
-		const viteEntriesPath = join(packageDir, "vite-entries.generated.json");
 
 		const tsconfigPath = args.config || join(packageDir, "tsconfig.build.json");
 		const tsConfig: TsConfig = JSON.parse(await Bun.file(tsconfigPath).text());
 		const tsconfigRootDir = tsConfig.compilerOptions.rootDir;
+		const viteEntriesPath =
+			args.generate || join(packageDir, "vite-entries.generated.json");
 
-		console.info(`🚀 Starting build workflow for package: ${packageName}`);
+		vConsole.info(`🚀 Starting build workflow for package: ${packageName}`);
 		const isDryRun = args["dry-run"] || false;
 		if (isDryRun) {
-			console.info("🔍 Dry run mode - showing what would be done");
+			vConsole.info("🔍 Dry run mode - showing what would be done");
 		}
 
 		try {
 			// Step 0: Cleaning up the previous build
-			console.info("\n📝 Step 0: Cleaning up the previous build...");
+			vConsole.info("\n📝 Step 0: Cleaning up the previous build...");
 			await $`rm -rf ${distDir} || true`;
 			await $`rm -rf ${tsconfigPath.replace("json", "tsbuildinfo")} || true`;
 
 			// Step 1: Run TypeScript build
-			console.info("\n📝 Step 1: Running TypeScript build...");
+			vConsole.info("\n📝 Step 1: Running TypeScript build...");
 			await $`cd ${packageDir} && bun run tsc --project ${tsconfigPath}`;
-			console.info("✅ TypeScript build completed");
+			vConsole.info("✅ TypeScript build completed");
 
 			// Step 2: Extract information from the build
-			console.info("\n📝 Step 2: Generating Vite entries and package.json...");
+			vConsole.info("\n📝 Step 2: Generating Vite entries and package.json...");
 			const { viteEntries, packageExports } = await getViteAndPackageExports(
 				distDir,
 				packageDir,
 				tsconfigRootDir,
 			);
-			console.info(
+			vConsole.info(
 				`✅ Generated ${Object.keys(viteEntries).length} Vite entries`,
 			);
-			console.info(
+			vConsole.info(
 				`✅ Generated ${Object.keys(packageExports).length} package.json exports`,
 			);
 
 			// Step 3: Save Vite entries
-			console.info("\n📝 Step 3: Saving Vite entries...");
+			vConsole.info("\n📝 Step 3: Saving Vite entries...");
 			if (!isDryRun) {
 				await Bun.write(viteEntriesPath, JSON.stringify(viteEntries, null, 2));
 				await $`bunx @biomejs/biome check --write ${viteEntriesPath}`;
-				console.info(`✅ Saved to: ${viteEntriesPath}`);
+				vConsole.info(`✅ Saved to: ${viteEntriesPath}`);
 			} else {
 				const viteEntriesString = JSON.stringify(viteEntries, null, 2);
-				console.info(
+				vConsole.info(
 					`📝 Would save to: ${viteEntriesPath}\n${viteEntriesString}`,
 				);
 			}
 
 			// Step 4: Run Vite build
-			console.info("\n⚡ Step 4: Running Vite build...");
+			vConsole.info("\n⚡ Step 4: Running Vite build...");
 			if (!isDryRun) {
+				// Remove all js files in the dist directory that exported during `tsc` build
 				await $`cd ${distDir} && rm -rf **/*.js`;
 				await $`cd ${packageDir} && bun run build:vite -- --emptyOutDir=false`;
 			} else {
-				console.info("⚡ Would run: bun run build");
+				vConsole.info("⚡ Would run: bun run build");
 			}
 
 			// Step 5: Update package.json exports
-			console.info("\n📝 Step 5: Updating package.json exports...");
+			vConsole.info("\n📝 Step 5: Updating package.json exports...");
 			if (!isDryRun) {
 				const packageJson = JSON.parse(await Bun.file(packageJsonPath).text());
 				packageJson.exports = packageExports;
 				await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
 				await $`bunx @biomejs/biome check --write ${packageJsonPath}`;
-				console.info("✅ Updated package.json exports");
+				vConsole.info("✅ Updated package.json exports");
 			} else {
 				const exportsString = JSON.stringify(packageExports, null, 2);
-				console.info(`📝 Would update: package.json exports\n${exportsString}`);
+				vConsole.info(
+					`📝 Would update: package.json exports\n${exportsString}`,
+				);
 			}
 
-			console.info("\n🎉 Build workflow completed successfully!");
+			vConsole.info("\n🎉 Build workflow completed successfully!");
 		} catch (error) {
-			console.error("❌ Build workflow failed:\n", error);
+			vConsole.error("❌ Build workflow failed:\n", error);
 			process.exit(1);
 		}
 	},
@@ -201,6 +205,7 @@ if (import.meta.main) {
 const findJsFiles = async (distDir: string) =>
 	$`find ${distDir} -name "*.js" -not -name "*.test.js" -type f`.text();
 
+// Get the absolute paths of all the js files in the dist directory
 const getJsFilesAbsolutePaths = async (distDir: string) => {
 	const files = await findJsFiles(distDir);
 
@@ -210,6 +215,7 @@ const getJsFilesAbsolutePaths = async (distDir: string) => {
 		.map((file) => file.replace(/\.js$/, ""))
 		.filter(Boolean);
 };
+
 // Get the typescript extension from the file name
 const getTsExtension = async (file: string) => {
 	try {

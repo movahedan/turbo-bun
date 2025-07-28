@@ -9,17 +9,17 @@
 
 > **Turboobun** is a comprehensive production-ready [Turborepo](https://turbo.build/repo/docs) with [Bun](https://bun.com/) template that demonstrates modern development practices with a sophisticated toolchain integrated with [DevContainer](https://containers.dev/docs). It's designed for teams building complex applications with shared components.
 
-### 🏄‍♂ Dive into the doc
+### 🏄‍♂ Dive into the docs
 
-- **[Docker Setup](./docs/1_DOCKER.md)** and **[DevContainer Guide](./docs/2_DEVCONTAINER.md)** - Complete Docker guide
-- **[GitHub Actions Local Testing](./docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md)** - Local CI/CD pipeline testing
-- **[Development Workflow](./docs/3_DEVFLOW.md)** - Daily contribution
-- **[Script Development Guide](./docs/5_SCRIPT_DEVELOPMENT_GUIDE.md)** - Structured Shell scripting with bun
-- **[Development Conventions](./docs/4_DEVCONVENTIONS.md)** - Coding standards and best practices
-- **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)** - Test infrastructure changes before deployment
+- **[Installation Guide](./docs/1_INSTALLATION_GUIDE.md)** - Complete step-by-step installation guide
+- **[Setup Flows](./docs/2_SETUP_FLOWS.md)** - Quick setup and development workflow
+- **[Development Flows](./docs/3_DEV_FLOWS.md)** - Daily development practices
+- **[Scripting Guide](./docs/4_SCRIPTING.md)** - Modular, type-safe script development
+- **[Docker & DevContainer](./docs/5_DOCKER.md)** - Implementation details and hidden features
+- **[Renovate Configuration](./docs/6_RENOVATE.md)** - Automated dependency management
 - **[Build Vite Library](./docs/7_BUILD_VITE_LIBRARY.md)** - Complete TypeScript library build workflow
-- **[Renovate Configuration](./docs/8_RENOVATE.md)** - Automated dependency management
-- **[AI Report](./docs/AI_REPORT.md)** - Automated testing and validation for AI assistants
+- **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)** - Test infrastructure changes before deployment
+- **[AI Prompt](./docs/AI_Prompt.md)** - Automated testing and validation for AI assistants
 
 ## 📋 Table of Contents
 
@@ -44,11 +44,16 @@
 ```bash
 git clone https://github.com/movahedan/turbo-bun.git && code turbo-bun
 ```
-2. **Run the start script**:
+2. **Follow the [Installation Guide](./docs/1_INSTALLATION_GUIDE.md)** for complete setup
+3. **Or run the quick setup**:
 ```bash
-bun run setup && bun run dev:checkup
+bun run local:setup
 ```
-3. **Open in Dev Container**: `Ctrl+Shift+P` → `Dev Containers: Reopen in Container`
+4. **Open in Dev Container**: `Ctrl+Shift+P` → `Dev Containers: Reopen in Container`
+5. **Run setups again**:
+```bash
+bun run local:setup && bun run dev:setup
+```
 
 ## 🎯 Overview
 
@@ -57,7 +62,7 @@ This project demonstrates a production-ready [Turborepo](https://turbo.build/rep
 - **Full DevContainer Integration**: Optimized [DevContainer](https://containers.dev/) running on host machine
 - **Multi-Application Architecture**: Multiple frontend and backend applications
 - **Shared Package System**: Reusable components and utilities
-- **Modular BunBash Scripting**: Type-safe, Documented, and Reusable [Shell scripts with Bun](https://bun.sh/docs/runtime/shell)
+- **Modular Scripting**: Type-safe, documented, and reusable [Shell scripts with Bun](https://bun.sh/docs/runtime/shell)
 - **GitHub Actions Local Testing**: Optimized local testing of CI/CD pipelines using [Act](https://hub.docker.com/r/efrecon/act)
 - **Modern Development Tools**: [TypeScript](https://www.typescriptlang.org/docs/), [Biome](https://biomejs.dev/docs/), [Jest](https://jestjs.io/docs/getting-started), and more
 - **Hot Reload Support**: Real-time development experience across all applications
@@ -112,7 +117,7 @@ The monorepo includes a sophisticated build system for TypeScript libraries:
 ### Automated Updates with Renovate
 The monorepo uses [Renovate](https://docs.renovatebot.com) for intelligent dependency management:
 
-- **[Renovate Configuration](./docs/8_RENOVATE.md)**: Complete automated dependency management
+- **[Renovate Configuration](./docs/6_RENOVATE.md)**: Complete automated dependency management
 - **Security Alerts**: Vulnerability detection and automated fixes
 - **Monorepo Optimization**: Intelligent grouping for workspace packages
 - **Custom Managers**: Support for Biome and other tools

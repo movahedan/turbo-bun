@@ -583,7 +583,6 @@ export class AccessControl {
 - [Environment Variables Management](./9_ENVIRONMENT_VARIABLES.md) - Core environment variable system
 - [Enterprise Developer Experience](./10_ENTERPRISE_ENV_DEVELOPER_EXPERIENCE.md) - Developer experience design
 - [Enterprise Implementation](./11_ENTERPRISE_ENV_IMPLEMENTATION.md) - Vercel-based implementation
-- [Development Conventions](./4_DEVCONVENTIONS.md) - Security and coding standards
 
 ---
 
