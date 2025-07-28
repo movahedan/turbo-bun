@@ -153,7 +153,7 @@ export const buildViteLibrary = createScript(
 			vConsole.info("\n📝 Step 3: Saving Vite entries...");
 			if (!isDryRun) {
 				await Bun.write(viteEntriesPath, JSON.stringify(viteEntries, null, 2));
-				await $`cd ${join(__dirname, "..")} && bun run check:fix ${viteEntriesPath} && cd ${packageDir}`;
+				await $`bunx @biomejs/biome check --write ${viteEntriesPath}`;
 				vConsole.info(`✅ Saved to: ${viteEntriesPath}`);
 			} else {
 				const viteEntriesString = JSON.stringify(viteEntries, null, 2);
@@ -178,7 +178,7 @@ export const buildViteLibrary = createScript(
 				const packageJson = JSON.parse(await Bun.file(packageJsonPath).text());
 				packageJson.exports = packageExports;
 				await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
-				await $`cd ${join(__dirname, "..")} && bun run check:fix ${packageJsonPath} && cd ${packageDir}`;
+				await $`bunx @biomejs/biome check --write ${packageJsonPath}`;
 				vConsole.info("✅ Updated package.json exports");
 			} else {
 				const exportsString = JSON.stringify(packageExports, null, 2);
