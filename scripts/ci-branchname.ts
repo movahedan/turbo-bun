@@ -25,7 +25,7 @@ const ciBranchNameConfig = {
 
 export const ciBranchName = createScript(
 	ciBranchNameConfig,
-	async function main(args, vConsole): Promise<void> {
+	async function main(args, xConsole): Promise<void> {
 		// In GitHub Actions, we might not have a proper branch name for pull requests
 		// Skip the check if we're in a CI environment and don't have a valid branch name
 		const isCI =
@@ -69,22 +69,22 @@ export const ciBranchName = createScript(
 				return true;
 			}
 
-			vConsole.log(`🔍 Checking branch name: ${name}`);
-			vConsole.log(`📋 Patterns to match: ${Object.keys(patterns).join(", ")}`);
+			xConsole.log(`🔍 Checking branch name: ${name}`);
+			xConsole.log(`📋 Patterns to match: ${Object.keys(patterns).join(", ")}`);
 
 			const isValid = Object.values(patterns).some((pattern) =>
 				pattern.test(name),
 			);
 
-			vConsole.log("✅ Branch name is valid!");
+			xConsole.log("✅ Branch name is valid!");
 
 			return isValid;
 		};
 
 		// Skip branch name check in CI if we don't have a valid branch name
 		if (isCI && !args["force-check"] && !isValidBranchName(branchName)) {
-			vConsole.log("⚠️  Skipping branch name check in CI environment");
-			vConsole.log(`Branch name detected: ${branchName}`);
+			xConsole.log("⚠️  Skipping branch name check in CI environment");
+			xConsole.log(`Branch name detected: ${branchName}`);
 			process.exit(0);
 		}
 
@@ -93,8 +93,8 @@ export const ciBranchName = createScript(
 		}
 
 		const showHelp = () => {
-			vConsole.error("❌ Invalid branch name!");
-			vConsole.error("\nBranch name should follow one of these patterns:");
+			xConsole.error("❌ Invalid branch name!");
+			xConsole.error("\nBranch name should follow one of these patterns:");
 			for (const prefix of validBranchPrefixes) {
 				if (prefix === "release") {
 					console.error(`- ${prefix}/1.0.0`);

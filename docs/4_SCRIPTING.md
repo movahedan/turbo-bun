@@ -172,9 +172,7 @@ async function main(args, xConsole) {
   xConsole.log("✅ Script completed successfully!");
   
   // Verbose output (only shown when --verbose is true)
-  if (args.verbose) {
-    xConsole.log("🔍 Debug information");
-  }
+  xConsole.log("🔍 Debug information");
   
   // Quiet output (hidden when --quiet is true)
   xConsole.warn("⚠️ Warning message");
