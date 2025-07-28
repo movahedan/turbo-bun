@@ -47,7 +47,7 @@ jobs:
           bun install -g --frozen-lockfile @changesets/cli@2.29.3
 
       - name: 🔍 - Check branch name
-        run: bun run scripts/check-branch-name.ts
+        run: bun run scripts/ci-branchname.ts
 
       - name: ✨ - Biome check
         run: bun run check .
@@ -95,11 +95,11 @@ jobs:
 
       - name: 🔍 - Attach affected to github output
         id: affected  
-        run: bun run scripts/github-attach-affected.ts
+        run: bun run scripts/ci-attach-affected.ts
 
       - name: 🔍 - Attach service ports to github output
         id: ports
-        run: bun run scripts/github-attach-service-ports.ts
+        run: bun run scripts/ci-attach-service-ports.ts
 
       - name: 🏗️ Test Production Build
         run: |

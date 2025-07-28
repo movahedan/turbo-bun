@@ -8,11 +8,11 @@ import type { ScriptConfig } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
 
 const cleanupConfig = {
-	name: "Development Cleanup",
+	name: "Local Development Cleanup",
 	description: `Comprehensive cleanup of Docker containers, build artifacts, and development files.
-To stop the devcontainer itself, run \`bun cleanup --vscode\` from host machine`,
-	usage: "bun run cleanup [options]",
-	examples: ["bun run cleanup", "bun run cleanup --verbose"],
+This includes DevContainer cleanup. To stop the VS Code DevContainer itself, run \`bun run dev:rm\` from host machine`,
+	usage: "bun run local:cleanup [options]",
+	examples: ["bun run local:cleanup", "bun run local:cleanup --verbose"],
 	options: [],
 } as const satisfies ScriptConfig;
 
@@ -20,15 +20,6 @@ const cleanup = createScript(
 	cleanupConfig,
 	async (_, vConsole): Promise<void> => {
 		vConsole.log(chalk.blue("🧹 Starting comprehensive cleanup..."));
-
-		async function stepDocker() {
-			vConsole.log(chalk.yellow("🐳 Removing Docker containers..."));
-			await $`docker compose -f docker-compose.yml down --volumes`;
-			await $`docker compose -f docker-compose.yml rm -f --volumes`;
-			await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes`;
-			await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
-		}
-		await stepDocker();
 
 		function getAllDirectories(
 			baseDir: string,
@@ -101,7 +92,10 @@ const cleanup = createScript(
 
 		vConsole.log(chalk.green("✅ Cleanup completed successfully!"));
 		vConsole.log(chalk.cyan("\n💡 To start fresh, run:"));
-		vConsole.log(chalk.cyan("  - bun run setup"));
+		vConsole.log(chalk.cyan("  - bun run local:setup # For local development"));
+		vConsole.log(
+			chalk.cyan("  - bun run dev:setup # For DevContainer development"),
+		);
 	},
 );
 

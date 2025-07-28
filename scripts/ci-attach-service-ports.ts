@@ -3,16 +3,16 @@
 import { createScript } from "./utils/create-scripts";
 import { getServicePorts } from "./utils/docker-compose-parser";
 
-const githubAttachServicePortsConfig = {
+const ciAttachServicePortsConfig = {
 	name: "GitHub Attach Service Ports",
 	description: "Attach service ports to GitHub Actions",
-	usage: "bun run github-attach-service-ports",
-	examples: ["bun run github-attach-service-ports"],
+	usage: "bun run ci-attach-service-ports.ts",
+	examples: ["bun run ci-attach-service-ports.ts"],
 	options: [],
 } as const;
 
-export const githubAttachServicePorts = createScript(
-	githubAttachServicePortsConfig,
+export const ciAttachServicePorts = createScript(
+	ciAttachServicePortsConfig,
 	async function main(_, xConsole) {
 		const portMappings = await getServicePorts("docker-compose.yml");
 
@@ -33,5 +33,5 @@ export const githubAttachServicePorts = createScript(
 );
 
 if (import.meta.main) {
-	githubAttachServicePorts();
+	ciAttachServicePorts();
 }

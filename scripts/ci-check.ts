@@ -3,16 +3,16 @@ import { $ } from "bun";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
 
-const checkPipelinesConfig = {
+const ciCheckConfig = {
 	name: "GitHub Actions Local Testing",
 	description:
 		"Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
-	usage: "bun run check:pipelines -e <event> -w <workflow> [-v | --verbose]",
+	usage: "bun run ci:check -e <event> -w <workflow> [-v | --verbose]",
 	examples: [
-		"bun run check:pipelines -v --verbose -e pull_request -w .github/workflows/Check.yml",
-		"bun run check:pipelines --event push --workflow .github/workflows/Build.yml",
-		"bun run check:pipelines --event release --workflow .github/workflows/Deploy.yml",
-		"bun run check:pipelines --event workflow_run --workflow .github/workflows/Check.yml",
+		"bun run ci:check -v --verbose -e pull_request -w .github/workflows/Check.yml",
+		"bun run ci:check --event push --workflow .github/workflows/Build.yml",
+		"bun run ci:check --event release --workflow .github/workflows/Deploy.yml",
+		"bun run ci:check --event workflow_run --workflow .github/workflows/Check.yml",
 	],
 	options: [
 		{
@@ -38,29 +38,26 @@ const checkPipelinesConfig = {
 	],
 } as const;
 
-export const checkPipelines = createScript(
-	checkPipelinesConfig,
-	async function main(args) {
-		console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
+export const ciCheck = createScript(ciCheckConfig, async function main(args) {
+	console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
 
-		try {
-			await $`act ${args.event} -W ${args.workflow} -P ubuntu-latest=catthehacker/ubuntu:act-latest --quiet`;
-			if (args.verbose) {
-				console.log("✅ Success with catthehacker/ubuntu:act-latest image!");
-			}
-		} catch (error) {
-			console.error("❌ Act test failed:", error);
-			throw error;
-		} finally {
-			await cleanupActContainers();
+	try {
+		await $`act ${args.event} -W ${args.workflow} -P ubuntu-latest=catthehacker/ubuntu:act-latest --quiet`;
+		if (args.verbose) {
+			console.log("✅ Success with catthehacker/ubuntu:act-latest image!");
 		}
+	} catch (error) {
+		console.error("❌ Act test failed:", error);
+		throw error;
+	} finally {
+		await cleanupActContainers();
+	}
 
-		console.log("✅ GitHub Actions test completed!");
-	},
-);
+	console.log("✅ GitHub Actions test completed!");
+});
 
 if (import.meta.main) {
-	await checkPipelines();
+	ciCheck();
 }
 
 // Cleanup function to stop and remove act containers

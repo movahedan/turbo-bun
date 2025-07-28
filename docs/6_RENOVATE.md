@@ -318,7 +318,7 @@ renovate validate-config renovate.json
 - **[Installation Guide](https://docs.renovatebot.com/getting-started/installing-onboarding/)** - Setup instructions
 - **[Configuration Options](https://docs.renovatebot.com/configuration-options/)** - All available settings
 - **[Dependency Dashboard](https://docs.renovatebot.com/key-concepts/dashboard/)** - Dashboard management
-- **[Development Workflow](./3_DEVFLOW.md)** - Daily development practices
+- **[Development Workflow](./3_DEV_FLOWS.md)** - Daily development practices
 - **[Quality Checklist](./0_QUALITY_CHECKLIST.md)** - Testing before deployment
 
 ---

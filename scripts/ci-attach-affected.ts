@@ -1,23 +1,19 @@
 #!/usr/bin/env bun
-import {
-	getAffectedServices,
-	getAffectedServicesWithDependencies,
-} from "./get-affected-services";
+import { getAffectedServicesWithDependencies } from "./affected";
 import { createScript } from "./utils/create-scripts";
 
-const githubAttachAffectedConfig = {
+const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",
 	description: "Attach affected services to GitHub Actions",
-	usage: "bun run github-attach-affected",
-	examples: ["bun run github-attach-affected"],
+	usage: "bun run ci-attach-affected.ts",
+	examples: ["bun run ci-attach-affected.ts"],
 	options: [],
 } as const;
 
-export const githubAttachAffected = createScript(
-	githubAttachAffectedConfig,
+export const ciAttachAffected = createScript(
+	ciAttachAffectedConfig,
 	async function main(_, xConsole) {
 		try {
-			const affectedServices = await getAffectedServices("prod");
 			const affectedServicesWithDependencies =
 				await getAffectedServicesWithDependencies("prod");
 			const affectedServicesNames = affectedServicesWithDependencies.map(
@@ -30,14 +26,9 @@ export const githubAttachAffected = createScript(
 				await Bun.write(process.env.GITHUB_OUTPUT, output);
 			}
 
-			if (affectedServices.length === 0) {
+			if (affectedServicesWithDependencies.length === 0) {
 				xConsole.log("No affected packages found");
 			} else {
-				// Output clean list for bash capture
-				xConsole.log(
-					"Affected packages:",
-					affectedServices.map((s) => JSON.stringify(s)).join("\n"),
-				);
 				xConsole.log(
 					"Required services (including dependencies):",
 					affectedServicesWithDependencies
@@ -55,5 +46,5 @@ export const githubAttachAffected = createScript(
 );
 
 if (import.meta.main) {
-	await githubAttachAffected();
+	ciAttachAffected();
 }

@@ -29,7 +29,7 @@ export interface AffectedService {
 	port?: number;
 }
 
-export async function getAffectedServices(
+async function getAffectedServices(
 	mode: ServiceMode,
 ): Promise<AffectedService[]> {
 	const keys = await getAffectedPackages();

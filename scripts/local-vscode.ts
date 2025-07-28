@@ -23,15 +23,15 @@ interface ExtensionsConfig {
  * Syncs extensions and settings from devcontainer.json to .vscode/
  */
 const syncVscodeConfigScriptConfig = {
-	name: "VS Code Configuration Sync",
+	name: "Local VS Code Configuration Sync",
 	description:
 		"Synchronize VS Code extensions and settings from devcontainer.json to .vscode/ directory",
-	usage: "bun run sync:vscode [options]",
+	usage: "bun run local:vscode [options]",
 	examples: [
-		"bun run sync:vscode",
-		"bun run sync:vscode --dry-run",
-		"bun run sync:vscode --extensions-only",
-		"bun run sync:vscode --settings-only",
+		"bun run local:vscode",
+		"bun run local:vscode --dry-run",
+		"bun run local:vscode --extensions-only",
+		"bun run local:vscode --settings-only",
 	],
 	options: [
 		{

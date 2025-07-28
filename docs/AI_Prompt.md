@@ -26,17 +26,17 @@ Before any implementation:
 
 ### 2. **Development Environment Documentation**
 For environment-related changes:
-- [ ] Read `docs/1_DOCKER.md` for Docker setup and configuration
-- [ ] Review `docs/2_DEVCONTAINER.md` for DevContainer workflow
-- [ ] Check `docs/3_DEVFLOW.md` for development commands and processes
-- [ ] Understand `docs/4_DEVCONVENTIONS.md` for coding standards
+- [ ] Review `docs/2_SETUP_FLOWS.md` for organized setup flows
+- [ ] Check `docs/3_DEV_FLOWS.md` for development commands and processes
+- [ ] Read `docs/5_DOCKER.md` for Docker setup and configuration
+- [ ] Understand `.cursor/rules/` for coding standards and conventions
 
 ### 3. **Quality and Testing Documentation**
 For code quality and testing changes:
 - [ ] Review `docs/0_QUALITY_CHECKLIST.md` for structural change requirements
 - [ ] Read `docs/TESTING.md` for testing strategies and patterns
 - [ ] Check `docs/7_BUILD_VITE_LIBRARY.md` for build system details
-- [ ] Review `docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md` for CI/CD processes
+- [ ] Review CI/CD processes in `docs/3_DEV_FLOWS.md`
 
 ### 4. **Planning and Architecture Documentation**
 For architectural or planning decisions:
@@ -53,13 +53,14 @@ For AI-assisted development:
 ## 🔍 Documentation Search Strategy
 
 ### Priority Order for Documentation Review:
-1. **`docs/AI_REPORT.md`** - AI-specific guidelines (MANDATORY)
+1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY)
 2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
+5. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
+4. **`docs/3_DEV_FLOWS.md`** - Development workflow and commands
+6. **`.cursor/rules/`** - Development conventions and coding standards
+7. **Relevant planning docs** - For architectural decisions
+8. **Specific feature docs** - For feature-specific implementations
 3. **`README.md`** - Project overview and quick start
-4. **`docs/3_DEVFLOW.md`** - Development workflow and commands
-5. **`docs/4_DEVCONVENTIONS.md`** - Coding standards and conventions
-6. **Relevant planning docs** - For architectural decisions
-7. **Specific feature docs** - For feature-specific implementations
 
 ### Documentation Search Commands:
 ```bash
@@ -81,9 +82,9 @@ git log --oneline -- docs/
 - **ALWAYS** ensure Docker/container compatibility for all changes
 
 ### 2. **AI Documentation Priority**
-- **ALWAYS** check `docs/AI_REPORT.md` first for AI-specific guidelines
+- **ALWAYS** check `docs/AI_Prompt.md` first for AI-specific guidelines
 - Follow AI-specific patterns and constraints
-- Use AI_REPORT.md as the primary reference for AI interactions
+- Use AI_Prompt.md as the primary reference for AI interactions
 
 ### 3. **Quality Checklist Compliance**
 - **ALWAYS** review `docs/0_QUALITY_CHECKLIST.md` for structural changes
@@ -91,14 +92,29 @@ git log --oneline -- docs/
 - Follow the checklist for testing and validation
 
 ### 4. **Development Workflow Compliance**
-- **ALWAYS** follow the workflow in `docs/3_DEVFLOW.md`
+- **ALWAYS** follow the workflow in `docs/3_DEV_FLOWS.md`
 - Use the correct commands and processes
 - Follow the established development patterns
 
 ### 5. **Documentation Updates**
 - **ALWAYS** update relevant documentation when making changes
-- Follow the documentation standards in `docs/4_DEVCONVENTIONS.md`
+- Follow the development conventions in `.cursor/rules/`
 - Ensure documentation reflects current implementation
+
+### 6. **Documentation Update Process**
+When asked to update documentation:
+- **ALWAYS** compare documented flows with actual repository state
+- **NEVER** assume anything not present in the repository
+- **ALWAYS** examine actual files, scripts, and configurations
+- **ALWAYS** update the document as a complete, legitimate summary
+- **ALWAYS** link to actual repository files instead of explaining everything
+- **ALWAYS** verify file paths and script names exist in the repository
+- **ALWAYS** check `package.json` scripts, `turbo.json` config, and actual file structure
+- **ALWAYS** ensure documentation matches the current implementation exactly
+- **ALWAYS** check `.cursor/rules/` directory and update rules if needed to keep them synced
+- **ALWAYS** verify that `.cursor/rules/` reflects current development patterns and conventions
+- **ALWAYS** apply this process to ALL documentation in the `docs/` folder, not just specific files
+- **ALWAYS** pay special attention to `README.md` in the root of the project as the primary entry point
 
 ## 📝 Implementation Checklist
 
@@ -122,7 +138,9 @@ Before implementing any change:
 
 ### ✅ **Post-Implementation Validation**
 - [ ] Run quality checks: `bun run check:quick`
-- [ ] Test affected applications: `bun run dev:checkup`
+- [ ] Test local setup: `bun run setup`
+- [ ] Test DevContainer setup: `bun run dev:setup`
+- [ ] Test DevContainer health: `bun run dev:check`
 - [ ] **CRITICAL**: Verify DevContainer functionality: `bun run dev:health`
 - [ ] **CRITICAL**: Test in isolated DevContainer environment
 - [ ] Update relevant documentation
@@ -132,35 +150,36 @@ Before implementing any change:
 ## 🎯 Documentation Categories
 
 ### **Core Development**
-- `docs/3_DEVFLOW.md` - Development workflow and commands
-- `docs/4_DEVCONVENTIONS.md` - Coding standards and conventions
+- `docs/3_DEV_FLOWS.md` - Development workflow and commands
+- `docs/2_SETUP_FLOWS.md` - Organized setup flows
+- `.cursor/rules/` - Development conventions and coding standards
 - `docs/TESTING.md` - Testing strategies and patterns
 
 ### **Infrastructure & Environment**
-- `docs/1_DOCKER.md` - Docker setup and configuration
-- `docs/2_DEVCONTAINER.md` - DevContainer workflow
-- `docs/6_GITHUB_ACTIONS_TEST_LOCALLY.md` - CI/CD processes
+- `docs/5_DOCKER.md` - Docker setup and configuration
+- `docs/3_DEV_FLOWS.md` - CI/CD processes
+- `docs/4_SCRIPTING.md` - Script development patterns
 
 ### **Quality & Build System**
 - `docs/0_QUALITY_CHECKLIST.md` - Structural change requirements
+- `docs/3_DEV_FLOWS.md` - Development workflow and commands
 - `docs/7_BUILD_VITE_LIBRARY.md` - Build system details
-- `docs/5_SCRIPT_DEVELOPMENT_GUIDE.md` - Script development patterns
 
 ### **Planning & Architecture**
 - `docs/planning/` - Architectural decisions and planning
-- `docs/AI_REPORT.md` - AI-specific guidelines (CRITICAL)
+- `docs/AI_Prompt.md` - AI-specific guidelines (CRITICAL)
 
 ## 🚫 Common Mistakes to Avoid
 
 1. **Skipping Documentation Review** - Always read relevant docs first
-2. **Ignoring AI_REPORT.md** - This is the primary AI reference
+2. **Ignoring AI_Prompt.md** - This is the primary AI reference
 3. **Not Following Quality Checklist** - Always check structural requirements
 4. **Missing Development Workflow** - Follow established patterns
 5. **Not Updating Documentation** - Keep docs in sync with implementation
 
 ## 💡 Best Practices
 
-1. **Start with AI_REPORT.md** for AI-specific guidance
+1. **Start with AI_Prompt.md** for AI-specific guidance
 2. **Use the quality checklist** for structural changes
 3. **Follow the development workflow** for consistency
 4. **Search documentation** before implementing similar features

@@ -388,12 +388,12 @@ export const COMMANDS = {
 ### Documentation Integration
 
 #### 1. Update DevContainer Documentation
-- [ ] **Add CLI usage to docs/2_DEVCONTAINER.md**
+- [ ] **Add CLI usage to docs/5_DOCKER.md**
 - [ ] **Document remote development scenarios**
 - [ ] **Provide troubleshooting guide**
 
 #### 2. Update Development Workflow
-- [ ] **Update docs/3_DEVFLOW.md**
+- [ ] **Update docs/3_DEV_FLOWS.md**
 - [ ] **Add DevContainer CLI commands**
 - [ ] **Document integration with existing workflow**
 

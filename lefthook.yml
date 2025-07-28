@@ -20,7 +20,7 @@ pre-push:
   parallel: true
   commands:
     branch-name:
-      run: bun run scripts/check-branch-name.ts
+      run: bun run scripts/ci-branchname.ts
     check:
       run: bun run check
     test:

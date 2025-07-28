@@ -1,22 +1,22 @@
 # 🔧 Structural Changes Checklist
 
-IF YOU ARE AI: ALL THE OTHER DOCUMENTATIONS ARE FOR HUMANS! DO NOT TALK TO THE DEVELOPER OVER THOSE FILES. YOU HAVE A SPECIFIC FILE FOR THAT USE CASE: AI_REPORT.MD
-
 A comprehensive checklist for testing structural changes, infrastructure updates, and tooling modifications.
 
 ## 📋 Quick Checklist
 
 ### ✅ **Core Functionality**
-- [ ] `bun run cleanup` - Complete cleanup works
-- [ ] `bun run setup` - Complete fresh setup works
-- [ ] `bun run dev:checkup` DevContainer starts without errors, Hot reload works in all apps
+- [ ] `bun run local:cleanup` - Complete cleanup works
+- [ ] `bun run local:setup` - Complete local development setup works
+- [ ] `bun run check:quick` - Quick verification works
+- [ ] `bun run dev:setup` - Complete DevContainer setup works
+- [ ] `bun run dev:check` - DevContainer health checks work
 - [ ] `bun run check:pipeline` GitHub Actions proceeds - A bit change in workflow usually needed
 
 ### ✅ **Individual Applications**
-- [ ] `bun run dev:admin` - Admin app (port 3001)
-- [ ] `bun run dev:blog` - Blog app (port 3002)
-- [ ] `bun run dev:storefront` - Storefront app (port 3003)
-- [ ] `bun run dev:api` - API app (port 3004)
+- [ ] `bun run dev:up admin` - Admin app (port 3001)
+- [ ] `bun run dev:up blog` - Blog app (port 3002)
+- [ ] `bun run dev:up storefront` - Storefront app (port 3003)
+- [ ] `bun run dev:up api` - API app (port 3004)
 
 ### ✅ **Development Environment**
 - [ ] VS Code extensions apply correctly

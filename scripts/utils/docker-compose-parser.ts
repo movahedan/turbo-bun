@@ -37,6 +37,12 @@ export interface ServiceInfo {
 	};
 }
 
+export interface ServiceHealth {
+	name: string;
+	status: "healthy" | "unhealthy" | "starting" | "none";
+	port?: string;
+}
+
 /**
  * Parse docker-compose file and extract service information
  */
@@ -190,4 +196,66 @@ export async function getDependentServices(
 	}
 
 	return dependents;
+}
+
+/**
+ * Get service health information from Docker ps output
+ */
+export async function getServiceHealthFromPs(
+	composePath: string,
+): Promise<ServiceHealth[]> {
+	const { stdout } = await Bun.spawn(
+		["docker", "compose", "-f", composePath, "--profile", "all", "ps"],
+		{
+			stdout: "pipe",
+			stderr: "pipe",
+		},
+	);
+
+	const output = await new Response(stdout).text();
+	return parseDockerPsOutput(output);
+}
+
+/**
+ * Parse Docker ps output to extract service health information
+ */
+function parseDockerPsOutput(output: string): ServiceHealth[] {
+	const lines = output.trim().split("\n");
+	const services: ServiceHealth[] = [];
+
+	for (const line of lines) {
+		if (line.includes("NAME") || line.includes("----")) continue; // Skip header
+
+		// Look for health status patterns in the line
+		const nameMatch = line.match(/^(\S+)/);
+		if (!nameMatch) continue;
+
+		const name = nameMatch[1];
+		let healthStatus: "healthy" | "unhealthy" | "starting" | "none" = "none";
+
+		// Check for health status patterns
+		if (line.includes("(healthy)")) {
+			healthStatus = "healthy";
+		} else if (line.includes("(unhealthy)")) {
+			healthStatus = "unhealthy";
+		} else if (line.includes("(health: starting)")) {
+			healthStatus = "starting";
+		} else if (line.includes("Up")) {
+			healthStatus = "starting"; // Assume starting if Up but no health status
+		}
+
+		// Extract port information using a safer regex pattern
+		const portMatch = line.match(
+			/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/,
+		);
+		const port = portMatch ? portMatch[1] : undefined;
+
+		services.push({
+			name,
+			status: healthStatus,
+			port,
+		});
+	}
+
+	return services;
 }

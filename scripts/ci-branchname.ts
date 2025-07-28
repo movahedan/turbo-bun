@@ -3,14 +3,14 @@ import { $ } from "bun";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
 
-const checkBranchNameConfig = {
-	name: "Branch Name Checker",
-	description: "Validates branch names against predefined patterns",
-	usage: "bun run check-branch-name [--verbose] [--force-check]",
+const ciBranchNameConfig = {
+	name: "CI Branch Name Checker",
+	description: "Validates branch names against predefined patterns for CI/CD",
+	usage: "bun run ci:branchname [--verbose] [--force-check]",
 	examples: [
-		"bun run check-branch-name",
-		"bun run check-branch-name --verbose",
-		"bun run check-branch-name --force-check",
+		"bun run ci:branchname",
+		"bun run ci:branchname --verbose",
+		"bun run ci:branchname --force-check",
 	],
 	options: [
 		{
@@ -23,8 +23,8 @@ const checkBranchNameConfig = {
 	],
 } as const;
 
-export const checkBranchName = createScript(
-	checkBranchNameConfig,
+export const ciBranchName = createScript(
+	ciBranchNameConfig,
 	async function main(args, vConsole): Promise<void> {
 		// In GitHub Actions, we might not have a proper branch name for pull requests
 		// Skip the check if we're in a CI environment and don't have a valid branch name
@@ -109,5 +109,5 @@ export const checkBranchName = createScript(
 );
 
 if (import.meta.main) {
-	checkBranchName();
+	ciBranchName();
 }

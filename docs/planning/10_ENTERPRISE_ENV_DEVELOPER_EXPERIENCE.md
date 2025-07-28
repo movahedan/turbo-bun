@@ -738,7 +738,6 @@ const securityComplianceBestPractices = {
 ## 🔗 Related Documentation
 
 - [Environment Variables Management](./9_ENVIRONMENT_VARIABLES.md) - Core environment variable system
-- [Development Conventions](./4_DEVCONVENTIONS.md) - Security and coding standards
 - [Docker Setup](./1_DOCKER.md) - Container environment configuration
 - [DevContainer Guide](./2_DEVCONTAINER.md) - Development environment setup
 
