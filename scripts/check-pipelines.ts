@@ -4,50 +4,44 @@ import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
+const checkPipelinesConfig = {
+	name: "GitHub Actions Local Testing",
+	description:
+		"Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
+	usage: "bun run check:pipelines -e <event> -w <workflow> [-v | --verbose]",
+	examples: [
+		"bun run check:pipelines -v --verbose -e pull_request -w .github/workflows/Check.yml",
+		"bun run check:pipelines --event push --workflow .github/workflows/Build.yml",
+		"bun run check:pipelines --event release --workflow .github/workflows/Deploy.yml",
+		"bun run check:pipelines --event workflow_run --workflow .github/workflows/Check.yml",
+	],
+	options: [
+		{
+			short: "-e",
+			long: "--event",
+			description: "GitHub event to simulate (e.g., pull_request, push)",
+			required: true,
+			validator: validators.enum([
+				"pull_request",
+				"push",
+				"release",
+				"workflow_dispatch",
+				"workflow_run",
+			]),
+		},
+		{
+			short: "-w",
+			long: "--workflow",
+			description: "Workflow file to test (e.g., .github/workflows/Check.yml)",
+			required: true,
+			validator: validators.fileExists,
+		},
+	],
+} as const;
+
 export const checkPipelines = createScript(
-	{
-		name: "GitHub Actions Local Testing",
-		description:
-			"Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
-		usage: "bun run check:pipelines -e <event> -w <workflow> [-v | --verbose]",
-		examples: [
-			"bun run check:pipelines -v --verbose -e pull_request -w .github/workflows/Check.yml",
-			"bun run check:pipelines --event push --workflow .github/workflows/Build.yml",
-			"bun run check:pipelines --event release --workflow .github/workflows/Deploy.yml",
-			"bun run check:pipelines --event workflow_run --workflow .github/workflows/Check.yml",
-		],
-		options: [
-			{
-				short: "-e",
-				long: "--event",
-				description: "GitHub event to simulate (e.g., pull_request, push)",
-				required: true,
-				validator: validators.enum([
-					"pull_request",
-					"push",
-					"release",
-					"workflow_dispatch",
-					"workflow_run",
-				]),
-			},
-			{
-				short: "-w",
-				long: "--workflow",
-				description:
-					"Workflow file to test (e.g., .github/workflows/Check.yml)",
-				required: true,
-				validator: validators.fileExists,
-			},
-			{
-				short: "-v",
-				long: "--verbose",
-				description: "Verbose output",
-				required: false,
-				validator: validators.boolean,
-			},
-		],
-	} as const,
-	async (args) => {
+	checkPipelinesConfig,
+	async function main(args) {
 		console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
 
 		const actCmd = await findCommand("act", undefined, undefined, args.verbose);

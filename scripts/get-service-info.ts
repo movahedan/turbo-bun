@@ -56,7 +56,7 @@ export const getServiceInfo = createScript(
 				validator: validators.boolean,
 			},
 			{
-				short: "-d",
+				short: "-deps",
 				long: "--dependencies",
 				description: "Show service dependencies",
 				required: false,
@@ -78,7 +78,7 @@ export const getServiceInfo = createScript(
 			},
 		],
 	} as const,
-	async (args) => {
+	async function main(args, xConsole) {
 		const format = args.format || "table";
 		const compose = args.compose || "both";
 		const showUrls = args.urls || false;
@@ -89,7 +89,7 @@ export const getServiceInfo = createScript(
 		try {
 			// Handle ports display (new functionality)
 			if (showPorts) {
-				await displayServicePorts(compose);
+				await displayServicePorts(compose, xConsole);
 				return;
 			}
 
@@ -99,32 +99,32 @@ export const getServiceInfo = createScript(
 				const service = await getServiceByName(args.service, filePath);
 
 				if (!service) {
-					console.error(
+					xConsole.error(
 						chalk.red(`❌ Service '${args.service}' not found in ${filePath}`),
 					);
 					process.exit(1);
 				}
 
 				if (format === "json") {
-					console.log(JSON.stringify(service, null, 2));
+					xConsole.log(JSON.stringify(service, null, 2));
 				} else {
-					console.log(chalk.blue(`📋 Service: ${service.name}`));
-					console.log(`   Port: ${service.port || "N/A"}`);
-					console.log(`   Host Port: ${service.hostPort || "N/A"}`);
-					console.log(`   Container Port: ${service.containerPort || "N/A"}`);
+					xConsole.log(chalk.blue(`📋 Service: ${service.name}`));
+					xConsole.log(`   Port: ${service.port || "N/A"}`);
+					xConsole.log(`   Host Port: ${service.hostPort || "N/A"}`);
+					xConsole.log(`   Container Port: ${service.containerPort || "N/A"}`);
 
 					if (showDependencies && service.dependencies) {
-						console.log(`   Dependencies: ${service.dependencies.join(", ")}`);
+						xConsole.log(`   Dependencies: ${service.dependencies.join(", ")}`);
 					}
 
 					if (showUrls && service.port) {
-						console.log(`   URL: http://localhost:${service.port}`);
+						xConsole.log(`   URL: http://localhost:${service.port}`);
 					}
 				}
 
 				// Show dependencies if requested
 				if (showDependencies) {
-					await displayDependencies(args.service, filePath);
+					await displayDependencies(args.service, filePath, xConsole);
 				}
 
 				return;
@@ -135,21 +135,21 @@ export const getServiceInfo = createScript(
 
 			// Output based on format
 			if (format === "json") {
-				console.log(JSON.stringify(services, null, 2));
+				xConsole.log(JSON.stringify(services, null, 2));
 			} else if (format === "list") {
 				for (const service of services) {
 					const env = service.environment ? ` [${service.environment}]` : "";
 					const port = service.port ? ` :${service.port}` : "";
-					console.log(`• ${service.name}${env}${port}`);
+					xConsole.log(`• ${service.name}${env}${port}`);
 				}
 			} else {
 				// Table format
-				console.log(chalk.blue("📋 Services Information:"));
-				console.log("=".repeat(80));
-				console.log(
+				xConsole.log(chalk.blue("📋 Services Information:"));
+				xConsole.log("=".repeat(80));
+				xConsole.log(
 					`${"Name".padEnd(20)} ${"Port".padEnd(10)} ${"Host".padEnd(10)} ${"Container".padEnd(10)} ${"Dependencies".padEnd(20)}`,
 				);
-				console.log("-".repeat(80));
+				xConsole.log("-".repeat(80));
 
 				for (const service of services) {
 					const name = service.name.padEnd(20);
@@ -160,23 +160,23 @@ export const getServiceInfo = createScript(
 					);
 					const deps = (service.dependencies?.join(", ") || "None").padEnd(20);
 
-					console.log(`${name} ${port} ${host} ${container} ${deps}`);
+					xConsole.log(`${name} ${port} ${host} ${container} ${deps}`);
 				}
 			}
 
 			// Show URLs if requested
 			if (showUrls) {
-				await displayServiceUrls(compose);
+				await displayServiceUrls(compose, xConsole);
 			}
 		} catch (error) {
-			console.error(chalk.red("❌ Error getting service information:"), error);
+			xConsole.error(chalk.red("❌ Error getting service information:"), error);
 			process.exit(1);
 		}
 	},
 );
 
 if (import.meta.main) {
-	getServiceInfo();
+	await getServiceInfo();
 }
 
 /**
@@ -191,25 +191,28 @@ const getComposeFilePath = (compose: string): string => {
 /**
  * Display service URLs for the specified compose environment
  */
-const displayServiceUrls = async (compose: string): Promise<void> => {
-	console.log(chalk.blue("\n🌐 Service URLs:"));
-	console.log("=".repeat(50));
+const displayServiceUrls = async (
+	compose: string,
+	xConsole: typeof console,
+): Promise<void> => {
+	xConsole.log(chalk.blue("\n🌐 Service URLs:"));
+	xConsole.log("=".repeat(50));
 
 	if (compose === "dev" || compose === "both") {
 		const devUrls = await getServiceUrls(
 			".devcontainer/docker-compose.dev.yml",
 		);
-		console.log(chalk.yellow("Development:"));
+		xConsole.log(chalk.yellow("Development:"));
 		for (const [name, url] of Object.entries(devUrls)) {
-			console.log(`   ${name}: ${url}`);
+			xConsole.log(`   ${name}: ${url}`);
 		}
 	}
 
 	if (compose === "prod" || compose === "both") {
 		const prodUrls = await getServiceUrls("docker-compose.yml");
-		console.log(chalk.yellow("\nProduction:"));
+		xConsole.log(chalk.yellow("\nProduction:"));
 		for (const [name, url] of Object.entries(prodUrls)) {
-			console.log(`   ${name}: ${url}`);
+			xConsole.log(`   ${name}: ${url}`);
 		}
 	}
 };
@@ -220,15 +223,16 @@ const displayServiceUrls = async (compose: string): Promise<void> => {
 const displayDependencies = async (
 	serviceName: string,
 	filePath: string,
+	xConsole: typeof console,
 ): Promise<void> => {
 	const dependencies = await getServiceDependencies(serviceName, filePath);
 	const dependents = await getDependentServices(serviceName, filePath);
 
-	console.log(chalk.blue("\n🔗 Dependencies:"));
-	console.log(
+	xConsole.log(chalk.blue("\n🔗 Dependencies:"));
+	xConsole.log(
 		`   Depends on: ${dependencies.length > 0 ? dependencies.join(", ") : "None"}`,
 	);
-	console.log(
+	xConsole.log(
 		`   Dependents: ${dependents.length > 0 ? dependents.join(", ") : "None"}`,
 	);
 };
@@ -261,15 +265,18 @@ const getFilteredServices = async (
 /**
  * Display service ports in standard output format
  */
-const displayServicePorts = async (compose: string): Promise<void> => {
+const displayServicePorts = async (
+	compose: string,
+	xConsole: typeof console,
+): Promise<void> => {
 	const filePath = getComposeFilePath(compose);
 	const portMappings = await getServicePorts(filePath);
 
 	if (Object.keys(portMappings).length === 0) {
-		console.log(chalk.yellow("No service ports found"));
+		xConsole.log(chalk.yellow("No service ports found"));
 	} else {
-		console.log(chalk.blue("🔌 Service Ports:"));
-		console.log("=".repeat(50));
-		console.log(JSON.stringify(portMappings, null, 2));
+		xConsole.log(chalk.blue("🔌 Service Ports:"));
+		xConsole.log("=".repeat(50));
+		xConsole.log(JSON.stringify(portMappings, null, 2));
 	}
 };

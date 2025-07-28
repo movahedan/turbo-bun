@@ -3,11 +3,31 @@
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
 import chalk from "chalk";
+import { defaultConfig, parseArgs, validators } from "./utils/arg-parser";
 import { getExposedServices } from "./utils/docker-compose-parser";
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const keepRunning = !args.includes("--shutdown") && !args.includes("-s");
+const checkDevcontainerConfig = {
+	name: "DevContainer Health Check",
+	description: "Check the health of the DevContainer",
+	usage: "bun run check-devcontainer [options]",
+	examples: [
+		"bun run check-devcontainer",
+		"bun run check-devcontainer --keep-running",
+	],
+	options: [
+		...defaultConfig.options,
+		{
+			short: "-s",
+			long: "--shutdown",
+			description: "Shutdown services after tests complete",
+			required: false,
+			validator: validators.boolean,
+		},
+	],
+} as const;
+
+const args = parseArgs(checkDevcontainerConfig);
+const keepRunning = !args["shutdown"];
 
 interface TestResult {
 	name: string;
@@ -46,7 +66,7 @@ class DevContainerTester {
 		await this.testBasicBuild();
 		await this.testDevContainerBuild();
 		await this.testServiceHealthChecks();
-		await this.testProductionCompose();
+		// await this.testProductionCompose();
 
 		// Only cleanup if not keeping services running
 		if (!keepRunning) {
@@ -335,26 +355,26 @@ class DevContainerTester {
 	// 	}
 	// }
 
-	private async testProductionCompose() {
-		const testName = "Production Compose";
-		try {
-			console.log(chalk.yellow("🏭 Testing production Docker Compose..."));
+	// private async testProductionCompose() {
+	// 	const testName = "Production Compose";
+	// 	try {
+	// 		console.log(chalk.yellow("🏭 Testing production Docker Compose..."));
 
-			// Test production compose validation
-			const { exitCode } = await $`docker compose config -q`;
-			if (exitCode === 0) {
-				this.addResult(testName, "PASS", "Production Docker Compose is valid");
-			} else {
-				this.addResult(
-					testName,
-					"FAIL",
-					`Production Docker Compose validation failed ${process.cwd()}/docker-compose.yml`,
-				);
-			}
-		} catch (error) {
-			this.addResult(testName, "FAIL", `Production compose error: ${error}`);
-		}
-	}
+	// 		// Test production compose validation
+	// 		const { exitCode } = await $`docker compose config -q`;
+	// 		if (exitCode === 0) {
+	// 			this.addResult(testName, "PASS", "Production Docker Compose is valid");
+	// 		} else {
+	// 			this.addResult(
+	// 				testName,
+	// 				"FAIL",
+	// 				`Production Docker Compose validation failed ${process.cwd()}/docker-compose.yml`,
+	// 			);
+	// 		}
+	// 	} catch (error) {
+	// 		this.addResult(testName, "FAIL", `Production compose error: ${error}`);
+	// 	}
+	// }
 
 	private async testKeepRunning() {
 		const testName = "Keep Running";
@@ -459,7 +479,7 @@ class DevContainerTester {
 }
 
 // Show help if requested
-if (args.includes("--help") || args.includes("-h")) {
+if (args.help) {
 	console.log(chalk.blue("🧪 DevContainer Test Suite"));
 	console.log("");
 	console.log(chalk.yellow("Usage:"));

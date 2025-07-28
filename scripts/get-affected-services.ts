@@ -24,40 +24,48 @@ export async function getAffectedPackages(): Promise<string[]> {
 	return affectedPackages.packages.slice(1);
 }
 
+type ServiceMode = "dev" | "prod" | "all";
+
 export interface AffectedService {
 	name: string;
-	environment: "dev" | "prod";
+	environment: ServiceMode;
 	port?: number;
 }
 
-export async function getAffectedServices(): Promise<AffectedService[]> {
+export async function getAffectedServices(
+	mode: ServiceMode,
+): Promise<AffectedService[]> {
 	const keys = await getAffectedPackages();
 	const allServices = await getAllServices();
 
 	const affectedServices: AffectedService[] = [];
 
 	// Check dev services
-	for (const service of allServices.dev) {
-		const serviceKey = service.name === "ui" ? "@repo/ui" : service.name;
-		if (keys.some((k: string) => k === serviceKey)) {
-			affectedServices.push({
-				name: service.name,
-				environment: "dev",
-				port: service.port,
-			});
+	if (mode === "dev" || mode === "all") {
+		for (const service of allServices.dev) {
+			const serviceKey = service.name === "ui" ? "@repo/ui" : service.name;
+			if (keys.some((k: string) => k === serviceKey)) {
+				affectedServices.push({
+					name: service.name,
+					environment: "dev",
+					port: service.port,
+				});
+			}
 		}
 	}
 
 	// Check prod services
-	for (const service of allServices.prod) {
-		const serviceKey = service.name.replace(/^prod-/, "");
-		const packageKey = serviceKey === "ui" ? "@repo/ui" : serviceKey;
-		if (keys.some((k: string) => k === packageKey)) {
-			affectedServices.push({
-				name: service.name,
-				environment: "prod",
-				port: service.port,
-			});
+	if (mode === "prod" || mode === "all") {
+		for (const service of allServices.prod) {
+			const serviceKey = service.name.replace(/^prod-/, "");
+			const packageKey = serviceKey === "ui" ? "@repo/ui" : serviceKey;
+			if (keys.some((k: string) => k === packageKey)) {
+				affectedServices.push({
+					name: service.name,
+					environment: "prod",
+					port: service.port,
+				});
+			}
 		}
 	}
 
@@ -67,10 +75,10 @@ export async function getAffectedServices(): Promise<AffectedService[]> {
 /**
  * Get affected services with their dependencies
  */
-export async function getAffectedServicesWithDependencies(): Promise<
-	AffectedService[]
-> {
-	const affectedServices = await getAffectedServices();
+export async function getAffectedServicesWithDependencies(
+	mode: "dev" | "prod" | "all",
+): Promise<AffectedService[]> {
+	const affectedServices = await getAffectedServices(mode);
 	const allServices = await getAllServices();
 
 	const allServicesWithDeps = new Set<string>();
@@ -115,4 +123,9 @@ export async function getAffectedServicesWithDependencies(): Promise<
 	}
 
 	return result;
+}
+
+if (import.meta.main) {
+	const affectedServices = await getAffectedServicesWithDependencies("all");
+	console.log(affectedServices);
 }

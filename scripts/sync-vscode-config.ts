@@ -22,71 +22,54 @@ interface ExtensionsConfig {
  * VS Code configuration synchronization script
  * Syncs extensions and settings from devcontainer.json to .vscode/
  */
+const syncVscodeConfigScriptConfig = {
+	name: "VS Code Configuration Sync",
+	description:
+		"Synchronize VS Code extensions and settings from devcontainer.json to .vscode/ directory",
+	usage: "bun run sync:vscode [options]",
+	examples: [
+		"bun run sync:vscode",
+		"bun run sync:vscode --dry-run",
+		"bun run sync:vscode --extensions-only",
+		"bun run sync:vscode --settings-only",
+	],
+	options: [
+		{
+			short: "-e",
+			long: "--extensions-only",
+			description: "Only sync extensions, skip settings",
+			required: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-s",
+			long: "--settings-only",
+			description: "Only sync settings, skip extensions",
+			required: false,
+			validator: validators.boolean,
+		},
+	],
+} as const;
+
 export const syncVscodeConfigScript = createScript(
-	{
-		name: "VS Code Configuration Sync",
-		description:
-			"Synchronize VS Code extensions and settings from devcontainer.json to .vscode/ directory",
-		usage: "bun run sync:vscode [options]",
-		examples: [
-			"bun run sync:vscode",
-			"bun run sync:vscode --dry-run",
-			"bun run sync:vscode --extensions-only",
-			"bun run sync:vscode --settings-only",
-		],
-		options: [
-			{
-				short: "-d",
-				long: "--dry-run",
-				description: "Show what would be synced without writing files",
-				required: false,
-				validator: validators.boolean,
-			},
-			{
-				short: "-e",
-				long: "--extensions-only",
-				description: "Only sync extensions, skip settings",
-				required: false,
-				validator: validators.boolean,
-			},
-			{
-				short: "-s",
-				long: "--settings-only",
-				description: "Only sync settings, skip extensions",
-				required: false,
-				validator: validators.boolean,
-			},
-			{
-				short: "-v",
-				long: "--verbose",
-				description: "Show detailed sync information",
-				required: false,
-				validator: validators.boolean,
-			},
-		],
-	} as const,
-	async (args: {
-		"dry-run"?: boolean;
-		"extensions-only"?: boolean;
-		"settings-only"?: boolean;
-		verbose?: boolean;
-	}): Promise<void> => {
-		console.log("🔄 Syncing VS Code configuration from devcontainer.json...");
+	syncVscodeConfigScriptConfig,
+	async function main(args, xConsole) {
+		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
 		const devcontainerConfig = readDevcontainerConfig();
 		const extensions = extractExtensions(devcontainerConfig);
 		const settings = extractSettings(devcontainerConfig);
 
 		if (args["dry-run"]) {
-			console.log("🔍 Dry run mode - showing what would be synced:");
+			xConsole.log("🔍 Dry run mode - showing what would be synced:");
 			if (!args["settings-only"]) {
-				console.log(`📦 Extensions (${extensions.length}):`);
-				extensions.forEach((ext) => console.log(`  - ${ext}`));
+				xConsole.log(`📦 Extensions (${extensions.length}):`);
+				extensions.forEach((ext) => xConsole.log(`  - ${ext}`));
 			}
 			if (!args["extensions-only"]) {
-				console.log(`⚙️  Settings (${Object.keys(settings).length}):`);
+				xConsole.log(`⚙️  Settings (${Object.keys(settings).length}):`);
 				Object.entries(settings).forEach(([key, value]) =>
-					console.log(`  - ${key}: ${JSON.stringify(value)}`),
+					xConsole.log(`  - ${key}: ${JSON.stringify(value)}`),
 				);
 			}
 			return;
@@ -102,12 +85,9 @@ export const syncVscodeConfigScript = createScript(
 			writeSettingsJson(settings);
 		}
 
-		console.log("✅ VS Code configuration synced successfully!");
-
-		if (args.verbose) {
-			console.log(`📦 Extensions: ${extensions.length}`);
-			console.log(`⚙️  Settings: ${Object.keys(settings).length} settings`);
-		}
+		xConsole.log("✅ VS Code configuration synced successfully!");
+		xConsole.log(`📦 Extensions: ${extensions.length}`);
+		xConsole.log(`⚙️  Settings: ${Object.keys(settings).length} settings`);
 	},
 );
 

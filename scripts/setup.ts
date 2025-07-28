@@ -5,77 +5,67 @@ import chalk from "chalk";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
 
-/**
- * Comprehensive development environment setup script
- * Installs dependencies, builds Docker images, and starts all services
- */
-const setupScript = createScript(
-	{
-		name: "Development Setup",
-		description:
-			"Comprehensive development environment setup with dependency installation, Docker builds, and service startup",
-		usage: "bun run setup [options]",
-		examples: [
-			"bun run setup",
-			"bun run setup --skip-docker",
-			"bun run setup --skip-vscode",
-		],
-		options: [
-			{
-				short: "-s",
-				long: "--skip-docker",
-				description: "Skip Docker image building and service startup",
-				required: false,
-				validator: validators.boolean,
-			},
-			{
-				short: "-c",
-				long: "--skip-cleanup",
-				description: "Skip cleanup after setup",
-				required: false,
-				validator: validators.boolean,
-			},
-			{
-				short: "-v",
-				long: "--skip-vscode",
-				description: "Skip VS Code configuration sync",
-				required: false,
-				validator: validators.boolean,
-			},
-		],
-	} as const,
-	async (args: {
-		"skip-docker"?: boolean;
-		"skip-vscode"?: boolean;
-		"dry-run"?: boolean;
-	}): Promise<void> => {
-		console.log(chalk.blue("🚀 Starting comprehensive development setup..."));
-		// Step 1: Install dependencies
-		console.log(chalk.blue("📦 Installing dependencies..."));
-		await $`bun install`;
+const setupConfig = {
+	name: "Development Setup",
+	description:
+		"Comprehensive development environment setup with dependency installation, Docker builds, and service startup",
+	usage: "bun run setup [options]",
+	examples: [
+		"bun run setup",
+		"bun run setup --skip-docker",
+		"bun run setup --skip-vscode",
+	],
+	options: [
+		{
+			short: "-s",
+			long: "--skip-docker",
+			description: "Skip Docker image building and service startup",
+			required: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-c",
+			long: "--skip-cleanup",
+			description: "Skip cleanup after setup",
+			required: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-v",
+			long: "--skip-vscode",
+			description: "Skip VS Code configuration sync",
+			required: false,
+			validator: validators.boolean,
+		},
+	],
+} as const;
 
-		// Step 2: Docker operations (unless skipped)
-		if (!args["skip-docker"]) {
-			console.log(chalk.blue("🎯 Run devcontainer setup..."));
-			await $`bun run dev:checkup`;
-		}
+const setup = createScript(setupConfig, async function main(args, xConsole) {
+	xConsole.log(chalk.blue("🚀 Starting comprehensive development setup..."));
+	// Step 1: Install dependencies
+	xConsole.log(chalk.blue("📦 Installing dependencies..."));
+	await $`bun install`;
 
-		// Step 3: Sync VS Code configuration (unless skipped)
-		if (!args["skip-vscode"]) {
-			console.log(chalk.blue("🎯 Syncing VS Code configuration..."));
-			await $`bun run sync:vscode`;
-		}
+	// Step 2: Docker operations (unless skipped)
+	if (!args["skip-docker"]) {
+		xConsole.log(chalk.blue("🎯 Run devcontainer setup..."));
+		await $`bun run dev:checkup`;
+	}
 
-		console.log(chalk.green("✅ Setup completed successfully!"));
+	// Step 3: Sync VS Code configuration (unless skipped)
+	if (!args["skip-vscode"]) {
+		xConsole.log(chalk.blue("🎯 Syncing VS Code configuration..."));
+		await $`bun run sync:vscode`;
+	}
 
-		console.log(chalk.cyan("\n💡 Useful commands:"));
-		console.log(chalk.cyan("  - bun run dev:logs     # View all service logs"));
-		console.log(chalk.cyan("  - bun run dev:status   # Check service status"));
-		console.log(chalk.cyan("  - bun run cleanup      # Clean everything"));
-	},
-	undefined,
-);
+	xConsole.log(chalk.green("✅ Setup completed successfully!"));
+
+	xConsole.log(chalk.cyan("\n💡 Useful commands:"));
+	xConsole.log(chalk.cyan("  - bun run dev:logs     # View all service logs"));
+	xConsole.log(chalk.cyan("  - bun run dev:status   # Check service status"));
+	xConsole.log(chalk.cyan("  - bun run cleanup      # Clean everything"));
+});
 
 if (import.meta.main) {
-	setupScript();
+	setup();
 }

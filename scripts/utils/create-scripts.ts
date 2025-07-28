@@ -1,102 +1,69 @@
-/**
- * Error handling utilities for scripts
- * Provides consistent error handling patterns across all scripts
- */
-
 import type { InferArgs, ScriptConfig } from "./arg-parser";
-
-/**
- * Higher-order function that wraps script execution with consistent error handling
- */
-export function withErrorHandling<T extends unknown[]>(
-	fn: (...args: T) => Promise<void> | void,
-	options: {
-		scriptName?: string;
-		exitOnError?: boolean;
-		showStack?: boolean;
-	} = {},
-): (...args: T) => Promise<void> {
-	const {
-		scriptName = "Script",
-		exitOnError = true,
-		showStack = false,
-	} = options;
-
-	return async (...args: T): Promise<void> => {
-		try {
-			await fn(...args);
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : String(error);
-			console.error(`❌ ${scriptName} failed:`, errorMessage);
-
-			if (showStack && error instanceof Error && error.stack) {
-				console.error("Stack trace:");
-				console.error(error.stack);
-			}
-
-			if (exitOnError) {
-				process.exit(1);
-			}
-
-			throw error;
-		}
-	};
-}
+import { defaultConfig, parseArgs } from "./arg-parser";
 
 /**
  * Utility to create a script with automatic error handling and type safety
  */
-export function createScript<T extends Readonly<ScriptConfig>>(
-	config: Readonly<T>,
-	fn: (args: InferArgs<Readonly<T>>) => Promise<void> | void,
+export function createScript<
+	Config extends ScriptConfig,
+	Return extends Promise<void> | void,
+>(
+	config: Config,
+	fn: (
+		args: InferArgs<typeof defaultConfig> & InferArgs<Config>,
+		cliConsole: typeof console,
+	) => Return,
 	options: {
 		exitOnError?: boolean;
 		showStack?: boolean;
 	} = {},
-): () => Promise<void> {
-	return withErrorHandling(
-		async () => {
-			const { parseArgs } = await import("./arg-parser");
-			const args = parseArgs(config);
-			await fn(args);
-		},
-		{ scriptName: config.name, ...options },
-	);
-}
+): (
+	passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>,
+) => Return {
+	return (passedArgs) => {
+		// Parse command line args if no passed args
+		const cliArgs =
+			passedArgs ||
+			parseArgs({
+				...defaultConfig,
+				...config,
+				options: [...defaultConfig.options, ...config.options],
+			});
 
-/**
- * Utility for handling specific types of errors with custom messages
- */
-export function handleSpecificErrors<T extends unknown[]>(
-	fn: (...args: T) => Promise<void> | void,
-	errorHandlers: Array<{
-		test: (error: unknown) => boolean;
-		message: string | ((error: unknown) => string);
-		exitCode?: number;
-	}>,
-): (...args: T) => Promise<void> {
-	return async (...args: T): Promise<void> => {
+		// Merge with defaults to ensure all default values are present
+		const defaultArgs = {
+			verbose: true,
+			quiet: false,
+			"dry-run": false,
+			help: false,
+		};
+
+		const args = {
+			...defaultArgs,
+			...cliArgs,
+		} as InferArgs<typeof defaultConfig> & InferArgs<Config>;
+
+		const c: typeof console = Object.assign(console, {
+			warn: (...props: Parameters<typeof console.warn>) => {
+				if (!("quiet" in args) || !args.quiet) console.warn(...props);
+			},
+			info: (...props: Parameters<typeof console.info>) => {
+				if (!("verbose" in args) || !args.verbose) console.info(...props);
+			},
+			log: (...props: Parameters<typeof console.log>) => {
+				if (!("verbose" in args) || args.verbose) console.log(...props);
+			},
+		});
+
 		try {
-			await fn(...args);
-		} catch (error) {
-			// Check for specific error handlers
-			for (const handler of errorHandlers) {
-				if (handler.test(error)) {
-					const message =
-						typeof handler.message === "function"
-							? handler.message(error)
-							: handler.message;
-					console.error(`❌ Error: ${message}`);
-					process.exit(handler.exitCode || 1);
-				}
-			}
+			return fn(args, c);
+		} catch (e) {
+			const message = e instanceof Error ? e.message : String(e);
+			c.error(`❌ ${config.name} failed:`, message);
+			if (e instanceof Error && e.stack) c.error(`Stack trace:\n${e.stack}\n`);
 
-			// Default error handling
-			const errorMessage =
-				error instanceof Error ? error.message : String(error);
-			console.error("❌ Error:", errorMessage);
-			process.exit(1);
+			if (options.exitOnError) process.exit(1);
+			throw e;
 		}
 	};
 }

@@ -50,9 +50,10 @@ const script = createScript(
       // Your options here
     ],
   } as const,
-  // Type-safe anonymous function with inferred argument types
-  async (args: { /* your args */ }): Promise<void> => {
+  // Type-safe function with inferred argument types and console wrapper
+  async function main(args, xConsole) {
     // Your script logic here
+    // Use xConsole.log() instead of console.log() for consistent output
   },
 );
 
@@ -68,64 +69,57 @@ import { validators } from "./utils/arg-parser";
 import { findCommand } from "./utils/command-finder";
 import { createScript } from "./utils/create-scripts";
 
-// Create script with automatic error handling and type safety
-const script = createScript(
-  {
-    name: "File Processor",
-    description: "Process files with various options",
-    usage: "bun run process-files -i <input> -o <output> [--verbose]",
-    examples: [
-      "bun run process-files -i data.txt -o result.txt",
-      "bun run process-files --input config.json --output output.json --verbose",
-    ],
-    options: [
-      {
-        short: "-i",
-        long: "--input",
-        description: "Input file to process",
-        required: true,
-        validator: validators.fileExists,
-      },
-      {
-        short: "-o",
-        long: "--output",
-        description: "Output file path",
-        required: true,
-        validator: validators.nonEmpty,
-      },
-      {
-        short: "-v",
-        long: "--verbose",
-        description: "Enable verbose output",
-        required: false,
-        validator: validators.boolean,
-      },
-    ],
-  } as const,
-  // Type-safe anonymous function with inferred argument types
-  async (args: { 
-    input: string; 
-    output: string; 
-    verbose?: boolean 
-  }): Promise<void> => {
-    console.log(`📁 Processing: ${args.input}`);
-    console.log(`💾 Output: ${args.output}`);
+const exampleScriptConfig = {
+  name: "Example Script",
+  description: "A simple example script demonstrating modular argument parsing",
+  usage: "bun run example-script -f <file> -o <output> [--verbose]",
+  examples: [
+    "bun run example-script -f input.txt -o output.txt",
+    "bun run example-script --file data.json --output result.json --verbose",
+  ],
+  options: [
+    {
+      short: "-f",
+      long: "--file",
+      description: "Input file to process",
+      required: true,
+      validator: validators.fileExists,
+    },
+    {
+      short: "-o",
+      long: "--output",
+      description: "Output file path",
+      required: true,
+      validator: validators.nonEmpty,
+    },
+  ],
+} as const;
+
+export const exampleScript = createScript(
+  exampleScriptConfig,
+  async function main(args, xConsole) {
+    xConsole.log("📁 Processing file:", args.file);
+    xConsole.log("💾 Output will be saved to:", args.output);
 
     if (args.verbose) {
-      console.log("🔍 Verbose mode enabled");
+      xConsole.log("🔍 Verbose mode enabled");
     }
 
-    // Use centralized command system
+    // Example of using the centralized command system
     const gitCmd = await findCommand("git");
-    console.log(`✅ Found git at: ${gitCmd}`);
+    xConsole.log(`✅ Found git at: ${gitCmd}`);
 
-    // Your processing logic here...
-    console.log("✅ Processing completed!");
+    // Your script logic here...
+    xConsole.log("✅ Example script completed successfully!");
   },
 );
 
-script();
+if (import.meta.main) {
+  exampleScript();
+}
 ```
+
+**Note:** The example script uses the export pattern for better modularity and testing capabilities.
 
 ## 🔧 Configuration Options
 
@@ -208,6 +202,29 @@ const actCmd = await findCommand("act");
 // - act, docker, git, bun
 ```
 
+## 📝 Console Output
+
+### Using xConsole
+
+The script function receives an `xConsole` parameter that provides consistent output formatting and error handling:
+
+```typescript
+async function main(args, xConsole) {
+  // ✅ Use xConsole for all output
+  xConsole.log("📁 Processing file:", args.file);
+  xConsole.log("✅ Script completed successfully!");
+  
+  // ❌ Avoid direct console.log usage
+  // console.log("Processing file:", args.file);
+}
+```
+
+**Benefits of xConsole:**
+- Consistent formatting across all scripts
+- Automatic error handling and reporting
+- Integration with the script system's logging
+- Better debugging and monitoring capabilities
+
 ### Custom Command Paths
 
 ```typescript
@@ -236,7 +253,7 @@ export const COMMANDS = {
 
 ```typescript
 // ✅ Good: Clear separation of concerns
-async function myScript(args: MyArgs): Promise<void> {
+async function myScript(args, xConsole) {
   // 1. Validate inputs
   // 2. Find required commands
   // 3. Execute logic
@@ -244,13 +261,44 @@ async function myScript(args: MyArgs): Promise<void> {
 }
 
 // ✅ Good: Descriptive function names
-async function processGitHubActions(args: { event: string; workflow: string }): Promise<void>
+async function processGitHubActions(args, xConsole)
 
 // ❌ Avoid: Generic names
 async function main(args: any): Promise<void>
 ```
 
-### 2. Error Handling
+### 2. Console Output
+
+```typescript
+// ✅ Good: Use xConsole for consistent output
+async function myScript(args, xConsole) {
+  xConsole.log("📁 Processing file:", args.file);
+  xConsole.log("✅ Script completed successfully!");
+}
+
+// ❌ Avoid: Direct console.log usage
+async function myScript(args) {
+  console.log("Processing file:", args.file); // Inconsistent with script system
+}
+```
+
+### 3. Export Pattern
+
+```typescript
+// ✅ Good: Export the script for modularity
+export const myScript = createScript(config, async function main(args, xConsole) {
+  // Script logic
+});
+
+if (import.meta.main) {
+  myScript();
+}
+
+// ✅ Good: Import and use in other scripts
+import { myScript } from "./my-script";
+```
+
+### 4. Error Handling
 
 ```typescript
 // ✅ Good: Let createScript handle errors
@@ -267,20 +315,17 @@ try {
 }
 ```
 
-### 3. Type Safety
+### 5. Type Safety
 
 ```typescript
 // ✅ Good: Use inferred types
-async function myScript(args: InferArgs<typeof config>): Promise<void>
-
-// ✅ Good: Explicit types for clarity
-async function myScript(args: { input: string; output: string }): Promise<void>
+async function myScript(args: InferArgs<typeof config>, xConsole)
 
 // ❌ Avoid: Any types
 async function myScript(args: any): Promise<void>
 ```
 
-### 4. Command Finding
+### 6. Command Finding
 
 ```typescript
 // ✅ Good: Use centralized commands
@@ -307,21 +352,21 @@ See these files for complete examples:
 #### File Processing Script
 
 ```typescript
-async (args: { input: string; output: string }): Promise<void> => {
-  console.log(`📁 Processing: ${args.input}`);
+async function main(args: { input: string; output: string }, xConsole) {
+  xConsole.log(`📁 Processing: ${args.input}`);
   
   const gitCmd = await findCommand("git");
   
   // Process files...
-  console.log("✅ Processing completed!");
+  xConsole.log("✅ Processing completed!");
 }
 ```
 
 #### Build Script
 
 ```typescript
-async (args: { target: string; clean?: boolean }): Promise<void> => {
-  console.log(`🏗️ Building target: ${args.target}`);
+async function main(args: { target: string; clean?: boolean }, xConsole) {
+  xConsole.log(`🏗️ Building target: ${args.target}`);
   
   const bunCmd = await findCommand("bun");
   
@@ -330,25 +375,25 @@ async (args: { target: string; clean?: boolean }): Promise<void> => {
   }
   
   await $`${bunCmd} run build`;
-  console.log("✅ Build completed!");
+  xConsole.log("✅ Build completed!");
 }
 ```
 
 #### Deployment Script
 
 ```typescript
-async (args: { environment: string; dryRun?: boolean }): Promise<void> => {
-  console.log(`🚀 Deploying to: ${args.environment}`);
+async function main(args: { environment: string; dryRun?: boolean }, xConsole) {
+  xConsole.log(`🚀 Deploying to: ${args.environment}`);
   
   const dockerCmd = await findCommand("docker");
   
   if (args.dryRun) {
-    console.log("🔍 Dry run mode - no actual deployment");
+    xConsole.log("🔍 Dry run mode - no actual deployment");
     return;
   }
   
   await $`${dockerCmd} build -t myapp .`;
-  console.log("✅ Deployment completed!");
+  xConsole.log("✅ Deployment completed!");
 }
 ```
 
@@ -423,9 +468,10 @@ const githubActionTest = createScript(
       },
     ],
   } as const,
-  async (args: { event: string; workflow: string }): Promise<void> => {
+  async function main(args: { event: string; workflow: string }, xConsole) {
     const actCmd = await findCommand("act");
     await $`${actCmd} ${args.event} -W ${args.workflow}`;
+    xConsole.log("✅ GitHub Actions test completed!");
   },
 );
 
@@ -476,7 +522,7 @@ bun run my-script --input non-existent-file.txt
 ```typescript
 function createScript<T extends ScriptConfig>(
   config: T,
-  scriptFunction: (args: InferArgs<T>) => Promise<void>
+  scriptFunction: (args: InferArgs<T>, xConsole: typeof console) => Promise<void>
 ): () => void
 ```
 
