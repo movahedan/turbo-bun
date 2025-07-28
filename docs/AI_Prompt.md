@@ -11,7 +11,7 @@
 - [ ] **ALWAYS** consider Docker/container compatibility for any changes
 - [ ] **ALWAYS** verify that changes work in the isolated DevContainer environment
 - [ ] **ALWAYS** use `bun run dev:*` commands for development workflows
-- [ ] **ALWAYS** check DevContainer health: `bun run dev:checkup`
+- [ ] **ALWAYS** check DevContainer health: `bun run dev:check`
 
 ## 📋 Mandatory Documentation Review Process
 
@@ -55,12 +55,12 @@ For AI-assisted development:
 ### Priority Order for Documentation Review:
 1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY)
 2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
-5. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
+3. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
 4. **`docs/3_DEV_FLOWS.md`** - Development workflow and commands
-6. **`.cursor/rules/`** - Development conventions and coding standards
-7. **Relevant planning docs** - For architectural decisions
-8. **Specific feature docs** - For feature-specific implementations
-3. **`README.md`** - Project overview and quick start
+5. **`.cursor/rules/`** - Development conventions and coding standards
+6. **Relevant planning docs** - For architectural decisions
+7. **Specific feature docs** - For feature-specific implementations
+8. **`README.md`** - Project overview and quick start
 
 ### Documentation Search Commands:
 ```bash
@@ -78,7 +78,7 @@ git log --oneline -- docs/
 - **ALWAYS** consider DevContainer implications for any implementation
 - **ALWAYS** test changes within the DevContainer environment
 - **ALWAYS** use DevContainer-specific commands: `bun run dev:*`
-- **ALWAYS** verify DevContainer health: `bun run dev:checkup`
+- **ALWAYS** verify DevContainer health: `bun run dev:check`
 - **ALWAYS** ensure Docker/container compatibility for all changes
 
 ### 2. **AI Documentation Priority**
@@ -138,7 +138,7 @@ Before implementing any change:
 
 ### ✅ **Post-Implementation Validation**
 - [ ] Run quality checks: `bun run check:quick`
-- [ ] Test local setup: `bun run setup`
+- [ ] Test local setup: `bun run local:setup`
 - [ ] Test DevContainer setup: `bun run dev:setup`
 - [ ] Test DevContainer health: `bun run dev:check`
 - [ ] **CRITICAL**: Verify DevContainer functionality: `bun run dev:health`

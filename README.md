@@ -163,7 +163,6 @@ The monorepo uses [Renovate](https://docs.renovatebot.com) for intelligent depen
 | `@repo/logger` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Logging utilities |
 | `@repo/test-preset` | Package | [Jest](https://jestjs.io/docs/getting-started) | - | Testing configurations |
 | `@repo/config-typescript` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | TypeScript configurations |
-| `@repo/build-tools` | Package | Build tools | - | Build utilities |
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

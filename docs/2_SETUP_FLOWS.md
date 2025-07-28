@@ -137,9 +137,9 @@ bun run local:setup --fresh
 ## 📚 Related Documentation
 
 - [Installation Guide](./1_INSTALLATION_GUIDE.md) - Basic installation steps
-- [Development Workflow](./3_DEVFLOW.md) - Daily development commands
+- [Development Workflow](./3_DEV_FLOWS.md) - Daily development commands
 - [Quality Checklist](./0_QUALITY_CHECKLIST.md) - Testing procedures
-- [Docker Setup](./10_DOCKER.md) - Docker configuration
+- [Docker Setup](./5_DOCKER.md) - Docker configuration
 
 ---
 

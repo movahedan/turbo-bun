@@ -415,8 +415,8 @@ This will show what would be generated without making actual changes.
 
 ## 📚 Related Documentation
 
-- **[Development Workflow](./3_DEVFLOW.md)** - Daily development practices
-- **[Script Development Guide](./5_SCRIPT_DEVELOPMENT_GUIDE.md)** - Creating custom scripts
+- **[Development Workflow](./3_DEV_FLOWS.md)** - Daily development practices
+- **[Script Development Guide](./4_SCRIPTING.md)** - Creating custom scripts
 - **[Quality Checklist](./0_QUALITY_CHECKLIST.md)** - Testing before deployment
 
 ---

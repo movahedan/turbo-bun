@@ -31,13 +31,13 @@ bun run test:coverage
 - `bun run test:parallel` - Run tests in parallel mode
 
 ### Package-Specific Commands
-- `bun run test:ui` - Run tests for UI package only
-- `bun run test:utils` - Run tests for Utils package only
-- `bun run test:logger` - Run tests for Logger package only
-- `bun run test:api` - Run tests for API app only
-- `bun run test:blog` - Run tests for Blog app only
-- `bun run test:storefront` - Run tests for Storefront app only
-- `bun run test:admin` - Run tests for Admin app only
+- `turbo run test --filter=@repo/ui` - Run tests for UI package only
+- `turbo run test --filter=@repo/utils` - Run tests for Utils package only
+- `turbo run test --filter=@repo/logger` - Run tests for Logger package only
+- `turbo run test --filter=@repo/api` - Run tests for API app only
+- `turbo run test --filter=@repo/blog` - Run tests for Blog app only
+- `turbo run test --filter=@repo/storefront` - Run tests for Storefront app only
+- `turbo run test --filter=@repo/admin` - Run tests for Admin app only
 
 ## 🎯 Individual Package Testing
 
@@ -80,10 +80,10 @@ We provide a flexible test configuration script for advanced scenarios:
 
 ```bash
 # Run tests with custom configuration
-bun run scripts/test-config.ts --watch --coverage --affected
+bun run packages/test-preset/test-config.ts --watch --coverage --affected
 
 # Available options
-bun run scripts/test-config.ts --help
+bun run packages/test-preset/test-config.ts --help
 ```
 
 ### Watch Mode Features
@@ -101,7 +101,7 @@ bun run scripts/test-config.ts --help
 ## 🏗️ Test Configuration
 
 ### Centralized Setup
-All tests use a centralized setup file: `scripts/test-setup.ts`
+All tests use a centralized setup file: `packages/test-preset/test-setup.ts`
 
 This file provides:
 - DOM environment setup for React tests
@@ -142,7 +142,7 @@ describe("Button", () => {
 
 ### Using Test Utilities
 ```typescript
-import { utils } from "../../scripts/test-setup";
+import { utils } from "../../packages/test-preset/test-setup";
 
 describe("MyComponent", () => {
   it("waits for async operations", async () => {

@@ -22,14 +22,14 @@ The DevContainer setup supports running multiple instances simultaneously:
 bun run dev:up
 
 # Start second instance with different project name
-COMPOSE_PROJECT_NAME=repo-test bun run dev:container --profile all up -d
+COMPOSE_PROJECT_NAME=repo-test bun run dev:compose --profile all up -d
 
 # Check both instances
 bun run dev:compose ps
-COMPOSE_PROJECT_NAME=repo-test bun run dev:container ps
+COMPOSE_PROJECT_NAME=repo-test bun run dev:compose ps
 
 # Clean up test instance
-COMPOSE_PROJECT_NAME=repo-test bun run dev:container down
+COMPOSE_PROJECT_NAME=repo-test bun run dev:compose down
 ```
 
 ### GitHub Actions Validation
@@ -49,27 +49,27 @@ For manual testing of the DevContainer setup:
 
 ```bash
 # 1. Test basic setup
-bun run setup
+bun run local:setup
 
 # 2. Test individual applications
-bun run dev:admin:up
-bun run dev:blog:up
-bun run dev:storefront:up
-bun run dev:api:up
+bun run dev:up admin
+bun run dev:up blog
+bun run dev:up storefront
+bun run dev:up api
 
 # 3. Test hot reload
 # Make a change to any file and verify it updates in the browser
 
 # 4. Test multiple instances
-COMPOSE_PROJECT_NAME=test-1 bun run dev:container --profile all up -d
-COMPOSE_PROJECT_NAME=test-2 bun run dev:container --profile all up -d
+COMPOSE_PROJECT_NAME=test-1 bun run dev:compose --profile all up -d
+COMPOSE_PROJECT_NAME=test-2 bun run dev:compose --profile all up -d
 
 # 5. Test production setup
 bun run prod:build
 bun run prod:up
 
 # 6. Clean up
-bun run cleanup
+bun run local:cleanup
 ```
 
 ### Performance Monitoring
@@ -98,7 +98,7 @@ If tests fail, check these common issues:
 2. **Port Conflicts**: Check if ports 3001-3004 are already in use
 3. **Resource Limits**: Increase Docker Desktop memory allocation
 4. **Permission Issues**: Fix Docker socket permissions (Linux)
-5. **Cache Issues**: Clear Docker cache with `bun run dev:clean`
+5. **Cache Issues**: Clear Docker cache with `bun run dev:cleanup`
 
 ## 🎯 Current Setup Status
 
@@ -152,7 +152,7 @@ Your setup **supports multiple instances** through:
 bun run dev:up
 
 # Instance 2 (different project name)
-COMPOSE_PROJECT_NAME=repo-test bun run dev:container --profile all up -d
+COMPOSE_PROJECT_NAME=repo-test bun run dev:compose --profile all up -d
 
 # Instance 3 (different ports)
 COMPOSE_PROJECT_NAME=repo-test2 docker compose -f .devcontainer/docker-compose.dev.yml --profile all up -d

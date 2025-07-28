@@ -105,7 +105,7 @@ turbo run dev --filter=@repo/* --parallel # Start all packages in parallel
 
 # DevContainer options
 bun run dev:up                # It's in parallel by default
-bun run dev:up --timeout=120  # Custom startup timeout
+bun run dev:up  # Start all services
 ```
 
 ### **Package Development**
