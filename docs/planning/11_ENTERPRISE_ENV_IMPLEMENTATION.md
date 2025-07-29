@@ -36,9 +36,8 @@ This document provides a complete implementation guide for enterprise environmen
 interface TurboobunWithEnvManagement {
   applications: {
     admin: { port: 3001; framework: 'React + Vite' };
-    blog: { port: 3002; framework: 'Remix + Vite' };
-    storefront: { port: 3003; framework: 'Next.js 15' };
-    api: { port: 3004; framework: 'Express + TypeScript' };
+    storefront: { port: 3002; framework: 'Next.js 15' };
+    api: { port: 3003; framework: 'Express + TypeScript' };
   };
   
   packages: {
@@ -70,13 +69,13 @@ interface EnhancedTurboobunArchitecture {
   infrastructure: {
     vercel: {
       environments: ['development', 'preview', 'production'];
-      projects: ['admin', 'blog', 'storefront', 'api'];
+      projects: ['admin', 'storefront', 'api'];
       teams: ['frontend', 'backend', 'devops'];
     };
     
     zitadel: {
       organizations: ['turboobun-dev', 'turboobun-staging', 'turboobun-prod'];
-      projects: ['admin-app', 'blog-app', 'storefront-app', 'api-service'];
+      projects: ['admin-app', 'storefront-app', 'api-service'];
       environments: ['dev', 'staging', 'production'];
     };
   };

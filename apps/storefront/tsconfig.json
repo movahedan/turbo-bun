@@ -14,11 +14,13 @@
 		"./next-env.d.ts",
 		"./.next/types/**/*.ts",
 		".next/types/**/*.ts",
-		"../../packages/logger/src/**/*"
+		"../../packages/logger/src/**/*",
+		"../../packages/ui/src/**/*"
 	],
-	"references": [
-		{
-			"path": "../../packages/ui/tsconfig.build.json"
-		}
+	"exclude": [
+		"../../packages/ui/src/**/*.test.ts",
+		"../../packages/ui/src/**/*.test.tsx",
+		"../../packages/ui/src/**/*.stories.ts",
+		"../../packages/ui/src/**/*.stories.tsx"
 	]
 }

@@ -88,7 +88,7 @@ interface ZitadelAuthArchitecture {
     };
     
     ssr: {
-      frameworks: ['nextjs', 'remix', 'nuxt', 'sveltekit'];
+      frameworks: ['nextjs', 'nuxt', 'sveltekit'];
       authFlow: 'authorization-code';
       tokenStorage: 'httpOnly-cookies';
     };

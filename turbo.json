@@ -17,6 +17,10 @@
 				"!.next/cache/**"
 			]
 		},
+		"build:storybook": {
+			"dependsOn": ["^check:types", "^build"],
+			"outputs": ["dist-storybook/**"]
+		},
 		"start": {
 			"dependsOn": ["^build"]
 		},

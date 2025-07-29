@@ -38,7 +38,6 @@ Our Docker setup provides a complete development and production environment with
 │   └── setup-docker.sh            # Docker setup script
 └── apps/
     ├── admin/Dockerfile            # Multi-stage production build
-    ├── blog/Dockerfile             # Multi-stage production build
     ├── storefront/Dockerfile       # Multi-stage production build
     └── api/Dockerfile              # Multi-stage production build
 ```
@@ -49,9 +48,9 @@ Our Docker setup provides a complete development and production environment with
 |---------|------|-----------|-------------|---------|
 | `vscode` | - | DevContainer | Development | VS Code development environment |
 | `admin` | 3001 | React + Vite | Both | Admin dashboard interface |
-| `blog` | 3002 | Remix + Vite | Both | Content management platform |
-| `storefront` | 3003 | Next.js 15 | Both | E-commerce frontend |
-| `api` | 3004 | Express + TypeScript | Both | Backend API server |
+| `storefront` | 3002 | Next.js 15 | Both | E-commerce frontend |
+| `api` | 3003 | Express + TypeScript | Both | Backend API server |
+| `ui` | 3006 | Storybook + Vite | Development | UI component library with Storybook |
 
 ## 🐳 DevContainer Details
 
@@ -163,7 +162,7 @@ services:
 3. **Socket Forwarding**: Requires careful port management to avoid binding conflicts
 
 **Port Mapping**:
-- **Development**: 3001-3004 (apps) + 5001-5004 (production)
+- **Development**: 3001-3003 (apps) + 5001-5003 (production)
 - **Production**: 5001-5004 (isolated from development)
 - **Health Checks**: All services include curl-based health checks
 
@@ -201,7 +200,7 @@ webpack: (config, { dev }) => {
 }
 ```
 
-**Vite (Admin & Blog)**:
+**Vite (Admin)**:
 ```typescript
 // apps/admin/vite.config.ts
 server: {
@@ -231,7 +230,7 @@ DOCKER_HOST=unix:///var/run/docker.sock  # Docker socket access
 **Production Environment Variables**:
 ```yaml
 environment:
-  - VITE_API_URL=http://api:5004      # Admin/Blog API URL
+  - VITE_API_URL=http://api:5004      # Admin API URL
   - NEXT_PUBLIC_API_URL=http://api:5004  # Storefront API URL
 ```
 
@@ -345,7 +344,7 @@ sudo usermod -aG docker $USER
 lsof -i :3001
 lsof -i :3002
 lsof -i :3003
-lsof -i :3004
+lsof -i :3003
 
 # Solution: Use Docker Compose port mapping instead of DevContainer forwarding
 ```
@@ -379,6 +378,50 @@ docker compose logs       # Production logs
 # VS Code debugging
 # View → Output → Dev Containers
 ```
+
+### Storybook Docker Configuration
+
+**Development Storybook Setup**:
+```yaml
+# .devcontainer/docker-compose.dev.yml
+ui:
+  extends:
+    service: apps
+  ports:
+    - "3006:3006"
+  environment:
+    - PORT=3006
+    - NODE_ENV=development
+    - CHOKIDAR_USEPOLLING=true
+    - WATCHPACK_POLLING=true
+  command: bun run dev --filter=@repo/ui
+  profiles: ["ui", "all"]
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:3006"]
+```
+
+**Storybook Host Binding**:
+```json
+// packages/ui/.storybook/main.ts
+async viteFinal(config) {
+  if (config.server) {
+    config.server.host = "0.0.0.0";
+    config.server.port = 3006;
+  }
+  return config;
+}
+```
+
+**Storybook Package Script**:
+```json
+// packages/ui/package.json
+"dev:storybook": "bunx --bun storybook dev --no-open --port 3006 --host 0.0.0.0"
+```
+
+**Access Storybook in Docker**:
+- **From Host**: `http://localhost:3006`
+- **From Container**: `http://ui:3006`
+- **Health Check**: `curl -f http://localhost:3006`
 
 ## 📚 Implementation Best Practices
 
