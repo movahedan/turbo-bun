@@ -384,7 +384,7 @@ interface BitwardenEnvManagement {
   scrape_configs:
     - job_name: 'turboobun-apps'
       static_configs:
-        - targets: ['localhost:3001', 'localhost:3002', 'localhost:3003', 'localhost:3004']
+        - targets: ['localhost:3001', 'localhost:3002', 'localhost:3003']
   ```
 
 #### 5.5 Grafana Dashboards
@@ -445,7 +445,6 @@ interface BitwardenEnvManagement {
   ├── e2e/
   │   ├── auth.spec.ts
   │   ├── admin.spec.ts
-  │   ├── blog.spec.ts
   │   └── storefront.spec.ts
   └── fixtures/
       ├── users.ts

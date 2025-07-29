@@ -1,5 +1,6 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { $ } from "bun";
 import chalk from "chalk";
 import { type ScriptConfig, validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
@@ -82,6 +83,7 @@ export const updatePackageJson = createScript(
 		packageJson.exports = newExports;
 
 		await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
+		await $`bunx @biomejs/biome check --write --no-errors-on-unmatched ${packageJsonPath}`;
 		vConsole.log(chalk.green("✅ Package.json updated successfully"));
 	},
 );

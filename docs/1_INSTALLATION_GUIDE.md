@@ -249,9 +249,8 @@ bun run dev:check
 
 📊 Health Status Report:
 - Service: admin (Port: 3001) - ✅ Healthy
-- Service: blog (Port: 3002) - ✅ Healthy
-- Service: storefront (Port: 3003) - ✅ Healthy
-- Service: api (Port: 3004) - ✅ Healthy
+- Service: storefront (Port: 3002) - ✅ Healthy
+- Service: api (Port: 3003) - ✅ Healthy
 
 ✅ DevContainer health check completed successfully!
 ```
@@ -391,11 +390,10 @@ bun run dev:health
 ```
 🐳 Development Services Status
 
-Name                Command               State           Ports
-turbo-bun-admin-1   bun run dev          Up              0.0.0.0:3001->3001/tcp
-turbo-bun-blog-1    bun run dev          Up              0.0.0.0:3002->3002/tcp
-turbo-bun-storefro  bun run dev          Up              0.0.0.0:3003->3003/tcp
-turbo-bun-api-1     bun run dev          Up              0.0.0.0:3004->3004/tcp
+Name                  Command               State           Ports
+turbo-bun-admin-1     bun run dev          Up              0.0.0.0:3001->3001/tcp
+turbo-bun-storefront  bun run dev          Up              0.0.0.0:3002->3002/tcp
+turbo-bun-api-1       bun run dev          Up              0.0.0.0:3003->3003/tcp
 ```
 
 ### **5.3 Test Applications**
@@ -403,9 +401,8 @@ turbo-bun-api-1     bun run dev          Up              0.0.0.0:3004->3004/tcp
 Open your browser and verify the applications are running:
 
 - **Admin Dashboard**: http://localhost:3001
-- **Blog**: http://localhost:3002
-- **Storefront**: http://localhost:3003
-- **API**: http://localhost:3004
+- **Storefront**: http://localhost:3002
+- **API**: http://localhost:3003
 
 ## 🧹 Step 6: Cleanup Process
 
@@ -558,7 +555,7 @@ bun run dev:rm
 lsof -i :3001
 lsof -i :3002
 lsof -i :3003
-lsof -i :3004
+lsof -i :3003
 
 # Kill conflicting processes or change ports in docker-compose.dev.yml
 ```

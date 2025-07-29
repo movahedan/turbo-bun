@@ -35,7 +35,6 @@ bun run test:coverage
 - `turbo run test --filter=@repo/utils` - Run tests for Utils package only
 - `turbo run test --filter=@repo/logger` - Run tests for Logger package only
 - `turbo run test --filter=@repo/api` - Run tests for API app only
-- `turbo run test --filter=@repo/blog` - Run tests for Blog app only
 - `turbo run test --filter=@repo/storefront` - Run tests for Storefront app only
 - `turbo run test --filter=@repo/admin` - Run tests for Admin app only
 
@@ -45,8 +44,6 @@ Each package has its own test scripts:
 
 ### Apps (React-based)
 ```bash
-# Blog app
-cd apps/blog
 bun run test          # Run tests
 bun run test:watch    # Run tests in watch mode
 bun run test:coverage # Run tests with coverage

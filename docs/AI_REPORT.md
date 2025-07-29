@@ -53,7 +53,6 @@ bun run local:setup
 
 # 2. Test individual applications
 bun run dev:up admin
-bun run dev:up blog
 bun run dev:up storefront
 bun run dev:up api
 
@@ -81,7 +80,7 @@ Monitor DevContainer performance:
 docker stats
 
 # Monitor specific containers
-docker stats admin blog storefront api
+docker stats admin storefront api
 
 # Check disk usage
 docker system df
@@ -95,7 +94,7 @@ docker builder df
 If tests fail, check these common issues:
 
 1. **Docker Not Running**: Ensure Docker Desktop is started
-2. **Port Conflicts**: Check if ports 3001-3004 are already in use
+2. **Port Conflicts**: Check if ports 3001-3003 are already in use
 3. **Resource Limits**: Increase Docker Desktop memory allocation
 4. **Permission Issues**: Fix Docker socket permissions (Linux)
 5. **Cache Issues**: Clear Docker cache with `bun run dev:cleanup`

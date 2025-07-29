@@ -14,9 +14,8 @@ A comprehensive checklist for testing structural changes, infrastructure updates
 
 ### ✅ **Individual Applications**
 - [ ] `bun run dev:up admin` - Admin app (port 3001)
-- [ ] `bun run dev:up blog` - Blog app (port 3002)
-- [ ] `bun run dev:up storefront` - Storefront app (port 3003)
-- [ ] `bun run dev:up api` - API app (port 3004)
+- [ ] `bun run dev:up storefront` - Storefront app (port 3002)
+- [ ] `bun run dev:up api` - API app (port 3003)
 
 ### ✅ **Development Environment**
 - [ ] VS Code extensions apply correctly

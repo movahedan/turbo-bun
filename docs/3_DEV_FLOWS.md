@@ -80,7 +80,6 @@ bun run dev                   # Start all apps in development mode
 
 # Start specific applications locally
 turbo run dev --filter=@repo/admin      # Start admin app only
-turbo run dev --filter=@repo/blog       # Start blog app only
 turbo run dev --filter=@repo/storefront # Start storefront app only
 turbo run dev --filter=@repo/api        # Start API only
 ```
@@ -92,7 +91,6 @@ bun run dev:up               # Start all DevContainer services
 
 # Start specific applications in DevContainer
 bun run dev:up admin         # Start admin service only
-bun run dev:up blog          # Start blog service only
 bun run dev:up storefront    # Start storefront service only
 bun run dev:up api           # Start API service only
 bun run dev:up ui            # Start UI package with Storybook only
@@ -174,7 +172,6 @@ bun run build                # Build all packages and applications
 
 # Build specific applications locally
 turbo run build --filter=@repo/admin      # Build admin app
-turbo run build --filter=@repo/blog       # Build blog app
 turbo run build --filter=@repo/storefront # Build storefront app
 turbo run build --filter=@repo/api        # Build API
 
@@ -189,7 +186,6 @@ bun run dev:build            # Build all DevContainer images
 
 # Build specific applications in DevContainer
 bun run dev:build admin      # Build admin service image
-bun run dev:build blog       # Build blog service image
 bun run dev:build storefront # Build storefront service image
 bun run dev:build api        # Build API service image
 ```
@@ -243,7 +239,6 @@ bun run dev:down             # Stop all DevContainer services
 
 # Start specific services
 bun run dev:up admin         # Start admin service only
-bun run dev:up blog          # Start blog service only
 bun run dev:up storefront    # Start storefront service only
 bun run dev:up api           # Start API service only
 ```
@@ -299,7 +294,7 @@ Use VS Code's command palette for conventional commits:
 1. **Open Command Palette**: `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
 2. **Type**: "Conventional Commits: Create Commit"
 3. **Select commit type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-4. **Enter scope**: `repo`, `admin`, `blog`, `storefront`, `api`, `ui`
+4. **Enter scope**: `repo`, `admin`, `storefront`, `api`, `ui`
 5. **Write description**: Clear, concise description of changes
 
 #### **Manual Commits**

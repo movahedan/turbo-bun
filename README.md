@@ -155,9 +155,8 @@ The monorepo uses [Renovate](https://docs.renovatebot.com) for intelligent depen
 | Name | Type | Framework | Port | Description |
 |------|------|-----------|------|-------------|
 | `admin` | App | [React](https://react.dev/learn) + [Vite](https://vitejs.dev/guide/) | 3001 | Admin dashboard interface |
-| `blog` | App | [Remix](https://remix.run/docs) + [Vite](https://vitejs.dev/guide/) | 3002 | Content management platform |
-| `storefront` | App | [Next.js](https://nextjs.org/docs) 15 | 3003 | E-commerce frontend |
-| `api` | App | [Express](https://expressjs.com/en/guide/routing.html) + [TypeScript](https://www.typescriptlang.org/docs/) | 3004 | Backend API server |
+| `storefront` | App | [Next.js](https://nextjs.org/docs) 15 | 3002 | E-commerce frontend |
+| `api` | App | [Express](https://expressjs.com/en/guide/routing.html) + [TypeScript](https://www.typescriptlang.org/docs/) | 3003 | Backend API server |
 | `@repo/ui` | Package | [React](https://react.dev/learn) | - | Shared UI components |
 | `@repo/utils` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Utility functions |
 | `@repo/logger` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Logging utilities |

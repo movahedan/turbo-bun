@@ -8,24 +8,7 @@ services:
     ports:
       - "5001:80"
     environment:
-      - VITE_API_URL=http://api:5004
-    depends_on:
-      - prod-api
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  prod-blog:
-    build:
-      context: .
-      dockerfile: apps/blog/Dockerfile
-    ports:
-      - "5002:3000"
-    environment:
-      - VITE_API_URL=http://api:5004
+      - VITE_API_URL=http://api:5003
     depends_on:
       - prod-api
     healthcheck:
@@ -40,9 +23,9 @@ services:
       context: .
       dockerfile: apps/storefront/Dockerfile
     ports:
-      - "5003:3000"
+      - "5002:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://api:5004
+      - NEXT_PUBLIC_API_URL=http://api:5003
     depends_on:
       - prod-api
     healthcheck:
@@ -57,7 +40,7 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "5004:5001"
+      - "5003:5001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s

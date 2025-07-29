@@ -38,7 +38,6 @@ Our Docker setup provides a complete development and production environment with
 │   └── setup-docker.sh            # Docker setup script
 └── apps/
     ├── admin/Dockerfile            # Multi-stage production build
-    ├── blog/Dockerfile             # Multi-stage production build
     ├── storefront/Dockerfile       # Multi-stage production build
     └── api/Dockerfile              # Multi-stage production build
 ```
@@ -49,9 +48,8 @@ Our Docker setup provides a complete development and production environment with
 |---------|------|-----------|-------------|---------|
 | `vscode` | - | DevContainer | Development | VS Code development environment |
 | `admin` | 3001 | React + Vite | Both | Admin dashboard interface |
-| `blog` | 3002 | Remix + Vite | Both | Content management platform |
-| `storefront` | 3003 | Next.js 15 | Both | E-commerce frontend |
-| `api` | 3004 | Express + TypeScript | Both | Backend API server |
+| `storefront` | 3002 | Next.js 15 | Both | E-commerce frontend |
+| `api` | 3003 | Express + TypeScript | Both | Backend API server |
 | `ui` | 3006 | Storybook + Vite | Development | UI component library with Storybook |
 
 ## 🐳 DevContainer Details
@@ -164,7 +162,7 @@ services:
 3. **Socket Forwarding**: Requires careful port management to avoid binding conflicts
 
 **Port Mapping**:
-- **Development**: 3001-3004 (apps) + 5001-5004 (production)
+- **Development**: 3001-3003 (apps) + 5001-5003 (production)
 - **Production**: 5001-5004 (isolated from development)
 - **Health Checks**: All services include curl-based health checks
 
@@ -202,7 +200,7 @@ webpack: (config, { dev }) => {
 }
 ```
 
-**Vite (Admin & Blog)**:
+**Vite (Admin)**:
 ```typescript
 // apps/admin/vite.config.ts
 server: {
@@ -232,7 +230,7 @@ DOCKER_HOST=unix:///var/run/docker.sock  # Docker socket access
 **Production Environment Variables**:
 ```yaml
 environment:
-  - VITE_API_URL=http://api:5004      # Admin/Blog API URL
+  - VITE_API_URL=http://api:5004      # Admin API URL
   - NEXT_PUBLIC_API_URL=http://api:5004  # Storefront API URL
 ```
 
@@ -346,7 +344,7 @@ sudo usermod -aG docker $USER
 lsof -i :3001
 lsof -i :3002
 lsof -i :3003
-lsof -i :3004
+lsof -i :3003
 
 # Solution: Use Docker Compose port mapping instead of DevContainer forwarding
 ```
