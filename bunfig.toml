@@ -32,7 +32,7 @@ exact = true
 
 [test]
 # Preload centralized test setup from test-preset package
-preload = ["@repo/test-preset"]
+preload = ["./packages/test-preset/happydom.ts", "./packages/test-preset/testing-library.ts", "./packages/test-preset/test-setup.ts"]
 
 # Environment variables for tests
 env = { 
@@ -46,6 +46,16 @@ timeout = 5000
 
 # Enable coverage reporting
 coverage = true
+
+# Exclude test-preset files from coverage reporting
+coveragePathIgnorePatterns = [
+	"**/packages/test-preset/**",
+	"**/node_modules/**",
+	"**/dist/**",
+	"**/build/**",
+	"**/.turbo/**",
+	"**/coverage/**"
+]
 
 # Watch mode configuration
 [test.watch]
@@ -70,7 +80,8 @@ ignore = [
 	"**/dist/**",
 	"**/build/**",
 	"**/.turbo/**",
-	"**/coverage/**"
+	"**/coverage/**",
+	"**/test-preset/**"
 ]
 
 # Debounce time for file changes (in milliseconds)

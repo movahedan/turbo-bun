@@ -13,9 +13,7 @@
 	},
 	"scripts": {
 		"check:types": "tsc --noEmit",
-		"test": "bun test",
-		"test:watch": "bun test --watch",
-		"test:coverage": "bun test --coverage"
+		"test": "bun test"
 	},
 	"dependencies": {
 		"clsx": "2.1.1",
