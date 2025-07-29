@@ -15,6 +15,7 @@ export function getAllDirectories(
 			directories.push({ name: app, path: `apps/${app}` });
 		}
 	}
+
 	const packagesDir = path.join(baseDir, "packages");
 	if (fs.existsSync(packagesDir)) {
 		const packages = fs.readdirSync(packagesDir);
