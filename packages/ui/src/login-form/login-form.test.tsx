@@ -224,8 +224,32 @@ describe("LoginForm", () => {
 		});
 	});
 
+	it("clears validation errors when user types valid input", () => {
+		render(<LoginForm onSubmit={mockOnSubmit} />);
+
+		const emailInput = screen.getByLabelText("Email");
+		const passwordInput = screen.getByLabelText("Password");
+
+		// First, trigger validation errors by submitting empty form
+		const submitButton = screen.getByRole("button", { name: "Sign In" });
+		fireEvent.click(submitButton);
+
+		// Verify errors are shown
+		expect(screen.getByText("Email is required")).toBeInTheDocument();
+		expect(screen.getByText("Password is required")).toBeInTheDocument();
+
+		// Now type valid values - this should clear the errors
+		fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+		fireEvent.change(passwordInput, { target: { value: "password123" } });
+
+		// Verify errors are cleared
+		expect(screen.queryByText("Email is required")).not.toBeInTheDocument();
+		expect(screen.queryByText("Password is required")).not.toBeInTheDocument();
+	});
+
 	it("handles onSubmit errors gracefully", async () => {
-		const errorOnSubmit = mock().mockRejectedValue(new Error("API Error"));
+		// Create a mock that throws an error to test the catch block
+		const errorOnSubmit = mock().mockRejectedValue(new Error("Test error"));
 
 		render(<LoginForm onSubmit={errorOnSubmit} />);
 
@@ -238,6 +262,7 @@ describe("LoginForm", () => {
 		const submitButton = screen.getByRole("button", { name: "Sign In" });
 		fireEvent.click(submitButton);
 
+		// The form should not crash even when onSubmit throws an error
 		await waitFor(() => {
 			expect(errorOnSubmit).toHaveBeenCalledWith({
 				email: "test@example.com",

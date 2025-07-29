@@ -8,11 +8,7 @@
 		"dev": "tsup src/index.ts --watch",
 		"build": "tsup src/index.ts",
 		"check:types": "tsc --noEmit",
-		"test": "bun test --dom",
-		"test:watch": "bun test --watch --dom",
-		"test:coverage": "bun test --coverage --dom",
-		"test:ui": "bun test --dom --grep ui",
-		"test:integration": "bun test --dom --grep integration"
+		"test": "bun test"
 	},
 	"dependencies": {
 		"@repo/logger": "workspace:*",
@@ -22,6 +18,7 @@
 		"morgan": "1.10.1"
 	},
 	"devDependencies": {
+		"@repo/test-preset": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
 		"@types/body-parser": "1.19.6",
 		"@types/cors": "2.8.19",

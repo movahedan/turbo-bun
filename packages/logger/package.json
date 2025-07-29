@@ -12,9 +12,7 @@
 	"scripts": {
 		"dev": "tsc --watch",
 		"check:types": "tsc --noEmit",
-		"test": "bun test",
-		"test:watch": "bun test --watch",
-		"test:coverage": "bun test --coverage"
+		"test": "bun test"
 	},
 	"devDependencies": {
 		"@repo/test-preset": "workspace:*",

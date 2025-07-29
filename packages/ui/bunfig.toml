@@ -1,6 +1,6 @@
 [test]
 # Enable DOM environment for React tests
-preload = ["../test-preset/happydom.ts", "../test-preset/testing-library.ts"]
+preload = ["../test-preset/happydom.ts", "../test-preset/testing-library.ts", '../test-preset/test-setup.ts']
 env = { NODE_ENV = "test" }
 
 # Test timeout in milliseconds
@@ -8,3 +8,13 @@ timeout = 5000
 
 # Enable coverage reporting
 coverage = true 
+
+# Exclude test-preset files from coverage reporting
+coveragePathIgnorePatterns = [
+	"**/test-preset/**",
+	"**/node_modules/**",
+	"**/dist/**",
+	"**/build/**",
+	"**/.turbo/**",
+	"**/coverage/**"
+]
