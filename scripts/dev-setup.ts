@@ -4,6 +4,7 @@ import { $ } from "bun";
 import chalk from "chalk";
 import { validators } from "./utils/arg-parser";
 import { createScript } from "./utils/create-scripts";
+import { parseCompose } from "./utils/docker-compose-parser";
 
 const devSetupConfig = {
 	name: "DevContainer Setup",
@@ -31,30 +32,22 @@ const devSetup = createScript(
 	async function main(args, xConsole) {
 		xConsole.log(chalk.blue("🐳 Starting DevContainer setup..."));
 
-		// Step 1: Start all services
-		xConsole.log(chalk.blue("🚀 Starting DevContainer services..."));
 		await $`bun run dev:up --build`;
-
-		// Step 2: Health check verification (unless skipped)
 		if (!args["skip-health-check"]) {
 			xConsole.log(chalk.blue("🏥 Running health checks..."));
 			await $`bun run dev:check`;
 		}
 
-		xConsole.log(chalk.green("✅ DevContainer setup completed successfully!"));
 		xConsole.log(chalk.cyan("\n💡 Services are running and available at:"));
-		// Get service URLs dynamically
-		const { getServiceUrls } = await import("./utils/docker-compose-parser");
-		const devUrls = await getServiceUrls(
-			".devcontainer/docker-compose.dev.yml",
-		);
+		const parsedCompose = await parseCompose("dev");
+		const devUrls = parsedCompose.serviceUrls();
 		for (const [name, url] of Object.entries(devUrls)) {
 			xConsole.log(chalk.cyan(`   • ${name}: ${url}`));
 		}
+
 		xConsole.log(
 			chalk.yellow("💡 Use 'bun run dev:cleanup' to stop services when done"),
 		);
-
 		xConsole.log(chalk.cyan("\n💡 Useful commands:"));
 		xConsole.log(
 			chalk.cyan(" - bun run dev:check # Check DevContainer health"),

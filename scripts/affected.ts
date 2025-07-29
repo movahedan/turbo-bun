@@ -1,5 +1,5 @@
 import { $ } from "bun";
-import { getAllServices } from "./utils/docker-compose-parser";
+import { parseCompose } from "./utils/docker-compose-parser";
 import { getAllDirectories } from "./utils/get-all-directories";
 
 /* Sample output of turbo command:
@@ -34,14 +34,15 @@ async function getAffectedServices(
 	mode: ServiceMode,
 ): Promise<AffectedService[]> {
 	const keys = await getAffectedPackages();
-	const allServices = await getAllServices();
+	const devServices = await parseCompose("dev");
+	const prodServices = await parseCompose("prod");
 	const allDirectories = getAllDirectories(process.cwd());
 
 	const affectedServices: AffectedService[] = [];
 
 	// Check dev services
 	if (mode === "dev" || mode === "all") {
-		for (const service of allServices.dev) {
+		for (const service of devServices.exposedServices()) {
 			const isPackage = allDirectories.find(
 				(d) => d.path.includes("packages") && d.path.includes(service.name),
 			);
@@ -59,7 +60,7 @@ async function getAffectedServices(
 
 	// Check prod services
 	if (mode === "prod" || mode === "all") {
-		for (const service of allServices.prod) {
+		for (const service of prodServices.exposedServices()) {
 			const isPackage = allDirectories.find(
 				(d) => d.path.includes("packages") && d.path.includes(service.name),
 			);
@@ -85,7 +86,8 @@ export async function getAffectedServicesWithDependencies(
 	mode: "dev" | "prod" | "all",
 ): Promise<AffectedService[]> {
 	const affectedServices = await getAffectedServices(mode);
-	const allServices = await getAllServices();
+	const devServices = await parseCompose("dev");
+	const prodServices = await parseCompose("prod");
 
 	const allServicesWithDeps = new Set<string>();
 
@@ -95,7 +97,9 @@ export async function getAffectedServicesWithDependencies(
 
 		// Find dependencies
 		const serviceList =
-			service.environment === "dev" ? allServices.dev : allServices.prod;
+			service.environment === "dev"
+				? devServices.exposedServices()
+				: prodServices.exposedServices();
 		const serviceInfo = serviceList.find((s) => s.name === service.name);
 		if (serviceInfo?.dependencies) {
 			for (const dep of serviceInfo.dependencies) {
@@ -108,7 +112,9 @@ export async function getAffectedServicesWithDependencies(
 	const result: AffectedService[] = [];
 	for (const serviceName of allServicesWithDeps) {
 		// Find in dev services
-		const devService = allServices.dev.find((s) => s.name === serviceName);
+		const devService = devServices
+			.exposedServices()
+			.find((s) => s.name === serviceName);
 		if (devService) {
 			result.push({
 				name: devService.name,
@@ -118,7 +124,9 @@ export async function getAffectedServicesWithDependencies(
 		}
 
 		// Find in prod services
-		const prodService = allServices.prod.find((s) => s.name === serviceName);
+		const prodService = prodServices
+			.exposedServices()
+			.find((s) => s.name === serviceName);
 		if (prodService) {
 			result.push({
 				name: prodService.name,

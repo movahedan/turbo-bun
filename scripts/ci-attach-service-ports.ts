@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { createScript } from "./utils/create-scripts";
-import { getServicePorts } from "./utils/docker-compose-parser";
+import { parseCompose } from "./utils/docker-compose-parser";
 
 const ciAttachServicePortsConfig = {
 	name: "GitHub Attach Service Ports",
@@ -14,7 +14,7 @@ const ciAttachServicePortsConfig = {
 export const ciAttachServicePorts = createScript(
 	ciAttachServicePortsConfig,
 	async function main(_, xConsole) {
-		const portMappings = await getServicePorts("docker-compose.yml");
+		const portMappings = (await parseCompose("prod")).servicePorts();
 
 		// Output in GitHub Actions format
 		if (process.env.GITHUB_OUTPUT) {

@@ -1,25 +1,9 @@
 #!/usr/bin/env bun
 
 import { existsSync } from "node:fs";
-import { parse } from "yaml";
-
-interface DockerComposeService {
-	ports?: string[];
-	environment?: Record<string, string>;
-	depends_on?: string[];
-	healthcheck?: {
-		test: string[];
-		interval?: string;
-		timeout?: string;
-		retries?: number;
-		start_period?: string;
-	};
-}
-
-interface DockerCompose {
-	name?: string;
-	services: Record<string, DockerComposeService>;
-}
+import { $ } from "bun";
+// waiting for https://github.com/oven-sh/bun/issues/1003
+import { parse as pYaml } from "yaml";
 
 export interface ServiceInfo {
 	name: string;
@@ -43,23 +27,67 @@ export interface ServiceHealth {
 	port?: string;
 }
 
-/**
- * Parse docker-compose file and extract service information
- */
-export async function parseDockerCompose(composePath: string): Promise<{
+const composePaths = {
+	dev: ".devcontainer/docker-compose.dev.yml",
+	prod: "docker-compose.yml",
+} as const;
+
+export const parseCompose = async (mode: "dev" | "prod") => {
+	const services = await parse(composePaths[mode]);
+
+	return {
+		exposedServices: () => services.filter((s) => s.port !== undefined),
+		serviceHealth: () => {
+			return $`docker compose -f ${composePaths[mode]} --profile all ps`.then(
+				({ stdout }) => parseDockerPsOutput(stdout.toString()),
+			);
+		},
+		serviceUrls: (baseUrl = "http://localhost") => {
+			return Object.fromEntries(
+				services
+					.filter((service) => service.port !== undefined)
+					.map((service) => [
+						service.name,
+						service.port ? `${baseUrl}:${service.port}` : "",
+					]),
+			);
+		},
+		servicePorts: () =>
+			Object.fromEntries(
+				services.map((s) => [s.name, s.port?.toString() ?? ""]),
+			),
+		dependentServices: (serviceName: string) =>
+			services.filter((service) => service.dependencies?.includes(serviceName)),
+	};
+};
+
+interface DockerCompose {
 	name?: string;
-	services: ServiceInfo[];
-}> {
+	services: Record<
+		string,
+		{
+			ports?: string[];
+			environment?: Record<string, string>;
+			depends_on?: string[];
+			healthcheck?: {
+				test: string[];
+				interval?: string;
+				timeout?: string;
+				retries?: number;
+				start_period?: string;
+			};
+		}
+	>;
+}
+
+async function parse(composePath: string): Promise<ServiceInfo[]> {
 	try {
 		if (!existsSync(composePath)) {
 			throw new Error(`Docker compose file not found: ${composePath}`);
 		}
 
-		const composeFile = Bun.file(composePath);
-		const composeContent = await composeFile.text();
-		const compose = parse(composeContent) as DockerCompose;
-
 		const services: ServiceInfo[] = [];
+		const compose: DockerCompose = pYaml(await Bun.file(composePath).text());
 
 		for (const [serviceName, service] of Object.entries(compose.services)) {
 			const serviceInfo: ServiceInfo = {
@@ -69,7 +97,6 @@ export async function parseDockerCompose(composePath: string): Promise<{
 				healthcheck: service.healthcheck,
 			};
 
-			// Parse port mapping
 			if (service.ports && service.ports.length > 0) {
 				const portMapping = service.ports[0];
 
@@ -96,143 +123,13 @@ export async function parseDockerCompose(composePath: string): Promise<{
 			services.push(serviceInfo);
 		}
 
-		return {
-			name: compose.name,
-			services,
-		};
+		return services;
 	} catch (error) {
 		console.error(`Error parsing ${composePath}:`, error);
-		return { services: [] };
+		return [];
 	}
 }
 
-/**
- * Get service information from both dev and prod docker-compose files
- */
-export async function getAllServices(): Promise<{
-	dev: ServiceInfo[];
-	prod: ServiceInfo[];
-}> {
-	const devServices = await parseDockerCompose(
-		".devcontainer/docker-compose.dev.yml",
-	);
-	const prodServices = await parseDockerCompose("docker-compose.yml");
-
-	return {
-		dev: devServices.services,
-		prod: prodServices.services,
-	};
-}
-
-/**
- * Get service by name from a specific docker-compose file
- */
-export async function getServiceByName(
-	serviceName: string,
-	composePath: string,
-): Promise<ServiceInfo | null> {
-	const { services } = await parseDockerCompose(composePath);
-	return services.find((service) => service.name === serviceName) || null;
-}
-
-/**
- * Get all services that expose ports
- */
-export async function getExposedServices(
-	composePath: string,
-): Promise<ServiceInfo[]> {
-	const { services } = await parseDockerCompose(composePath);
-	return services.filter((service) => service.port !== undefined);
-}
-
-/**
- * Get service URLs for a given docker-compose file
- */
-export async function getServiceUrls(
-	composePath: string,
-	baseUrl = "http://localhost",
-): Promise<Record<string, string>> {
-	const services = await getExposedServices(composePath);
-	const urls: Record<string, string> = {};
-
-	for (const service of services) {
-		if (service.port) {
-			urls[service.name] = `${baseUrl}:${service.port}`;
-		}
-	}
-
-	return urls;
-}
-
-/**
- * Get service ports for a given docker-compose file
- */
-export async function getServicePorts(
-	composePath: string,
-): Promise<Record<string, string>> {
-	const { services } = await parseDockerCompose(composePath);
-	const ports: Record<string, string> = {};
-
-	for (const service of services) {
-		if (service.port) {
-			ports[service.name] = service.port.toString();
-		}
-	}
-
-	return ports;
-}
-
-/**
- * Get service dependencies for a given service
- */
-export async function getServiceDependencies(
-	serviceName: string,
-	composePath: string,
-): Promise<string[]> {
-	const service = await getServiceByName(serviceName, composePath);
-	return service?.dependencies || [];
-}
-
-/**
- * Get all services that depend on a specific service
- */
-export async function getDependentServices(
-	serviceName: string,
-	composePath: string,
-): Promise<string[]> {
-	const { services } = await parseDockerCompose(composePath);
-	const dependents: string[] = [];
-
-	for (const service of services) {
-		if (service.dependencies?.includes(serviceName)) {
-			dependents.push(service.name);
-		}
-	}
-
-	return dependents;
-}
-
-/**
- * Get service health information from Docker ps output
- */
-export async function getServiceHealthFromPs(
-	composePath: string,
-): Promise<ServiceHealth[]> {
-	const { stdout } = await Bun.spawn(
-		["docker", "compose", "-f", composePath, "--profile", "all", "ps"],
-		{
-			stdout: "pipe",
-			stderr: "pipe",
-		},
-	);
-
-	const output = await new Response(stdout).text();
-	return parseDockerPsOutput(output);
-}
-
-/**
- * Parse Docker ps output to extract service health information
- */
 function parseDockerPsOutput(output: string): ServiceHealth[] {
 	const lines = output.trim().split("\n");
 	const services: ServiceHealth[] = [];
@@ -248,17 +145,15 @@ function parseDockerPsOutput(output: string): ServiceHealth[] {
 		let healthStatus: "healthy" | "unhealthy" | "starting" | "none" = "none";
 
 		// Check for health status patterns
-		if (line.includes("(healthy)")) {
+		if (line.includes("healthy") || line.includes("Up")) {
 			healthStatus = "healthy";
-		} else if (line.includes("(unhealthy)")) {
+		} else if (line.includes("unhealthy")) {
 			healthStatus = "unhealthy";
-		} else if (line.includes("(health: starting)")) {
+		} else if (line.includes("starting")) {
 			healthStatus = "starting";
-		} else if (line.includes("Up")) {
-			healthStatus = "starting"; // Assume starting if Up but no health status
 		}
 
-		// Extract port information using a safer regex pattern
+		// Extract port information using a regex pattern
 		const portMatch = line.match(
 			/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/,
 		);
