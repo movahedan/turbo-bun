@@ -10,13 +10,13 @@ WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
 COPY ./scripts ./scripts
-COPY ./package.json ./bun.lock ./
+COPY ./package.json ./bun.lockb ./
 RUN turbo prune --scope=admin --docker
 
 FROM turbo AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/bun.lock ./bun.lock
+COPY --from=pruner /app/out/bun.lockb ./bun.lockb
 COPY --from=pruner /app/out/full/ .
 RUN bun install --ignore-scripts
 

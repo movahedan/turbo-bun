@@ -10,7 +10,7 @@
 		"ignoreUnknown": false,
 		"includes": [
 			"**",
-			"!bun.lock",
+			"!bun.lockb",
 			"!renovate.json",
 			"!**/node_modules/**",
 			"!**/dist/**",

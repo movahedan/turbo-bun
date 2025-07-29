@@ -9,14 +9,14 @@ FROM turbo AS pruner
 WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
-COPY ./package.json ./bun.lock ./
+COPY ./package.json ./bun.lockb ./
 COPY ./scripts ./scripts
 RUN turbo prune --scope=@repo/ui --docker
 
 FROM turbo AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/bun.lock ./bun.lock
+COPY --from=pruner /app/out/bun.lockb ./bun.lockb
 RUN bun install --ignore-scripts
 
 FROM turbo AS build
