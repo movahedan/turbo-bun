@@ -1,27 +1,8 @@
 #!/usr/bin/env bun
-
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { validators } from "./utils/arg-parser";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { createScript } from "./utils/create-scripts";
 
-interface DevcontainerConfig {
-	customizations?: {
-		vscode?: {
-			extensions?: string[];
-			settings?: Record<string, unknown>;
-		};
-	};
-}
-
-interface ExtensionsConfig {
-	recommendations: string[];
-}
-
-/**
- * VS Code configuration synchronization script
- * Syncs extensions and settings from devcontainer.json to .vscode/
- */
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",
 	description:
@@ -33,22 +14,7 @@ const syncVscodeConfigScriptConfig = {
 		"bun run local:vscode --extensions-only",
 		"bun run local:vscode --settings-only",
 	],
-	options: [
-		{
-			short: "-e",
-			long: "--extensions-only",
-			description: "Only sync extensions, skip settings",
-			required: false,
-			validator: validators.boolean,
-		},
-		{
-			short: "-s",
-			long: "--settings-only",
-			description: "Only sync settings, skip extensions",
-			required: false,
-			validator: validators.boolean,
-		},
-	],
+	options: [],
 } as const;
 
 export const syncVscodeConfigScript = createScript(
@@ -56,38 +22,38 @@ export const syncVscodeConfigScript = createScript(
 	async function main(args, xConsole) {
 		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
-		const devcontainerConfig = readDevcontainerConfig();
-		const extensions = extractExtensions(devcontainerConfig);
-		const settings = extractSettings(devcontainerConfig);
+		const {
+			customizations: {
+				vscode: { extensions: recommendations = [], settings = {} } = {},
+			} = {},
+		} = JSON.parse(
+			stripComments(
+				await Bun.file(
+					join(import.meta.dir, "..", ".devcontainer", "devcontainer.json"),
+				).text(),
+			),
+		);
+		const settingsConfigString = JSON.stringify(settings, null, 2);
+		const extensionsConfigString = JSON.stringify({ recommendations }, null, 2);
 
 		if (args["dry-run"]) {
 			xConsole.log("🔍 Dry run mode - showing what would be synced:");
-			if (!args["settings-only"]) {
-				xConsole.log(`📦 Extensions (${extensions.length}):`);
-				extensions.forEach((ext) => xConsole.log(`  - ${ext}`));
-			}
-			if (!args["extensions-only"]) {
-				xConsole.log(`⚙️  Settings (${Object.keys(settings).length}):`);
-				Object.entries(settings).forEach(([key, value]) =>
-					xConsole.log(`  - ${key}: ${JSON.stringify(value)}`),
-				);
-			}
+			xConsole.log(`📦 Extensions:\n${extensionsConfigString}`);
+			xConsole.log(`⚙️  Settings:\n${settingsConfigString}`);
+
 			return;
 		}
 
-		// Sync extensions (unless settings-only mode)
-		if (!args["settings-only"]) {
-			writeExtensionsJson(extensions);
-		}
+		const vscodeDir = join(import.meta.dir, "..", ".vscode");
+		if (!existsSync(vscodeDir)) mkdirSync(vscodeDir, { recursive: true });
+		const extensionsPath = join(vscodeDir, "extensions.json");
+		const settingsPath = join(vscodeDir, "settings.json");
 
-		// Sync settings (unless extensions-only mode)
-		if (!args["extensions-only"]) {
-			writeSettingsJson(settings);
-		}
-
+		writeFileSync(extensionsPath, extensionsConfigString);
+		xConsole.log(`✅ Updated ${extensionsPath}!`);
+		writeFileSync(settingsPath, settingsConfigString);
+		xConsole.log(`✅ Updated ${settingsPath}!`);
 		xConsole.log("✅ VS Code configuration synced successfully!");
-		xConsole.log(`📦 Extensions: ${extensions.length}`);
-		xConsole.log(`⚙️  Settings: ${Object.keys(settings).length} settings`);
 	},
 );
 
@@ -104,80 +70,4 @@ function stripComments(content: string): string {
 		.replace(/\/\/[^\r\n]*/g, "")
 		.replace(/\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//g, "")
 		.replace(/^\s*[\r\n]/gm, "");
-}
-
-/**
- * Read and parse devcontainer.json
- */
-function readDevcontainerConfig(): DevcontainerConfig {
-	const devcontainerPath = join(
-		import.meta.dir,
-		"..",
-		".devcontainer",
-		"devcontainer.json",
-	);
-	const content = readFileSync(devcontainerPath, "utf8");
-	const cleanContent = stripComments(content);
-	return JSON.parse(cleanContent);
-}
-
-/**
- * Extract extensions from devcontainer config
- */
-function extractExtensions(devcontainerConfig: DevcontainerConfig): string[] {
-	const extensions =
-		devcontainerConfig.customizations?.vscode?.extensions || [];
-	return extensions;
-}
-
-/**
- * Extract settings from devcontainer config
- */
-function extractSettings(
-	devcontainerConfig: DevcontainerConfig,
-): Record<string, unknown> {
-	const settings = devcontainerConfig.customizations?.vscode?.settings || {};
-	return settings;
-}
-
-/**
- * Write extensions.json file
- */
-function writeExtensionsJson(extensions: string[]): void {
-	const extensionsPath = join(
-		import.meta.dir,
-		"..",
-		".vscode",
-		"extensions.json",
-	);
-	const extensionsConfig: ExtensionsConfig = {
-		recommendations: extensions,
-	};
-
-	// Ensure .vscode directory exists
-	const vscodeDir = dirname(extensionsPath);
-	if (!existsSync(vscodeDir)) {
-		mkdirSync(vscodeDir, { recursive: true });
-	}
-
-	writeFileSync(extensionsPath, JSON.stringify(extensionsConfig, null, 2));
-	console.log(
-		`✅ Updated ${extensionsPath} with ${extensions.length} extensions`,
-	);
-}
-
-/**
- * Write settings.json file
- */
-function writeSettingsJson(settings: Record<string, unknown>): void {
-	const settingsPath = join(import.meta.dir, "..", ".vscode", "settings.json");
-
-	// Ensure .vscode directory exists
-	const vscodeDir = dirname(settingsPath);
-	if (!existsSync(vscodeDir)) {
-		mkdirSync(vscodeDir, { recursive: true });
-	}
-
-	writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
-	console.log(`✅ Updated ${settingsPath}`);
 }
