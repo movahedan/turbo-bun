@@ -59,7 +59,7 @@ Based on repository patterns and VS Code settings:
 
 ### 🔧 Infrastructure Scopes
 - **`(ci)`** - CI/CD pipeline changes (GitHub Actions, workflows)
-- **`(deps)`** - Dependency updates (package.json, bun.lockb)
+- **`(deps)`** - Dependency updates (package.json, bun.lock)
 - **`(repo)`** - Repository-level documentation (README, docs/)
 - **`(scripts)`** - Script changes (scripts/ directory)
 - **`(config)`** - Configuration files (turbo.json, biome.json, etc.)

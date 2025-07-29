@@ -1,5 +1,5 @@
 FROM oven/bun:1.2.19-alpine AS base
-RUN bun install -g turbo@2.5.4
+RUN bun install -g turbo@2.5.5
 
 FROM base AS turbo
 WORKDIR /app
@@ -9,14 +9,14 @@ FROM turbo AS pruner
 WORKDIR /app
 COPY ./apps ./apps
 COPY ./packages ./packages
-COPY ./package.json ./bun.lockb ./
+COPY ./package.json ./bun.lock ./
 COPY ./scripts ./scripts
 RUN turbo prune --scope=@repo/ui --docker
 
 FROM turbo AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
-COPY --from=pruner /app/out/bun.lockb ./bun.lockb
+COPY --from=pruner /app/out/bun.lock ./bun.lock
 RUN bun install --ignore-scripts
 
 FROM turbo AS build

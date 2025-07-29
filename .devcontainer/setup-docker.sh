@@ -9,7 +9,7 @@ sudo chmod -R 777 /app/node_modules
 # Fix file ownership for development files (excluding git objects) ------------
 echo "Fixing file ownership for development files..."
 sudo chown -R vscode-user:vscode-user /app/apps /app/packages /app/scripts
-sudo chown -R vscode-user:vscode-user /app/package.json /app/bun.lockb /app/turbo.json /app/biome.json
+sudo chown -R vscode-user:vscode-user /app/package.json /app/bun.lock /app/turbo.json /app/biome.json
 sudo chown -R vscode-user:vscode-user /app/commitlint.config.ts /app/lefthook.yml /app/.env /app/.npmrc
 sudo chown -R vscode-user:vscode-user /app/README.md /app/LICENSE /app/renovate.json
 sudo chown -R vscode-user:vscode-user /app/.devcontainer /app/.changeset /app/.cursor /app/.vscode /app/.turbo
