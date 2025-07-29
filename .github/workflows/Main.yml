@@ -42,8 +42,8 @@ jobs:
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: |
           bun install -E --no-save
-          bun install -g --frozen-lockfile @biomejs/biome@2.0.6
-          bun install -g --frozen-lockfile turbo@2.5.4
+          bun install -g --frozen-lockfile @biomejs/biome@2.1.3
+          bun install -g --frozen-lockfile turbo@2.5.5
           bun install -g --frozen-lockfile @changesets/cli@2.29.3
 
       - name: 🏗️ Build Packages
