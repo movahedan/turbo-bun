@@ -52,6 +52,7 @@ Our Docker setup provides a complete development and production environment with
 | `blog` | 3002 | Remix + Vite | Both | Content management platform |
 | `storefront` | 3003 | Next.js 15 | Both | E-commerce frontend |
 | `api` | 3004 | Express + TypeScript | Both | Backend API server |
+| `ui` | 3006 | Storybook + Vite | Development | UI component library with Storybook |
 
 ## 🐳 DevContainer Details
 
@@ -379,6 +380,50 @@ docker compose logs       # Production logs
 # VS Code debugging
 # View → Output → Dev Containers
 ```
+
+### Storybook Docker Configuration
+
+**Development Storybook Setup**:
+```yaml
+# .devcontainer/docker-compose.dev.yml
+ui:
+  extends:
+    service: apps
+  ports:
+    - "3006:3006"
+  environment:
+    - PORT=3006
+    - NODE_ENV=development
+    - CHOKIDAR_USEPOLLING=true
+    - WATCHPACK_POLLING=true
+  command: bun run dev --filter=@repo/ui
+  profiles: ["ui", "all"]
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:3006"]
+```
+
+**Storybook Host Binding**:
+```json
+// packages/ui/.storybook/main.ts
+async viteFinal(config) {
+  if (config.server) {
+    config.server.host = "0.0.0.0";
+    config.server.port = 3006;
+  }
+  return config;
+}
+```
+
+**Storybook Package Script**:
+```json
+// packages/ui/package.json
+"dev:storybook": "bunx --bun storybook dev --no-open --port 3006 --host 0.0.0.0"
+```
+
+**Access Storybook in Docker**:
+- **From Host**: `http://localhost:3006`
+- **From Container**: `http://ui:3006`
+- **Health Check**: `curl -f http://localhost:3006`
 
 ## 📚 Implementation Best Practices
 

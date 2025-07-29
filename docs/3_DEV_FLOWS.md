@@ -95,6 +95,7 @@ bun run dev:up admin         # Start admin service only
 bun run dev:up blog          # Start blog service only
 bun run dev:up storefront    # Start storefront service only
 bun run dev:up api           # Start API service only
+bun run dev:up ui            # Start UI package with Storybook only
 ```
 
 #### **Development Options**
@@ -113,7 +114,7 @@ bun run dev:up  # Start all services
 #### **Local Mode (Host Machine)**
 ```bash
 # Work on specific packages locally
-turbo run dev --filter=@repo/ui         # Start UI package development
+turbo run dev --filter=@repo/ui         # Start UI package development with Storybook
 turbo run dev --filter=@repo/utils      # Start utils package development
 turbo run dev --filter=@repo/logger     # Start logger package development
 

@@ -3,12 +3,16 @@
 	"compilerOptions": {
 		"baseUrl": "."
 	},
+	"include": ["src/**/*", "../../packages/ui/src/**/*"],
+	"exclude": [
+		"../../packages/ui/src/**/*.test.ts",
+		"../../packages/ui/src/**/*.test.tsx",
+		"../../packages/ui/src/**/*.stories.ts",
+		"../../packages/ui/src/**/*.stories.tsx"
+	],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"
-		},
-		{
-			"path": "../../packages/ui"
 		}
 	]
 }

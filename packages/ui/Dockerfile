@@ -24,22 +24,21 @@ WORKDIR /app
 COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app/ .
 COPY --from=pruner /app/scripts ./scripts
-RUN bun run build --filter=@repo/ui
+RUN bun run build:storybook --filter=@repo/ui
 
-FROM turbo AS runner
+FROM nginx:alpine AS runner
 WORKDIR /app
-RUN mkdir -p .turbo/cache && chmod -R 777 .turbo
-RUN addgroup --system --gid 1001 runner-group
-RUN adduser --system --uid 1001 runner-user
+RUN mkdir -p /var/cache/nginx && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chmod -R 755 /var/cache/nginx && \
+    mkdir -p /run && \
+    touch /run/nginx.pid && \
+    chown -R nginx:nginx /run/nginx.pid && \
+    chmod -R 755 /run/nginx.pid
 
-ARG MODE=444
-COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
-COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/ui ./packages/ui
-COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/utils ./packages/utils
+COPY --from=build --chown=nginx:nginx /app/packages/ui/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build --chown=nginx:nginx /app/packages/ui/dist-storybook/ /usr/share/nginx/html
 
-USER runner-user
-EXPOSE 3000
-ENV NODE_ENV=production
-ENV PORT=3000
-CMD ["bun", "run", "start", "--filter=@repo/ui"]
+USER nginx
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

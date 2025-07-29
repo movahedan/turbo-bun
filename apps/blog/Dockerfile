@@ -34,7 +34,7 @@ RUN addgroup --system --gid 1001 runner-group
 RUN adduser --system --uid 1001 runner-user
 
 
-ARG MODE=444
+ARG MODE=755
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
 COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/ui ./packages/ui

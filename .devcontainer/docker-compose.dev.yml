@@ -169,3 +169,20 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+  ui:
+    extends:
+      service: apps
+    ports:
+      - "3006:3006"
+    environment:
+      - PORT=3006
+      - HOST=0.0.0.0
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - TURBO_TOKEN=${TURBO_TOKEN:-}
+      - TURBO_TEAM=${TURBO_TEAM:-}
+    command: bun run dev --filter=@repo/ui
+    profiles: ["ui", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3006"]

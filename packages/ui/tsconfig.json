@@ -3,21 +3,12 @@
 	"extends": "@repo/typescript-config/react-library.json",
 	"compilerOptions": {
 		"composite": true,
-
-		// Target & Language Settings
 		"module": "esnext",
 		"lib": ["DOM", "ES2015"],
 		"target": "ES2015",
-
-		// Import Settings
 		"baseUrl": "."
 	},
-	"include": [
-		".",
-		"../test-preset/matchers.d.ts",
-		"../utils/src/**/*",
-		"vite-entries.generated.json"
-	],
+	"include": [".", "../test-preset/matchers.d.ts", "../utils/src/**/*"],
 	"exclude": ["../utils/src/**/*.test.ts", "../utils/src/**/*.test.tsx"],
 	"references": [
 		{

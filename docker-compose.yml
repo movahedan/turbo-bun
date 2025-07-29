@@ -69,4 +69,14 @@ services:
     build:
       context: .
       dockerfile: packages/ui/Dockerfile
-    # UI package is a library, so it doesn't need to be exposed
+    ports:
+      - "5006:80"
+    environment:
+      - PORT=80
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

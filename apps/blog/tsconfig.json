@@ -8,10 +8,11 @@
 			"@repo/ui/*": ["../../packages/ui/dist/ui/src/*"]
 		}
 	},
-	"include": ["**/*.ts", "**/*.tsx"],
-	"references": [
-		{
-			"path": "../../packages/ui/tsconfig.build.json"
-		}
+	"include": ["**/*.ts", "**/*.tsx", "../../packages/ui/src/**/*"],
+	"exclude": [
+		"../../packages/ui/src/**/*.stories.ts",
+		"../../packages/ui/src/**/*.stories.tsx",
+		"../../packages/ui/src/**/*.test.ts",
+		"../../packages/ui/src/**/*.test.tsx"
 	]
 }
