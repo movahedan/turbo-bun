@@ -360,6 +360,47 @@ turbo run test --parallel                # Parallel testing
 turbo run check:types --parallel         # Parallel type checking
 ```
 
+## 🔒 Lockfile Configuration
+
+### **JSON Lockfile Format**
+This project uses JSON lockfiles (`bun.lock`) instead of binary lockfiles (`bun.lockb`) for better compatibility with tools like Turbo and Docker builds.
+
+#### **Configuration**
+```toml
+# bunfig.toml
+[install]
+saveTextLockfile = true  # Always generate JSON lockfiles
+```
+
+#### **Why JSON Lockfiles?**
+- **Turbo Compatibility**: Turbo can parse JSON lockfiles for `turbo prune` operations
+- **Docker Builds**: Docker builds work reliably with JSON format
+- **Git Diffing**: JSON lockfiles are human-readable and diffable
+- **CI/CD Pipelines**: Better compatibility with various CI/CD tools
+
+#### **Lockfile Management**
+```bash
+# Install dependencies (generates bun.lock)
+bun install
+
+# Update dependencies
+bun update
+
+# Force regenerate lockfile
+rm bun.lock && bun install
+
+# Check lockfile format
+file bun.lock  # Should show "JSON text"
+```
+
+#### **Docker Build Integration**
+The JSON lockfile format ensures that `turbo prune` commands in Docker builds work correctly:
+```dockerfile
+# Dockerfile
+COPY ./package.json ./bun.lock ./
+RUN turbo prune --scope=api --docker
+```
+
 ## 📚 Related Documentation
 
 - [Installation Guide](./1_INSTALLATION_GUIDE.md) - Setup and cleanup procedures

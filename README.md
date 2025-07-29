@@ -120,6 +120,23 @@ The monorepo includes a sophisticated build system for TypeScript libraries:
 - **Dry Run Mode**: Preview changes without making them
 - **Error Handling**: Comprehensive error reporting and cleanup
 
+## 🔒 Lockfile Configuration
+
+### JSON Lockfile Format
+This project uses JSON lockfiles (`bun.lock`) instead of binary lockfiles (`bun.lockb`) for optimal compatibility:
+
+- **Turbo Integration**: Seamless `turbo prune` operations for Docker builds
+- **Docker Compatibility**: Reliable containerized builds and CI/CD pipelines
+- **Git Diffing**: Human-readable lockfile changes for better code reviews
+- **Tool Compatibility**: Works with all standard development tools
+
+### Configuration
+```toml
+# bunfig.toml
+[install]
+saveTextLockfile = true  # Always generate JSON lockfiles
+```
+
 ## 🔄 Dependency Management
 
 ### Automated Updates with Renovate
