@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noParameterAssign: react ref needs to be assigned */
 import { cn } from "@repo/utils/cn";
 import * as React from "react";
 
