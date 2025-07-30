@@ -1,0 +1,142 @@
+name: Release Check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+      - 'package.json'
+  push:
+    branches:
+      - 'release/**'
+
+jobs:
+  check-release:
+    name: Check Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.19
+
+      - name: 📦 Install dependencies
+        run: bun install -E --no-save
+
+      - name: 🔍 Check if this is a release branch
+        id: is-release
+        run: |
+          if [[ "${{ github.ref }}" == refs/heads/release/* ]]; then
+            echo "is-release=true" >> $GITHUB_OUTPUT
+            echo "release-branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "is-release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📋 Validate CHANGELOG.md
+        if: steps.is-release.outputs.is-release == 'true'
+        run: |
+          echo "::group::📋 Validating CHANGELOG.md"
+          
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "❌ CHANGELOG.md not found"
+            exit 1
+          fi
+          
+          # Check if changelog has proper format
+          if ! grep -q "^## \[.*\] - " CHANGELOG.md; then
+            echo "❌ CHANGELOG.md missing proper version entry"
+            exit 1
+          fi
+          
+          # Extract version from changelog
+          VERSION=$(grep "^## \[.*\] - " CHANGELOG.md | head -1 | sed 's/^## \[\(.*\)\] - .*/\1/')
+          echo "📦 Version from changelog: $VERSION"
+          
+          # Check if package.json version matches
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "📦 Package.json version: $PKG_VERSION"
+          
+          if [ "$VERSION" != "$PKG_VERSION" ]; then
+            echo "❌ Version mismatch: changelog=$VERSION, package.json=$PKG_VERSION"
+            exit 1
+          fi
+          
+          echo "✅ CHANGELOG.md validation passed"
+          echo "::endgroup::"
+
+      - name: 🏷️ Validate version bump
+        if: steps.is-release.outputs.is-release == 'true'
+        run: |
+          echo "::group::🏷️ Validating Version Bump"
+          
+          # Get the previous version from main branch
+          git fetch origin main
+          PREV_VERSION=$(git show origin/main:package.json | node -p "JSON.parse(require('fs').readFileSync(0)).version")
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "📦 Previous version: $PREV_VERSION"
+          echo "📦 Current version: $CURRENT_VERSION"
+          
+          # Parse versions
+          IFS='.' read -r prev_major prev_minor prev_patch <<< "$PREV_VERSION"
+          IFS='.' read -r curr_major curr_minor curr_patch <<< "$CURRENT_VERSION"
+          
+          # Check if version was actually bumped
+          if [ "$prev_major" -eq "$curr_major" ] && [ "$prev_minor" -eq "$curr_minor" ] && [ "$prev_patch" -eq "$curr_patch" ]; then
+            echo "❌ Version was not bumped"
+            exit 1
+          fi
+          
+          echo "✅ Version bump validation passed"
+          echo "::endgroup::"
+
+      - name: 📝 Check commit messages
+        if: steps.is-release.outputs.is-release == 'true'
+        run: |
+          echo "::group::📝 Checking Commit Messages"
+          
+          # Check if there's a proper release commit
+          if ! git log --oneline | grep -q "chore(release): bump version"; then
+            echo "❌ Missing release commit message"
+            exit 1
+          fi
+          
+          echo "✅ Commit message validation passed"
+          echo "::endgroup::"
+
+      - name: 🚀 Validate release branch name
+        if: steps.is-release.outputs.is-release == 'true'
+        run: |
+          echo "::group::🚀 Validating Release Branch"
+          
+          BRANCH_NAME="${{ github.ref_name }}"
+          EXPECTED_VERSION=$(node -p "require('./package.json').version")
+          EXPECTED_BRANCH="release/$EXPECTED_VERSION"
+          
+          echo "📦 Branch name: $BRANCH_NAME"
+          echo "📦 Expected branch: $EXPECTED_BRANCH"
+          
+          if [ "$BRANCH_NAME" != "$EXPECTED_BRANCH" ]; then
+            echo "❌ Branch name doesn't match version"
+            echo "Expected: $EXPECTED_BRANCH"
+            echo "Actual: $BRANCH_NAME"
+            exit 1
+          fi
+          
+          echo "✅ Release branch validation passed"
+          echo "::endgroup::"
+
+      - name: ✅ Release validation summary
+        if: steps.is-release.outputs.is-release == 'true'
+        run: |
+          echo "🎉 Release validation completed successfully!"
+          echo "📦 Version: $(node -p "require('./package.json').version")"
+          echo "🌿 Branch: ${{ github.ref_name }}"
+          echo "📋 Ready for merge to main" 

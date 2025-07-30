@@ -1,0 +1,75 @@
+name: Release PR
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  create-release-pr:
+    name: Create Release PR
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.19
+
+      - name: 📦 Install dependencies
+        run: bun install -E --no-save
+
+      - name: 🔍 Check for changesets
+        id: changesets
+        run: |
+          echo "::group::📋 Checking for Changesets"
+          if bunx changeset status | grep -q "No changesets found"; then
+            echo "No changesets found"
+            echo "has-changesets=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changesets found"
+            echo "has-changesets=true" >> $GITHUB_OUTPUT
+          fi
+          echo "::endgroup::"
+
+      - name: 🏷️ Create Release PR
+        if: steps.changesets.outputs.has-changesets == 'true'
+        uses: changesets/action@v1
+        with:
+          title: "chore(release): version bump"
+          commit: "chore(release): version bump"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📝 Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('If this PR contains changes that should be released')
+            );
+            
+            if (!botComment) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `This PR does not contain any changesets. If this PR contains changes that should be released, please add a changeset by running \`bun run changeset\` and following the prompts.`
+              });
+            } 
