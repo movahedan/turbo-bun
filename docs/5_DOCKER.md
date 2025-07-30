@@ -50,7 +50,7 @@ Our Docker setup provides a complete development and production environment with
 | `admin` | 3001 | React + Vite | Both | Admin dashboard interface |
 | `storefront` | 3002 | Next.js 15 | Both | E-commerce frontend |
 | `api` | 3003 | Express + TypeScript | Both | Backend API server |
-| `ui` | 3006 | Storybook + Vite | Development | UI component library with Storybook |
+| `ui` | 3004 | Storybook + Vite | Development | UI component library with Storybook |
 
 ## 🐳 DevContainer Details
 
@@ -162,8 +162,8 @@ services:
 3. **Socket Forwarding**: Requires careful port management to avoid binding conflicts
 
 **Port Mapping**:
-- **Development**: 3001-3003 (apps) + 5001-5003 (production)
-- **Production**: 5001-5004 (isolated from development)
+- **Development**: 3001-3004 (apps) managed by docker-compose.dev.yml
+- **Production**: 5001-5004 (isolated from development) managed by docker-compose.yml
 - **Health Checks**: All services include curl-based health checks
 
 ### Volume Mounting Strategy
@@ -204,7 +204,6 @@ webpack: (config, { dev }) => {
 ```typescript
 // apps/admin/vite.config.ts
 server: {
-  host: "0.0.0.0",
   watch: {
     usePolling: true,
     interval: 1000,
@@ -215,7 +214,7 @@ server: {
 **Express (API)**:
 ```json
 // apps/api/package.json
-"dev": "tsup --watch --onSuccess 'node dist/index.js'"
+"dev": "tsup --watch --onSuccess 'bun dist/index.js'"
 ```
 
 ### Environment Variable Strategy
@@ -251,6 +250,12 @@ healthcheck:
 - **HTTP-based**: Standard web service health checking
 - **Configurable**: Easy to customize for different services
 - **Docker Native**: Works with Docker's health check system
+
+**Recent Improvements**:
+- **Removed Hardcoded Ports**: Dockerfiles no longer have EXPOSE declarations
+- **Flexible Port Management**: Docker Compose handles all port mapping
+- **Improved Health Checks**: More reliable health check implementations
+- **Better Container Orchestration**: Enhanced compatibility with orchestration tools
 
 ## ⚡ Performance Optimizations
 
@@ -288,7 +293,6 @@ RUN npm ci --only=production
 # Runtime stage
 FROM node:18-alpine AS runtime
 COPY --from=builder /app /app
-EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
@@ -344,7 +348,7 @@ sudo usermod -aG docker $USER
 lsof -i :3001
 lsof -i :3002
 lsof -i :3003
-lsof -i :3003
+lsof -i :3004
 
 # Solution: Use Docker Compose port mapping instead of DevContainer forwarding
 ```
@@ -369,7 +373,7 @@ lsof -i :3003
 # Check DevContainer status
 bun run dev:check        # Health check
 bun run dev:logs         # View logs
-bun run dev:compose ps   # Container status
+bun run dev:health       # Container status with formatted output
 
 # Production debugging
 docker compose ps         # Production services
@@ -388,40 +392,28 @@ ui:
   extends:
     service: apps
   ports:
-    - "3006:3006"
+    - "3004:3004"
   environment:
-    - PORT=3006
+    - PORT=3004
     - NODE_ENV=development
     - CHOKIDAR_USEPOLLING=true
     - WATCHPACK_POLLING=true
   command: bun run dev --filter=@repo/ui
   profiles: ["ui", "all"]
   healthcheck:
-    test: ["CMD", "curl", "-f", "http://localhost:3006"]
-```
-
-**Storybook Host Binding**:
-```json
-// packages/ui/.storybook/main.ts
-async viteFinal(config) {
-  if (config.server) {
-    config.server.host = "0.0.0.0";
-    config.server.port = 3006;
-  }
-  return config;
-}
+    test: ["CMD", "curl", "-f", "http://ui:3004"]
 ```
 
 **Storybook Package Script**:
 ```json
 // packages/ui/package.json
-"dev:storybook": "bunx --bun storybook dev --no-open --port 3006 --host 0.0.0.0"
+"dev:storybook": "bunx --bun storybook dev --no-open"
 ```
 
 **Access Storybook in Docker**:
-- **From Host**: `http://localhost:3006`
-- **From Container**: `http://ui:3006`
-- **Health Check**: `curl -f http://localhost:3006`
+- **From Host**: `http://localhost:3004`
+- **From Container**: `http://ui:3004`
+- **Health Check**: `curl -f http://localhost:3004`
 
 ## 📚 Implementation Best Practices
 
@@ -429,7 +421,7 @@ async viteFinal(config) {
 
 1. **Always Use DevContainer**: Ensures consistent environment
 2. **Individual App Development**: Start only needed services
-3. **Regular Cleanup**: `bun run dev:clean` for performance
+3. **Regular Cleanup**: `bun run dev:cleanup` for performance
 4. **Resource Monitoring**: Keep Docker resource usage in check
 
 ### Production Best Practices

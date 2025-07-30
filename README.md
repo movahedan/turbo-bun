@@ -174,7 +174,7 @@ The monorepo uses [Renovate](https://docs.renovatebot.com) for intelligent depen
 | `admin` | App | [React](https://react.dev/learn) + [Vite](https://vitejs.dev/guide/) | 3001 | Admin dashboard interface |
 | `storefront` | App | [Next.js](https://nextjs.org/docs) 15 | 3002 | E-commerce frontend |
 | `api` | App | [Express](https://expressjs.com/en/guide/routing.html) + [TypeScript](https://www.typescriptlang.org/docs/) | 3003 | Backend API server |
-| `@repo/ui` | Package | [React](https://react.dev/learn) | - | Shared UI components |
+| `@repo/ui` | Package | [React](https://react.dev/learn) | 3004 | Shared UI components with Storybook |
 | `@repo/utils` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Utility functions |
 | `@repo/logger` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Logging utilities |
 | `@repo/test-preset` | Package | [Jest](https://jestjs.io/docs/getting-started) | - | Testing configurations |

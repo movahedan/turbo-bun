@@ -27,7 +27,7 @@ The project implements a layered setup architecture:
 │  └── Build System (turbo, vite)                             │
 ├─────────────────────────────────────────────────────────────┤
 │  🐳 DevContainer Layer (Optional)                           │
-│  ├── Docker Services (admin, storefront, api)               │
+│  ├── Docker Services (admin, storefront, api, ui)           │
 │  ├── Development Tools (act, docker-compose)                │
 │  └── Health Monitoring & Logging                            │
 ├─────────────────────────────────────────────────────────────┤
@@ -121,7 +121,6 @@ hotfix/security_patch                    # ❌ Invalid (underscore)
 bun run local:setup --verbose --debug
 bun run dev:setup --verbose --debug
 ```
-
 
 ### **Recovery Procedures**
 
