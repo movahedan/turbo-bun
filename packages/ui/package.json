@@ -21,7 +21,6 @@
 	},
 	"scripts": {
 		"check:types": "tsc --noEmit",
-		"test": "bun test",
 		"dev": "bun run scripts/dev.ts",
 		"dev:storybook": "bunx --bun storybook dev --no-open",
 		"prebuild": "bun run ../../scripts/update-package-json.ts",

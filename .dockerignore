@@ -42,6 +42,7 @@ pids
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+lcov.info
 .nyc_output
 
 # Cache directories

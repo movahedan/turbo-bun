@@ -12,8 +12,7 @@
 		"./cn": "./src/cn.ts"
 	},
 	"scripts": {
-		"check:types": "tsc --noEmit",
-		"test": "bun test"
+		"check:types": "tsc --noEmit"
 	},
 	"dependencies": {
 		"clsx": "2.1.1",

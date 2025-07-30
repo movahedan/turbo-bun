@@ -33,7 +33,6 @@ exact = true
 [test]
 # Preload centralized test setup from test-preset package
 preload = ["./packages/test-preset/happydom.ts", "./packages/test-preset/testing-library.ts", "./packages/test-preset/test-setup.ts"]
-
 # Environment variables for tests
 env = { 
 	NODE_ENV = "test", 
@@ -46,8 +45,10 @@ timeout = 5000
 
 # Enable coverage reporting
 coverage = true
-
-# Exclude test-preset files from coverage reporting
+coverageDir = "./coverage"
+coverageThreshold = { lines = 0.9, functions = 0.9, statements = 0.9 }
+coverageIgnoreSourcemaps = true
+coverageSkipTestFiles = true
 coveragePathIgnorePatterns = [
 	"**/packages/test-preset/**",
 	"**/node_modules/**",

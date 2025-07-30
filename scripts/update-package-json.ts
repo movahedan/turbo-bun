@@ -84,7 +84,7 @@ export const updatePackageJson = createScript(
 		packageJson.exports = newExports;
 
 		await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
-		await $`bunx @biomejs/biome check --write --no-errors-on-unmatched ${packageJsonPath}`;
+		await $`bun biome check --write --no-errors-on-unmatched ${packageJsonPath}`;
 		vConsole.log(chalk.green("✅ Package.json updated successfully"));
 	},
 );

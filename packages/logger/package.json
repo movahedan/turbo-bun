@@ -11,8 +11,7 @@
 	},
 	"scripts": {
 		"dev": "tsc --watch",
-		"check:types": "tsc --noEmit",
-		"test": "bun test"
+		"check:types": "tsc --noEmit"
 	},
 	"devDependencies": {
 		"@repo/test-preset": "workspace:*",

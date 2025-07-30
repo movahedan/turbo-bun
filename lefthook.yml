@@ -5,7 +5,7 @@ pre-commit:
   commands:
     check:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,html,css,md,mdx,yaml,yml}"
-      run: bunx @biomejs/biome check --write --no-errors-on-unmatched {staged_files}
+      run: bun biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
     typescript:
       glob: "*.{ts,tsx}"
@@ -14,16 +14,16 @@ pre-commit:
 commit-msg:
   commands:
     commitlint:
-      run: bunx commitlint --edit {1}
+      run: bun commitlint --edit {1}
 
 pre-push:
   parallel: true
   commands:
     branch-name:
-      run: bun run scripts/ci-branchname.ts
+      run: bun scripts/ci-branchname.ts
     check:
-      run: bun run check
+      run: bun check
     test:
-      run: bun run test --affected
+      run: bun test
     build:
       run: bun run build --affected
