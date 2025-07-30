@@ -14,6 +14,8 @@ jobs:
     env:
       TURBO_SCM_HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha || 'HEAD' }}
       TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
 
     steps:
       - name: 📥 Checkout repository
@@ -40,11 +42,8 @@ jobs:
 
       - name: 📦 Install dependencies
         if: steps.bun-cache.outputs.cache-hit != 'true'
-        run: |
-          bun install
-          bun install -g --frozen-lockfile @biomejs/biome@2.0.6
-          bun install -g --frozen-lockfile turbo@2.5.4
-          bun install -g --frozen-lockfile @changesets/cli@2.29.3
+        run: bun install
+          
 
       - name: 🔍 - Check branch name
         run: bun run scripts/ci-branchname.ts
@@ -67,6 +66,10 @@ jobs:
   validate-docker-compose:
     name: 🐳 Validate Docker Compose
     runs-on: ubuntu-latest
+    env:
+     TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+     TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4

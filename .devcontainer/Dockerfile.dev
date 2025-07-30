@@ -1,7 +1,6 @@
 FROM oven/bun:1.2.19-alpine AS base
 
 RUN apk add --no-cache curl
-RUN bun install -g turbo@2.5.4
 
 WORKDIR /app
 
