@@ -22,8 +22,8 @@ const config: StorybookConfig = {
 	},
 	async viteFinal(config) {
 		if (config.server) {
-			config.server.host = "0.0.0.0";
-			config.server.allowedHosts = ["localhost", "127.0.0.1", "0.0.0.0", "ui"];
+			config.server.host = process.env.HOST || "localhost";
+			config.server.allowedHosts = ["localhost", "ui"];
 		}
 		return config;
 	},

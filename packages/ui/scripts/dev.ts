@@ -44,7 +44,7 @@ async function main() {
 
 	// Run Storybook directly instead of spawning it
 	console.log(chalk.blue("🎬 Starting Storybook directly..."));
-	await $`bun run dev:storybook`;
+	await $`bun run dev:storybook -- --port ${process.env.PORT || process.env.REPO_PORTS_UI} --host ${process.env.HOST}`;
 }
 
 // Handle process termination

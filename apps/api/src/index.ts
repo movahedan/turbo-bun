@@ -1,10 +1,11 @@
 import { log } from "@repo/logger";
 import { createServer } from "./server";
 
-const port = Number(process.env.PORT) || 3004;
-const server = createServer();
+const host = process.env.HOST || "localhost";
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
-server.listen(port, "0.0.0.0", () => {
-	log("api running on 0.0.0.0");
+const server = createServer();
+server.listen(port, host, () => {
+	log(`api running on ${host}`);
 	console.log(`api running on ${port}`);
 });
