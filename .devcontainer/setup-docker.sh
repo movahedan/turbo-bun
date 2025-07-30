@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# Fix node_modules directory permissions ---------------------------------------
-echo "Fixing node_modules directory permissions..."
-sudo rm -rf /app/node_modules
 sudo chown -R vscode-user:vscode-user /app/node_modules
 sudo chmod -R 777 /app/node_modules
-
-# Fix file ownership for development files (excluding git objects) ------------
-echo "Fixing file ownership for development files..."
 sudo chown -R vscode-user:vscode-user /app/apps /app/packages /app/scripts
 sudo chown -R vscode-user:vscode-user /app/package.json /app/bun.lock /app/turbo.json /app/biome.json
 sudo chown -R vscode-user:vscode-user /app/commitlint.config.ts /app/lefthook.yml /app/.env /app/.npmrc
@@ -24,7 +18,7 @@ if [ -S /var/run/docker.sock ]; then
     # Set socket permissions for non-root access
     sudo chmod 666 /var/run/docker.sock
     # Add user to docker group
-    sudo usermod -aG vscode-user $USER
+    sudo usermod -aG docker vscode-user
     echo "Docker permissions configured for Linux/macOS"
 else
     echo "No Docker socket found, assuming Windows or Docker Desktop"

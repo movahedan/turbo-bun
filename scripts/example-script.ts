@@ -31,13 +31,9 @@ const exampleScriptConfig = {
 export const exampleScript = createScript(
 	exampleScriptConfig,
 	async function main(args, xConsole) {
-		xConsole.log("📁 Processing file:", args.file);
+		xConsole.info("📁 Processing file:", args.file);
 		xConsole.log("💾 Output will be saved to:", args.output);
-
-		if (args.verbose) {
-			xConsole.log("🔍 Verbose mode enabled");
-		}
-
+		xConsole.warn("🔍 Verbose mode enabled");
 		// Your script logic here...
 		xConsole.log("✅ Example script completed successfully!");
 	},

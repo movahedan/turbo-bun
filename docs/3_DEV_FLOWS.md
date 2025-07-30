@@ -41,7 +41,7 @@ bun run test                 # Run all tests across all packages
 # Run tests for specific packages
 turbo run test --filter=@repo/ui        # Test UI package only
 turbo run test --filter=@repo/utils     # Test utils package only
-turbo run test --filter=@repo/admin     # Test admin app only
+turbo run test --filter=admin           # Test admin app only
 
 # Run tests for affected packages only
 bun run test --affected      # Test only packages affected by changes
@@ -79,9 +79,9 @@ turbo run test --clearCache  # Clear Turbo test cache
 bun run dev                   # Start all apps in development mode
 
 # Start specific applications locally
-turbo run dev --filter=@repo/admin      # Start admin app only
-turbo run dev --filter=@repo/storefront # Start storefront app only
-turbo run dev --filter=@repo/api        # Start API only
+turbo run dev --filter=admin      # Start admin app only
+turbo run dev --filter=storefront # Start storefront app only
+turbo run dev --filter=api        # Start API only
 ```
 
 #### **DevContainer Mode (Containerized)**
@@ -139,7 +139,7 @@ bun run check:quick          # Quick verification of changes
 ```bash
 # Health checks
 bun run dev:check             # Check DevContainer health
-bun run dev:health            # Check service health status
+bun run dev:health            # Check service health status with formatted output
 
 # Service monitoring
 bun run dev:logs              # View service logs
@@ -150,7 +150,7 @@ bun run dev:logs -f           # Follow logs in real-time
 
 ### **Code Quality Checks**
 
-#### **Local Mode abd DevContainer Mode (Host Machine and Containerized)**
+#### **Local Mode and DevContainer Mode (Host Machine and Containerized)**
 ```bash
 # Run all quality checks locally
 bun run check                 # Check code quality (linting, formatting)
@@ -171,9 +171,9 @@ bun run check:quick           # Quick verification (lint, type, test, build)
 bun run build                # Build all packages and applications
 
 # Build specific applications locally
-turbo run build --filter=@repo/admin      # Build admin app
-turbo run build --filter=@repo/storefront # Build storefront app
-turbo run build --filter=@repo/api        # Build API
+turbo run build --filter=admin      # Build admin app
+turbo run build --filter=storefront # Build storefront app
+turbo run build --filter=api        # Build API
 
 # Build affected packages only
 bun run build --affected     # Build only affected packages
@@ -246,7 +246,7 @@ bun run dev:up api           # Start API service only
 ### **Service Monitoring**
 ```bash
 # Check service status
-bun run dev:health           # Check health of all services
+bun run dev:health           # Check health of all services with formatted output
 bun run dev:health admin     # Check health of specific service
 
 # View service logs
@@ -261,6 +261,13 @@ bun run dev:logs -f admin    # Follow logs in real-time
 bun run dev:build            # Build all DevContainer images
 bun run dev:build admin      # Build specific service image (Actually it's the same image for all)
 bun run dev:build --no-cache # Build without cache
+```
+
+### **Service Restart**
+```bash
+# Restart services
+bun run dev:restart          # Restart all DevContainer services
+bun run dev:restart admin    # Restart specific service
 ```
 
 ## 🤝 Contribution Workflow

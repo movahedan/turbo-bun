@@ -39,8 +39,4 @@ COPY --from=build --chown=runner-user:runner-group /app/packages/logger ./packag
 COPY --from=build --chown=runner-user:runner-group /app/apps/api ./apps/api
 
 USER runner-user
-EXPOSE 5001
-ENV NODE_ENV=production
-ENV PORT=5001
-
-CMD ["bun", "run", "./apps/api/dist/index.cjs"]
+CMD ["bun", "run", "./apps/api/dist/index.js"]

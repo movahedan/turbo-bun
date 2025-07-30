@@ -19,8 +19,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Bun
 RUN curl -fsSL https://bun.com/install | bash -s "bun-v1.2.15"
-RUN ~/.bun/bin/bun install -g turbo@2.5.4
+# Add bun bin to PATH for the vscode-user
+RUN addgroup --system --gid 1001 vscode-user & adduser --system --uid 1001 --shell /bin/zsh vscode-user
+
+USER vscode-user
+ENV PATH="/home/vscode-user/.bun/bin:$PATH"
+RUN echo 'export PATH="$PATH"' >> /home/vscode-user/.zshrc
 
 WORKDIR /app
 

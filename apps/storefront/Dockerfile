@@ -30,8 +30,7 @@ RUN bun run build --filter=storefront
 FROM turbo AS runner
 WORKDIR /app
 RUN mkdir -p .turbo/cache && chmod -R 777 .turbo
-RUN addgroup --system --gid 1001 runner-group
-RUN adduser --system --uid 1001 runner-user
+RUN addgroup --system --gid 1001 runner-group && adduser --system --uid 1001 runner-user
 
 ARG MODE=755
 ARG OWNER_MODE=765
@@ -45,7 +44,4 @@ COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/apps/sto
 COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/apps/storefront/next.config.ts ./apps/storefront/next.config.ts
 
 USER runner-user
-EXPOSE 3000
-ENV NODE_ENV=production
-ENV PORT=3000
 CMD ["bun", "run", "start", "--filter=storefront"]

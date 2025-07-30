@@ -1,17 +1,26 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-docker-compose
 {
-	"name": "Repo",
-	// Use the new development compose files for hot reload support
-	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
-	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
+	"name": "turbo-bun",
 	"dockerComposeFile": ["docker-compose.dev.yml"],
-	// The 'service' property is the name of the service for the container that VS Code should
-	// use. Update this value and .devcontainer/docker-compose.yml to the real service name.
-	"service": "vscode",
-	// The optional 'workspaceFolder' property is the path VS Code should open by default when
-	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
+	"service": "vscode-service",
 	"workspaceFolder": "/app",
+	"remoteUser": "vscode-user",
+	"containerUser": "vscode-user",
+	"runServices": ["vscode-service"],
+	"networks": ["dev-network"],
+	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
+	"shutdownAction": "stopContainer",
+	// Mount Docker socket for Docker-from-Docker (Linux/macOS)
+	// Windows uses Docker Desktop with different connection method
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	"remoteEnv": {
+		"PROJECT_ROOT": "${localWorkspaceFolder}",
+		"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+		"COMPOSE_PROJECT_NAME": "repo"
+	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {
@@ -24,37 +33,15 @@
 		},
 		"ghcr.io/shyim/devcontainers-features/bun:0": "latest",
 		"ghcr.io/devcontainers/features/common-utils:2": {
-			"installZsh": false,
-			"configureZshAsDefaultShell": false,
-			"installOhMyZsh": false,
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": true,
 			"upgradePackages": false,
 			"username": "automatic",
 			"userUid": "automatic",
 			"userGid": "automatic"
 		}
 	},
-	// Mount Docker socket for Docker-from-Docker (Linux/macOS)
-	// Windows uses Docker Desktop with different connection method
-	"mounts": [
-		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-	],
-	// Set PROJECT_ROOT for docker-compose volume mounting (use host path, not container path)
-	"remoteEnv": {
-		"PROJECT_ROOT": "${localWorkspaceFolder}",
-		"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
-		"COMPOSE_PROJECT_NAME": "repo"
-	},
-	// Enable Docker access for devcontainer user
-	"remoteUser": "vscode-user",
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [],
-	// Start only the vscode service (app containers managed separately)
-	"runServices": ["vscode"],
-	// Setup Docker permissions and start development environment
-	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
-	// Keep containers running for better development experience
-	"shutdownAction": "stopCompose",
-	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
 	"customizations": {
 		"vscode": {
 			"extensions": [

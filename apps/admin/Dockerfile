@@ -41,5 +41,4 @@ COPY --from=build --chown=nginx:nginx /app/apps/admin/nginx.conf /etc/nginx/conf
 COPY --from=build --chown=nginx:nginx /app/apps/admin/dist/ /usr/share/nginx/html
 
 USER nginx
-EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

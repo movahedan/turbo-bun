@@ -4,8 +4,8 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"start": "bun dist/index.cjs",
-		"dev": "tsup src/index.ts --watch",
+		"start": "bun dist/index.js",
+		"dev": "tsup src/index.ts --watch --onSuccess 'bun dist/index.js'",
 		"build": "tsup src/index.ts",
 		"check:types": "tsc --noEmit",
 		"test": "bun test"
