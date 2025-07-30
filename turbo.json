@@ -1,10 +1,23 @@
 {
 	"$schema": "https://turborepo.com/schema.json",
 	"ui": "tui",
+	"envMode": "loose",
 	"tasks": {
 		"//#check": {},
 		"//#check:fix": {
 			"cache": false
+		},
+		"check:types": {
+			"dependsOn": ["^build", "^check:types"]
+		},
+		"dev": {
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"dependsOn": ["^build"],
+			"cache": false,
+			"persistent": true
+		},
+		"start": {
+			"dependsOn": ["^build"]
 		},
 		"build": {
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -20,9 +33,6 @@
 		"build:storybook": {
 			"dependsOn": ["^check:types", "^build"],
 			"outputs": ["dist-storybook/**"]
-		},
-		"start": {
-			"dependsOn": ["^build"]
 		},
 		"test": {
 			"inputs": [
@@ -40,48 +50,6 @@
 			"dependsOn": ["^build", "@repo/test-preset#build"],
 			"cache": true,
 			"persistent": false
-		},
-		"test:watch": {
-			"inputs": [
-				"$TURBO_DEFAULT$",
-				"**/*.test.ts",
-				"**/*.test.tsx",
-				"**/*.spec.ts",
-				"**/*.spec.tsx",
-				"**/*.test.js",
-				"**/*.test.jsx",
-				"**/*.spec.js",
-				"**/*.spec.jsx"
-			],
-			"outputs": ["coverage/**"],
-			"dependsOn": ["^build", "@repo/test-preset#build"],
-			"cache": false,
-			"persistent": true
-		},
-		"test:coverage": {
-			"inputs": [
-				"$TURBO_DEFAULT$",
-				"**/*.test.ts",
-				"**/*.test.tsx",
-				"**/*.spec.ts",
-				"**/*.spec.tsx",
-				"**/*.test.js",
-				"**/*.test.jsx",
-				"**/*.spec.js",
-				"**/*.spec.jsx"
-			],
-			"outputs": ["coverage/**"],
-			"dependsOn": ["^build", "@repo/test-preset#build"],
-			"cache": true,
-			"persistent": false
-		},
-		"check:types": {
-			"dependsOn": ["^build", "^check:types"]
-		},
-		"dev": {
-			"dependsOn": ["^build"],
-			"cache": false,
-			"persistent": true
 		}
 	}
 }
