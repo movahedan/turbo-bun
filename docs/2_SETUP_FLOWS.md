@@ -7,6 +7,7 @@ This document provides detailed technical information about the setup flows, con
 ## 📋 Table of Contents
 
 - [Architecture Overview](#-architecture-overview)
+- [Environment Configuration Strategy](#-environment-configuration-strategy)
 - [CI/CD Integration](#-cicd-integration)
 - [Troubleshooting](#-troubleshooting)
 
@@ -27,7 +28,7 @@ The project implements a layered setup architecture:
 │  └── Build System (turbo, vite)                             │
 ├─────────────────────────────────────────────────────────────┤
 │  🐳 DevContainer Layer (Optional)                           │
-│  ├── Docker Services (admin, storefront, api, ui)           │
+│  ├── Docker Services (admin, storefront, api, ui)          │
 │  ├── Development Tools (act, docker-compose)                │
 │  └── Health Monitoring & Logging                            │
 ├─────────────────────────────────────────────────────────────┤
@@ -68,6 +69,83 @@ bun run dev:rm          # Container removal (from host)
 - **Test Execution**: ~20-40 seconds
 - **Build Process**: ~30-60 seconds
 - **Total Runtime**: ~2-3 minutes (cold), ~1 minute (warm)
+
+## 🔧 Environment Configuration Strategy
+
+### **Docker Compose Environment Management**
+
+**Root Environment Files**: Docker Compose uses root-level environment files with passed arguments:
+
+```yaml
+# docker-compose.yml (Production)
+services:
+  prod-admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - VITE_API_URL=http://api:5003
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+
+# .devcontainer/docker-compose.dev.yml (Development)
+services:
+  admin:
+    extends:
+      service: apps
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: "3001"
+      HOST: "0.0.0.0"
+      NODE_ENV: "development"
+    command: bun run dev --filter=admin -- --host 0.0.0.0 --port 3001
+```
+
+**Key Configuration Points**:
+- **Root `.env` file**: Used by Docker Compose for shared environment variables
+- **Service-specific environment**: Each service defines its own PORT and HOST
+- **HOST must be `0.0.0.0`**: Ensures container accessibility
+- **PORT must be unique**: Prevents conflicts between services
+
+### **Local Development Environment**
+
+**Package-Level Environment Files**: Local development uses package-specific environment files:
+
+```bash
+# Local development structure
+apps/admin/.env          # Admin app environment variables
+apps/storefront/.env     # Storefront app environment variables  
+apps/api/.env           # API app environment variables
+packages/ui/.env        # UI package environment variables
+```
+
+**Local Development Configuration**:
+- **HOST**: `0.0.0.0` (required for container accessibility)
+- **PORT**: Unique per service (3001, 3002, 3003, 3004)
+- **No hardcoded ports**: Docker Compose handles port mapping
+- **Package-specific configs**: Each app manages its own environment
+
+### **Port Configuration Strategy**
+
+**Development Ports** (Docker Compose):
+- **Admin**: 3001
+- **Storefront**: 3002  
+- **API**: 3003
+- **UI (Storybook)**: 3004
+
+**Production Ports** (Docker Compose):
+- **Admin**: 5001
+- **Storefront**: 5002
+- **API**: 5003
+- **UI**: 5006
+
+**Conflict Prevention**:
+- **Development**: 3001-3004 range
+- **Production**: 5001-5006 range
+- **No overlapping**: Clear separation between environments
 
 ## 🔄 CI/CD Integration
 
