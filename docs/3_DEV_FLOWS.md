@@ -283,6 +283,27 @@ bun run check:types          # Type checking
 bun run test --affected      # Test affected packages
 ```
 
+### **Version Management**
+```bash
+# Create a changeset for versioning
+bun run changeset            # Create new changeset
+
+# Version the root monorepo
+bun run version-root         # Version with quality checks
+bun run version              # Version only
+
+# Check changeset status
+bunx changeset status        # View pending changesets
+
+# Custom version management
+bun run version:init         # Initialize release branch
+bun run version:add --patch  # Generate changelog for patch
+bun run version:add --minor  # Generate changelog for minor
+bun run version:add --major  # Generate changelog for major
+bun run version:commit       # Commit version bump
+bun run version:push         # Push release branch
+```
+
 ### **Branch Management**
 ```bash
 # Check branch naming
@@ -414,6 +435,7 @@ RUN turbo prune --scope=api --docker
 - [Setup Flows](./2_SETUP_FLOWS.md) - Advanced setup configuration
 - [Cursor Rules](./.cursor/rules/) - Development conventions and coding standards
 - [Quality Checklist](./0_QUALITY_CHECKLIST.md) - Testing and validation procedures
+- [Changesets Versioning](./8_CHANGESETS_VERSIONING.md) - Version management and changelog generation
 
 ---
 
