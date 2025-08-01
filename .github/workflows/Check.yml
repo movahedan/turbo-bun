@@ -8,9 +8,71 @@ on:
       - main
 
 jobs:
+  get-affected:
+    name: 🔍 Get affected
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    outputs:
+      affected-packages: ${{ steps.affected-packages.outputs.affected-packages }}
+      affected-services: ${{ steps.affected-services.outputs.affected-services }}
+      service-ports: ${{ steps.service-ports.outputs.service-ports }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          no-cache: true
+          bun-version: 1.2.19
+
+      - name: 🗃️ Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📦 Install dependencies
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        run: bun install -E --no-save
+
+      - name: 🔍 - Get affected packages
+        id: affected-packages
+        run: |
+          echo "::group::🔍 Getting affected packages"
+          bun run scripts/ci-attach-affected.ts --mode turbo --output-id affected-packages
+          echo "::endgroup::"
+
+      - name: 🔍 - Get affected services
+        id: affected-services
+        run: |
+          echo "::group::🔍 Getting affected services"
+          bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
+          echo "::endgroup::"
+      
+      - name: 🔍 - Attach service ports to github output
+        if: steps.affected-services.outputs.affected-services != ''
+        id: service-ports
+        run: |
+          echo "::group::🔍 Getting service ports"
+          bun run scripts/ci-attach-service-ports.ts --output-id service-ports
+          echo "::endgroup::"
+
   validate-source:
     name: 🔍 Validate
     runs-on: ubuntu-latest
+    needs: get-affected
+    if: github.event.workflow_run.conclusion == 'success' && needs.get-affected.outputs.affected-packages != ''
     env:
       TURBO_SCM_HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha || 'HEAD' }}
       TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
@@ -51,29 +113,24 @@ jobs:
       - name: ✨ - Biome check
         run: bun run check .
 
-      - name: 🔍 - Get affected packages
-        id: affected-packages
-        run: |
-          echo "::group::🔍 Getting affected packages"
-          bun run scripts/ci-attach-affected.ts --mode turbo --output-id affected-packages
-          echo "::endgroup::"
-
       - name: 🏗️ - Build packages
-        run: bun run build ${{ steps.affected-packages.outputs.affected-packages }}
+        run: bun run build ${{ needs.get-affected.outputs.affected-packages }}
 
       - name: 🔍 - Type check
-        run: bun run check:types ${{ steps.affected-packages.outputs.affected-packages }}
+        run: bun run check:types ${{ needs.get-affected.outputs.affected-packages }}
 
       - name: 🧪 - Test
-        run: bun test ${{ steps.affected-packages.outputs.affected-packages }}
+        run: bun test ${{ needs.get-affected.outputs.affected-packages }}
 
       - name: 🏗️ - Build
-        run: bun run build ${{ steps.affected-packages.outputs.affected-packages }}
+        run: bun run build ${{ needs.get-affected.outputs.affected-packages }}
 
 
   validate-docker-compose:
     name: 🐳 Validate Docker Compose
     runs-on: ubuntu-latest
+    needs: get-affected
+    if: github.event.workflow_run.conclusion == 'success' && needs.get-affected.outputs.affected-services != ''
     env:
      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -104,33 +161,17 @@ jobs:
       - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔍 - Get affected services
-        id: affected-services
-        run: |
-          echo "::group::🔍 Getting affected services"
-          bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
-          echo "::endgroup::"
-
-      - name: 🔍 - Attach service ports to github output
-        if: steps.affected-services.outputs.affected-services != ''
-        id: ports
-        run: |
-          echo "::group::🔍 Getting service ports"
-          bun run scripts/ci-attach-service-ports.ts
-          echo "::endgroup::"
-
       - name: 🏗️ Test Production Build
-        if: steps.affected-services.outputs.affected-services != ''
         run: |
           echo "::group::🏗️ Testing Production Build"
 
-          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
+          if [ -z "${{ needs.get-affected.outputs.affected-services }}" ]; then
             echo "No affected services to test"
             exit 0
           fi
 
           # Build production images without cache to test build process
-          bun run prod:compose build ${{ steps.affected-services.outputs.affected-services }} --no-cache --parallel
+          bun run prod:compose build ${{ needs.get-affected.outputs.affected-services }} --no-cache --parallel
           if [ $? -ne 0 ]; then
             echo "❌ Production builds failed"
             exit 1
@@ -140,18 +181,17 @@ jobs:
           echo "::endgroup::"
 
       - name: 🧪 Test Production Services
-        if: steps.affected-services.outputs.affected-services != ''
         run: |
           echo "::group::🧪 Testing Production Services"
           
           # Check if we have any affected packages
-          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
+          if [ -z "${{ needs.get-affected.outputs.affected-services }}" ]; then
             echo "No affected packages to test"
             exit 0
           fi
           
           # Start services in background
-          bun run prod:compose up ${{ steps.affected-services.outputs.affected-services }} -d
+          bun run prod:compose up ${{ needs.get-affected.outputs.affected-services }} -d
           
           # Wait for services to start
           sleep 30
@@ -160,11 +200,11 @@ jobs:
           bun run prod:compose ps
           
           # Test service health (basic connectivity)
-          for service in ${{ steps.affected-services.outputs.affected-services }}; do
+          for service in ${{ needs.get-affected.outputs.affected-services }}; do
             echo "Testing $service..."
             
             # Get port from the ports output - use proper jq syntax with quotes
-            port=$(echo '${{ steps.ports.outputs.service-ports }}' | jq -r --arg service "$service" '.[$service] // empty' 2>/dev/null || echo "")
+            port=$(echo '${{ needs.get-affected.outputs.service-ports }}' | jq -r --arg service "$service" '.[$service] // empty' 2>/dev/null || echo "")
             
             if [ -n "$port" ] && [ "$port" != "null" ] && [ "$port" != "" ]; then
               echo "Service $service is accessible on port $port"
@@ -176,15 +216,15 @@ jobs:
           done
 
       - name: 🧹 Cleanup
-        if: always() && steps.affected-services.outputs.affected-services != ''
+        if: always()
         run: |
           echo "::group::🧹 Cleaning up Docker resources"
-          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
+          if [ -z "${{ needs.get-affected.outputs.affected-services }}" ]; then
             echo "No affected services to clean up"
             exit 0
           fi
 
-          bun run prod:compose down ${{ steps.affected-services.outputs.affected-services }} --remove-orphans || true
+          bun run prod:compose down ${{ needs.get-affected.outputs.affected-services }} --remove-orphans || true
           docker system prune -f || true
           echo "✅ Cleanup completed"
           echo "::endgroup::"

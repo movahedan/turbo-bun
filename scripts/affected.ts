@@ -48,7 +48,7 @@ export async function getBaseSha(): Promise<string> {
 
 	let baseSha: string;
 	if (isMergeCommit) {
-		console.log("🔍 This is a merge commit, finding base SHA...");
+		console.log("🔍 Previous commit is a merge commit, finding base SHA...");
 
 		// For merge commits, we want the previous head of main before the merge
 		// This is the first parent of the merge commit
@@ -58,7 +58,7 @@ export async function getBaseSha(): Promise<string> {
 		baseSha = firstParent.trim();
 	} else {
 		console.log(
-			"📋 This is a regular commit, using previous commit as base SHA.",
+			"📋 Previous commit is a regular commit, using it as base SHA.",
 		);
 		// For regular commits, use the previous commit as base
 		const previousCommit = await $`git rev-parse ${currentSha.trim()}^1`.text();
