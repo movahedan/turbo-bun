@@ -1,45 +1,135 @@
-# 🏷️ Changesets Version Management
+# 🏷️ Version Management with Changesets
 
-> **Automated version bumping and changelog generation for the monorepo root**
+> **Comprehensive version management system with automated changelog generation and releases**
 
-This document covers how to use Changesets for managing the root monorepo version and generating changelogs. The setup is configured to only version the root monorepo (`turbo-bun`) and not individual packages.
+This document covers both the custom version management system and the standard Changesets workflow for managing versions in the monorepo.
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Quick Start](#-quick-start)
-- [Workflow](#-workflow)
-- [Commands](#-commands)
-- [GitHub Actions](#-github-actions)
+- [Custom Version Management](#-custom-version-management)
+- [Standard Changesets Workflow](#-standard-changesets-workflow)
+- [Scripts and Commands](#-scripts-and-commands)
+- [CI/CD Integration](#-cicd-integration)
 - [Best Practices](#-best-practices)
 - [Troubleshooting](#-troubleshooting)
+- [Related Documentation](#-related-documentation)
 
 ## 🎯 Overview
 
-Changesets is configured to track changes across all packages and apps in the workspace. The root monorepo version is managed separately. This provides:
+This project supports two version management approaches:
 
-- **Automated version bumping** based on conventional commits
+1. **Custom Version Management**: Automated workflow with intelligent changeset creation
+2. **Standard Changesets**: Traditional manual changeset workflow
+
+Both approaches use [Changesets](https://github.com/changesets/changesets) for changelog generation and version management, providing:
+
+- **Automated version bumping** based on changeset types
 - **Changelog generation** for all changes
-- **GitHub Actions integration** for automated release PRs
-- **Comprehensive changelog** for all packages and apps
-- **Centralized version management** at the root level
+- **GitHub Actions integration** for automated workflows
+- **Monorepo support** for multiple packages and apps
+- **Flexible workflow** supporting both automated and manual approaches
 
-### Configuration
+### **Configuration**
 
 ```json
 // .changeset/config.json
 {
-  "fixed": [],                   // Track all packages individually
-  "access": "restricted",        // No npm publishing
-  "commit": true,                // Auto-commit version changes
-  "baseBranch": "main"           // Main branch for releases
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": true,
+  "fixed": [],
+  "linked": [],
+  "access": "restricted",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": []
 }
 ```
 
-**Note**: The root monorepo version (`turbo-bun`) is managed separately from the workspace packages.
+## 🚀 Custom Version Management
+
+The custom version management system provides automated workflow with intelligent changeset creation.
+
+### **Key Features**
+
+- **Automated Changeset Creation**: Uses Turbo's affected packages detection
+- **Smart Versioning**: Automatically creates changesets for changed packages
+- **Manual Override**: Developers can create changesets manually when needed
+- **CI/CD Integration**: Seamless integration with GitHub Actions
+- **Version Field Filtering**: Only versions packages that have version fields
+
+### **Available Scripts**
+
+```bash
+# Automated changeset creation
+bun run version:add-auto
+
+# Deployment analysis
+bun run version:deploy
+
+# Manual changeset creation
+bun run version:add
+
+# Generate changelog and commit
+bun run version:commit
+
+# CI integration
+bun run ci:attach-packages-to-deploy
 ```
 
-## 🚀 Quick Start
+### **Package.json Scripts**
+
+```json
+{
+  "scripts": {
+    "version:add-auto": "bun run scripts/version-add-auto.ts",
+    "version:deploy": "bun run scripts/version-deploy.ts",
+    "version:add": "bunx @changesets/cli add",
+    "version:commit": "bunx @changesets/cli version --commit",
+    "ci:attach-packages-to-deploy": "bun run scripts/ci-attach-packages-to-deploy.ts"
+  }
+}
+```
+
+### **Workflow**
+
+#### **Automated Changeset Creation**
+```bash
+# Automatically create changesets based on affected packages
+bun run version:add-auto
+```
+
+**What it does**:
+- Uses Turbo's affected packages detection
+- Filters to only packages with version fields
+- Intelligently creates/updates changesets based on:
+  - **Package changes**: Uses Turbo's affected packages detection
+  - **Existing changesets**: Respects manually created changesets
+  - **Smart versioning**: Adds patch bumps for changed packages
+
+#### **Deployment Analysis**
+```bash
+# Determine which packages need deployment after PR merge
+bun run version:deploy
+```
+
+**What it does**:
+- Analyzes version bump commits to identify changed packages
+- Filters to only packages with version fields
+- Outputs deployment information for CI/CD
+
+### **Quick Patch Release**
+
+```bash
+bun run version:add-auto  # Automatically detects changes and creates changesets
+bun run version:commit
+git push
+```
+
+## 📝 Standard Changesets Workflow
+
+The traditional Changesets workflow for manual version management.
 
 ### **Creating a Changeset**
 
@@ -65,29 +155,6 @@ bun run version-root
 # 3. Generate changelog
 # 4. Commit changes
 ```
-
-## 🔄 Workflow
-
-### **Daily Development Flow**
-
-1. **Make changes** to your codebase
-2. **Create changeset** when ready to version:
-   ```bash
-   bun run changeset
-   ```
-3. **Commit changeset** to your branch
-4. **Push to main** - triggers automated release PR
-5. **Review and merge** release PR to version the root
-
-### **Release Process**
-
-1. **Changes are pushed** to main branch
-2. **GitHub Action** checks for changesets
-3. **Release PR** is created automatically
-4. **Review changes** and merge PR
-5. **Version is bumped** and changelog updated
-
-## 📝 Commands
 
 ### **Available Scripts**
 
@@ -140,7 +207,29 @@ Add comprehensive DevContainer support and UI improvements
 - Update API with improved error handling
 ```
 
-## 🤖 GitHub Actions
+## 🔄 CI/CD Integration
+
+The version management system integrates seamlessly with GitHub Actions workflows:
+
+### **PR Workflow** (`.github/workflows/Check.yml`)
+
+The PR workflow consists of three separate jobs:
+
+1. **🔍 Validate** - Runs all validation checks (linting, testing, building)
+2. **🐳 Validate Docker Compose** - Tests production builds and services
+3. **📋 Version Management** - Runs only if both validation jobs succeed:
+   - **Analyzes changes** (`bun run version:add-auto`)
+   - **Generates changelog and commits** (`bun run version:commit`)
+   - **Pushes to PR branch** (`git push`)
+
+This ensures that version changes are only applied when ALL validation checks pass.
+
+### **Main Branch Workflow** (`.github/workflows/Main.yml`)
+
+After PR merge, the workflow:
+1. **Analyzes deployment needs** (`bun run version:deploy`)
+2. **Determines which packages to deploy**
+3. **Provides deployment information** for downstream processes
 
 ### **Automated Workflows**
 
@@ -154,13 +243,15 @@ Add comprehensive DevContainer support and UI improvements
 - **Action**: Versions root and commits changes
 - **File**: `.github/workflows/release.yml`
 
-### **Workflow Steps**
+### **Workflow Benefits**
 
-1. **Check for changesets** in the repository
-2. **Create release PR** if changesets found
-3. **Comment on PRs** without changesets
-4. **Version root** when PR is merged
-5. **Commit version changes** automatically
+- **Automated Versioning**: No manual changeset creation required
+- **Manual Override**: Developers can create changesets manually when needed
+- **Smart Detection**: Uses Turbo's affected packages detection
+- **Breaking Change Detection**: Automatically detects and handles breaking changes
+- **Deployment Tracking**: Know exactly what needs to be deployed
+- **PR Integration**: Version changes are part of the PR review process
+- **Flexible Workflow**: Supports both automated and manual approaches
 
 ## 📋 Best Practices
 
@@ -214,39 +305,28 @@ git commit -m "feat(dev): add DevContainer support
 - Add VS Code extensions support"
 ```
 
-## 🔧 Configuration
-
-### **Changeset Config**
-
-```json
-{
-  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-  "changelog": "@changesets/cli/changelog",
-  "commit": true,
-  "fixed": ["turbo-bun"],
-  "linked": [],
-  "access": "restricted",
-  "baseBranch": "main",
-  "updateInternalDependencies": "patch",
-  "ignore": []
-}
-```
-
-### **Package.json Scripts**
-
-```json
-{
-  "scripts": {
-    "changeset": "bunx --install=force --bun @changesets/cli changeset",
-    "version": "bunx --install=force --bun @changesets/cli version",
-    "version-root": "turbo run build lint test && bunx --install=force --bun @changesets/cli version"
-  }
-}
-```
-
 ## 🚨 Troubleshooting
 
 ### **Common Issues**
+
+#### **"No changeset files found"**
+```bash
+# Option 0: Create changesets manually (Optional)
+bun run version:add
+# Option 1: Run the analyze command to automatically create changesets
+bun run version:add-auto
+# Then run changesets version
+bun run version:commit
+```
+
+#### **"Changesets version failed"**
+```bash
+# Check if changesets are properly configured
+cat .changeset/config.json
+
+# Try running changesets manually
+bun run version:commit
+```
 
 #### **No Changesets Found**
 ```bash
@@ -271,6 +351,15 @@ bun run version
 # Verify changeset format is correct
 ```
 
+### **Manual Recovery**
+
+```bash
+# If something goes wrong, you can run the workflow manually
+bun run version:add-auto
+bun run version:commit
+git push
+```
+
 ### **Manual Version Bump**
 
 ```bash
@@ -284,6 +373,15 @@ git commit -m "chore(release): version bump"
 git push
 ```
 
+### **Changesets Commands**
+
+```bash
+# Manual changesets commands (if needed)
+bunx @changesets/cli add          # Create changeset interactively
+bunx @changesets/cli version      # Generate changelog and bump versions
+bunx @changesets/cli release      # Publish packages (if applicable)
+```
+
 ## 📚 Related Documentation
 
 - [Development Workflow](./3_DEV_FLOWS.md) - Daily development commands
@@ -293,4 +391,4 @@ git push
 
 ---
 
-**💡 Pro Tip**: Always create changesets for significant changes, even if they don't immediately affect the user-facing API. This helps maintain a comprehensive changelog and version history. 
+**💡 Pro Tip**: The integration with Changesets provides the best of both worlds - automated workflow with the power of manual control when needed. The `version:add-auto` command automatically creates changesets based on actual code changes, making versioning intelligent and automated while still allowing manual overrides when desired. 

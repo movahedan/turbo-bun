@@ -1,6 +1,5 @@
 {
 	"name": "@repo/test-preset",
-	"version": "0.0.1",
 	"private": true,
 	"type": "module",
 	"main": "./test-setup.ts",

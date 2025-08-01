@@ -12,8 +12,61 @@ on:
       - main
 
 jobs:
+  analyze-deployment:
+    name: 🔍 Analyze Deployment & Version Management
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+    outputs:
+      packages-to-deploy: ${{ steps.packages-to-deploy.outputs.packages-to-deploy }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.19
+
+      - name: 🗃️ Cache Bun dependencies
+        uses: actions/cache@v4
+        id: bun-cache
+        with:
+          path: |
+            ~/.bun/install/cache
+            **/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: 📦 Install dependencies
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        run: bun install -E --no-save
+
+      - name: 🔍 - Analyze deployment packages & version management
+        id: packages-to-deploy
+        run: bun run version:commit --attach-to-output packages-to-deploy
+
+      - name: 📋 - Generate changelog and bump versions
+        run: |
+          echo "::group::📋 Generating changelog and bumping versions"
+          bun run version:commit
+          echo "::endgroup::"
+
+      - name: 🚀 - Push version changes to main
+        run: |
+          echo "::group::🚀 Pushing version changes"
+          git push origin main
+          echo "::endgroup::"
+
   build-affected:
     name: Build Affected
+    needs: analyze-deployment
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +99,13 @@ jobs:
         run: |
           echo "::group::🏗️ Building Packages"
           bun run prod:build
+          echo "::endgroup::"
+
+      - name: 📋 - Display deployment info
+        run: |
+          echo "::group::📋 Deployment Summary"
+          echo "Packages to deploy: ${{ needs.analyze-deployment.outputs.packages-to-deploy }}"
+          echo "::endgroup::"
 
       # - name: 🐳 Login to Docker Registry
       #   uses: docker/login-action@v3
@@ -57,7 +117,7 @@ jobs:
       # - name: 🐳 Build and Push Docker Images
       #   run: |
       #     echo "::group::🐳 Building Docker Images"
-      #     for pkg in ${{ steps.changed.outputs.packages }}; do
+      #     for pkg in ${{ needs.analyze-deployment.outputs.packages }}; do
       #       if [ -f "$pkg/Dockerfile" ]; then
       #         echo "Building Docker image for $pkg..."
       #         docker build -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:${{ github.sha }} -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:latest $pkg
@@ -70,7 +130,7 @@ jobs:
       # - name: 🚀 Deploy to Environment
       #   run: |
       #     echo "::group::🚀 Deploying Packages"
-      #     for pkg in ${{ steps.changed.outputs.packages }}; do
+      #     for pkg in ${{ needs.analyze-deployment.outputs.apps }}; do
       #       if [ -f "$pkg/Dockerfile" ]; then
       #         echo "Deploying $pkg..."
       #         # Add your deployment commands here
