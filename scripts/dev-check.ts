@@ -3,8 +3,7 @@
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
 import chalk from "chalk";
-import { validators } from "./utils/arg-parser";
-import { createScript } from "./utils/create-scripts";
+import { createScript, validators } from "./utils/create-scripts";
 import {
 	parseCompose,
 	type ServiceHealth,

@@ -3,8 +3,11 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
-import { type ScriptConfig, validators } from "./utils/arg-parser";
-import { createScript } from "./utils/create-scripts";
+import {
+	createScript,
+	type ScriptConfig,
+	validators,
+} from "./utils/create-scripts";
 
 const updatePackageJsonConfig = {
 	name: "update-package-json",

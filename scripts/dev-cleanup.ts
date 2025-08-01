@@ -2,7 +2,7 @@
 
 import { $ } from "bun";
 import chalk from "chalk";
-import type { ScriptConfig } from "./utils/arg-parser";
+import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 
 const devCleanupConfig = {

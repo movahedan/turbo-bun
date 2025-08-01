@@ -11,8 +11,7 @@ Use the modular script development system for command-line tools with automatic 
 ```ts
 #!/usr/bin/env bun
 
-import { validators } from "./utils/arg-parser";
-import { createScript } from "./utils/create-scripts";
+import { createScript, validators } from "./utils/create-scripts";
 
 export const descriptiveNameForScript = createScript(
   // keep the config inline, it's better
@@ -84,7 +83,7 @@ async function main(args: any): Promise<void>
 ## Available Validators
 
 ```ts
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 
 // File exists
 validators.fileExists

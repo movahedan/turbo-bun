@@ -368,8 +368,7 @@ bun run devcontainer  # Automated DevContainer opening
 #### 2. Script Integration
 ```typescript
 // Integrate with existing script patterns
-import { createScript } from "./utils/create-scripts";
-import { validators } from "./utils/arg-parser";
+import { createScript, validators } from "./utils/create-scripts";
 ```
 
 #### 3. Command System Integration

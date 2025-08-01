@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
-import { validators } from "./utils/arg-parser";
-import { createScript } from "./utils/create-scripts";
+import { createScript, validators } from "./utils/create-scripts";
 
 const exampleScriptConfig = {
 	name: "Example Script",

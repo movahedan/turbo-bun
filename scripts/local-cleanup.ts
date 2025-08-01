@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
-import type { ScriptConfig } from "./utils/arg-parser";
+import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 import { getAllDirectories } from "./utils/get-all-directories";
 

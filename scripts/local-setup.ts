@@ -2,8 +2,7 @@
 
 import { $ } from "bun";
 import chalk from "chalk";
-import { validators } from "./utils/arg-parser";
-import { createScript } from "./utils/create-scripts";
+import { createScript, validators } from "./utils/create-scripts";
 
 const setupLocalConfig = {
 	name: "Local Development Setup",

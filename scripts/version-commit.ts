@@ -4,18 +4,9 @@ import { readFileSync } from "node:fs";
 import { $ } from "bun";
 import chalk from "chalk";
 import { getAffectedPackages } from "./affected";
+import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 import { readExistingChangesets } from "./version-add-auto";
-
-interface ChangesetEntry {
-	packages: Record<string, "patch" | "minor" | "major">;
-	summary: string;
-}
-
-interface ChangesetFile {
-	filename: string;
-	content: ChangesetEntry;
-}
 
 const versionCommitConfig = {
 	name: "Version Commit",
@@ -28,17 +19,17 @@ const versionCommitConfig = {
 			long: "--base-sha",
 			description: "The base SHA to use for affected package detection",
 			required: false,
-			default: "origin/main",
+			defaultValue: "origin/main",
 		},
 		{
 			short: "-a",
 			long: "--attach-to-output",
 			description: "Attach packages to deploy to the github job output",
 			required: false,
-			default: "",
+			defaultValue: "",
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 function filterPackagesToDeploy(packages: string[]): string[] {
 	return packages.filter((pkg) => {

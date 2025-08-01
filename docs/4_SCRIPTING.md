@@ -30,7 +30,7 @@ Our script system provides type-safe command-line tools with automatic argument 
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 
 const scriptConfig = {
@@ -90,7 +90,7 @@ Every script follows this pattern:
 #!/usr/bin/env bun
 
 // 1. Imports
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 
 // 2. Configuration
@@ -144,7 +144,7 @@ interface ArgOption {
 ### Built-in Validators
 
 ```typescript
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 
 // File validation
 validators.fileExists        // File must exist
@@ -269,7 +269,7 @@ if (import.meta.main) {
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 import { $ } from "bun";
 
@@ -322,7 +322,7 @@ if (import.meta.main) {
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./utils/arg-parser";
+import { validators } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 import { $ } from "bun";
 
