@@ -161,10 +161,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 
 		const optionKey = option.long.replace("--", "");
 		// Handle boolean flags (no value needed)
-		if (
-			option.validator === undefined ||
-			option.validator === validators.boolean
-		) {
+		if (option.validator === validators.boolean) {
 			const consideredTrue = isLastArg || nextArgIsOption;
 
 			const nextArgIsTrue =
@@ -197,7 +194,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		}
 
 		// Validate the value
-		const validation = option.validator(nextArg);
+		const validation = option.validator?.(nextArg) ?? true;
 		if (typeof validation === "string") {
 			throw new Error(`❌ Error: ${validation}`);
 		}

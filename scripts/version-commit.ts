@@ -26,8 +26,8 @@ const versionCommitConfig = {
 			defaultValue: "origin/main",
 		},
 		{
-			short: "-a",
-			long: "--attach-to-output",
+			short: "-o",
+			long: "--attach-to-output-id",
 			description: "Attach packages to deploy to the github job output",
 			required: false,
 			defaultValue: "",
@@ -57,6 +57,7 @@ export const versionCommit = createScript(
 		);
 
 		const baseSha = await getLastVersioningCommit();
+		const outputId = options["attach-to-output-id"];
 		xConsole.log(chalk.cyan(`📋 Using base SHA: ${baseSha}`));
 
 		await $`bun run version:add:auto --base-sha ${baseSha}`.text();
@@ -68,7 +69,7 @@ export const versionCommit = createScript(
 			xConsole.log(chalk.yellow("🔍 Dry run, skipping commit and push"));
 		} else {
 			// Run changesets version to generate changelog and bump versions
-			await $`bun run @changesets/cli version --commit`.text();
+			await $`bunx @changesets/cli version`.text();
 
 			// Get the new version and create a Git tag
 			const newVersion = await getLatestVersion();
@@ -89,11 +90,11 @@ export const versionCommit = createScript(
 		);
 
 		// Output for GitHub Actions
-		if (options["attach-to-output"]) {
-			const output = `packages-to-deploy<<EOF\n${JSON.stringify(packagesToDeploy)}\nEOF\n`;
+		if (outputId) {
+			const output = `${outputId}<<EOF\n${JSON.stringify(packagesToDeploy)}\nEOF\n`;
 			xConsole.log(
 				chalk.yellow(
-					`\n📱 Attached: ${options["attach-to-output"]}=${JSON.stringify(packagesToDeploy)}\n`,
+					`\n📱 Attached: ${outputId}=${JSON.stringify(packagesToDeploy)}\n`,
 				),
 			);
 

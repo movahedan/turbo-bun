@@ -48,7 +48,7 @@
 		"prod:build": "bun run prod:compose build",
 		"prod:health": "bun run prod:compose ps --format table",
 		"//version": "////////////////////////////////////////////////////////////////////////////////////////////////",
-		"version:add": "bun run @changesets/cli add",
+		"version:add": "bunx @changesets/cli add",
 		"version:add:auto": "bun run scripts/version-add-auto.ts",
 		"version:commit": "bun run scripts/version-commit.ts"
 	},

@@ -41,7 +41,7 @@ jobs:
 
       - name: 🔍 - Generate changelog and bump versions
         id: packages-to-deploy
-        run: bun run version:commit --attach-to-output packages-to-deploy
+        run: bun run version:commit --attach-to-output-id packages-to-deploy
 
       - name: 📋 - Display deployment info
         run: |
