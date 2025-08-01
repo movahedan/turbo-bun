@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { $ } from "bun";
 import chalk from "chalk";
 import { getAffectedPackages } from "./affected";
@@ -14,6 +14,35 @@ interface ChangesetEntry {
 interface ChangesetFile {
 	filename: string;
 	content: ChangesetEntry;
+}
+
+/**
+ * Determines which packages should be ignored based on their package.json configuration
+ * Packages are ignored if they are private and don't have a version field
+ */
+function getPackagesToIgnore(affectedPackages: string[]): string[] {
+	const packagesToIgnore: string[] = [];
+
+	for (const pkg of affectedPackages) {
+		try {
+			const packageJsonPath = pkg.startsWith("@repo/")
+				? `packages/${pkg.replace("@repo/", "")}/package.json`
+				: `apps/${pkg}/package.json`;
+
+			if (!existsSync(packageJsonPath)) {
+				continue;
+			}
+
+			const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+
+			// Ignore packages that are private and don't have a version field
+			if (packageJson.private === true && !packageJson.version) {
+				packagesToIgnore.push(pkg);
+			}
+		} catch {}
+	}
+
+	return packagesToIgnore;
 }
 
 const versionAddAutoConfig = {
@@ -114,27 +143,34 @@ export const versionAddAuto = createScript(
 			),
 		);
 
-		// Filter to only packages that have version fields
-		const packagesWithVersions = affectedPackages.filter((pkg) => {
-			try {
-				const packageJsonPath = pkg.startsWith("@repo/")
-					? `packages/${pkg.replace("@repo/", "")}/package.json`
-					: `apps/${pkg}/package.json`;
-				const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-				return packageJson.version !== undefined;
-			} catch {
-				return false;
-			}
-		});
+		// Determine which packages should be ignored
+		const packagesToIgnore = getPackagesToIgnore(affectedPackages);
+		if (packagesToIgnore.length > 0) {
+			xConsole.log(
+				chalk.yellow(
+					`🚫 Auto-ignoring ${packagesToIgnore.length} packages: ${packagesToIgnore.join(", ")}`,
+				),
+			);
+		}
 
+		// Filter to only packages that should be versioned
+		const packagesToVersion = affectedPackages.filter(
+			(pkg) => !packagesToIgnore.includes(pkg),
+		);
 		xConsole.log(
 			chalk.blue(
-				`📦 Found ${packagesWithVersions.length} versioned packages: ${packagesWithVersions.join(", ")}`,
+				`📦 Found ${packagesToVersion.length} packages to version: ${packagesToVersion.join(", ")}`,
 			),
 		);
 
-		if (packagesWithVersions.length === 0) {
-			xConsole.log(chalk.yellow("⚠️  No versioned package changes detected"));
+		xConsole.log(
+			chalk.blue(
+				`📦 Found ${packagesToVersion.length} packages to version: ${packagesToVersion.join(", ")}`,
+			),
+		);
+
+		if (packagesToVersion.length === 0) {
+			xConsole.log(chalk.yellow("⚠️  No packages to version detected"));
 			return;
 		}
 
@@ -147,7 +183,7 @@ export const versionAddAuto = createScript(
 		// Determine what needs to be added
 		const packagesToAdd: Record<string, "patch" | "minor" | "major"> = {};
 
-		for (const pkg of packagesWithVersions) {
+		for (const pkg of packagesToVersion) {
 			// Check if package already has a changeset
 			let hasChangeset = false;
 			for (const changeset of existingChangesets) {

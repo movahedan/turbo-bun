@@ -1,0 +1,14 @@
+{
+	"name": "@repo/typescript-config",
+	"private": true,
+	"exports": {
+		"./base.json": "./base.json",
+		"./vite.json": "./vite.json",
+		"./nextjs.json": "./nextjs.json",
+		"./react-library.json": "./react-library.json"
+	},
+	"peerDependencies": {
+		"typescript": "5.8.3",
+		"bun-types": "1.2.19"
+	}
+}

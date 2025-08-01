@@ -71,13 +71,6 @@
         "@types/react-dom": "19.1.7",
       },
     },
-    "packages/config-typescript": {
-      "name": "@repo/typescript-config",
-      "peerDependencies": {
-        "bun-types": "1.2.19",
-        "typescript": "5.8.3",
-      },
-    },
     "packages/logger": {
       "name": "@repo/logger",
       "devDependencies": {
@@ -96,6 +89,13 @@
       },
       "peerDependencies": {
         "chalk": "5.4.1",
+      },
+    },
+    "packages/typescript-config": {
+      "name": "@repo/typescript-config",
+      "peerDependencies": {
+        "bun-types": "1.2.19",
+        "typescript": "5.8.3",
       },
     },
     "packages/ui": {
@@ -440,7 +440,7 @@
 
     "@repo/test-preset": ["@repo/test-preset@workspace:packages/test-preset"],
 
-    "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/config-typescript"],
+    "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/typescript-config"],
 
     "@repo/ui": ["@repo/ui@workspace:packages/ui"],
 

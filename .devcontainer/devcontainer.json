@@ -95,7 +95,7 @@
 					"@repo/ui",
 					"@repo/logger",
 					"@repo/utils",
-					"@repo/config-typescript",
+					"@repo/typescript-config",
 					"@repo/test-preset"
 				],
 				"typescript.preferences.useAliasesForRenames": false,
