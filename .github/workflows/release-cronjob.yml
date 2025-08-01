@@ -1,0 +1,201 @@
+name: Release Cronjob
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-for-release:
+    name: Check for Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🚀 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.19
+
+      - name: 📦 Install dependencies
+        run: bun install -E --no-save
+
+      - name: 🔍 Get last release info
+        id: last-release
+        run: |
+          echo "::group::🔍 Getting Last Release Info"
+          
+          # Get the last tag
+          if git tag --sort=-version:refname | head -1; then
+            LAST_TAG=$(git tag --sort=-version:refname | head -1)
+            echo "📦 Last tag: $LAST_TAG"
+            echo "last-tag=$LAST_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "📦 No tags found, using initial commit"
+            echo "last-tag=initial" >> $GITHUB_OUTPUT
+          fi
+          
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "📦 Current version: $CURRENT_VERSION"
+          echo "current-version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          echo "::endgroup::"
+
+      - name: 📊 Analyze commit activity
+        id: commit-analysis
+        run: |
+          echo "::group::📊 Analyzing Commit Activity"
+          
+          if [ "${{ steps.last-release.outputs.last-tag }}" = "initial" ]; then
+            # No tags, analyze all commits
+            COMMIT_COUNT=$(git rev-list --count HEAD)
+            COMMIT_MESSAGES=$(git log --oneline --format="%s" | head -20)
+          else
+            # Analyze commits since last tag
+            COMMIT_COUNT=$(git rev-list --count ${{ steps.last-release.outputs.last-tag }}..HEAD)
+            COMMIT_MESSAGES=$(git log --oneline --format="%s" ${{ steps.last-release.outputs.last-tag }}..HEAD | head -20)
+          fi
+          
+          echo "📊 Commit count since last release: $COMMIT_COUNT"
+          echo "commit-count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+          
+          echo "📝 Recent commit messages:"
+          echo "$COMMIT_MESSAGES"
+          
+          # Analyze commit types
+          FEAT_COUNT=$(echo "$COMMIT_MESSAGES" | grep -c "feat:" || echo "0")
+          FIX_COUNT=$(echo "$COMMIT_MESSAGES" | grep -c "fix:" || echo "0")
+          BREAKING_COUNT=$(echo "$COMMIT_MESSAGES" | grep -c "BREAKING CHANGE" || echo "0")
+          
+          echo "🔧 Features: $FEAT_COUNT"
+          echo "🐛 Fixes: $FIX_COUNT"
+          echo "💥 Breaking changes: $BREAKING_COUNT"
+          
+          echo "feat-count=$FEAT_COUNT" >> $GITHUB_OUTPUT
+          echo "fix-count=$FIX_COUNT" >> $GITHUB_OUTPUT
+          echo "breaking-count=$BREAKING_COUNT" >> $GITHUB_OUTPUT
+          
+          echo "::endgroup::"
+
+      - name: 🎯 Determine release recommendation
+        id: release-recommendation
+        run: |
+          echo "::group::🎯 Release Recommendation"
+          
+          COMMIT_COUNT=${{ steps.commit-analysis.outputs.commit-count }}
+          FEAT_COUNT=${{ steps.commit-analysis.outputs.feat-count }}
+          FIX_COUNT=${{ steps.commit-analysis.outputs.fix-count }}
+          BREAKING_COUNT=${{ steps.commit-analysis.outputs.breaking-count }}
+          
+          # Determine if release is recommended
+          RELEASE_RECOMMENDED=false
+          RELEASE_TYPE="none"
+          
+          if [ "$BREAKING_COUNT" -gt 0 ]; then
+            RELEASE_RECOMMENDED=true
+            RELEASE_TYPE="major"
+            echo "💥 Breaking changes detected - MAJOR release recommended"
+          elif [ "$FEAT_COUNT" -gt 2 ] || [ "$COMMIT_COUNT" -gt 10 ]; then
+            RELEASE_RECOMMENDED=true
+            RELEASE_TYPE="minor"
+            echo "✨ Significant features or activity - MINOR release recommended"
+          elif [ "$FIX_COUNT" -gt 3 ] || [ "$COMMIT_COUNT" -gt 5 ]; then
+            RELEASE_RECOMMENDED=true
+            RELEASE_TYPE="patch"
+            echo "🔧 Bug fixes or moderate activity - PATCH release recommended"
+          else
+            echo "📊 Insufficient activity for release recommendation"
+          fi
+          
+          echo "release-recommended=$RELEASE_RECOMMENDED" >> $GITHUB_OUTPUT
+          echo "release-type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          
+          echo "::endgroup::"
+
+      - name: 📋 Create release issue
+        if: steps.release-recommendation.outputs.release-recommended == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['release', 'automated']
+            });
+            
+            // Check if we already have a recent release issue
+            const recentIssue = issues.find(issue => 
+              issue.title.includes('Weekly Release Check') &&
+              new Date(issue.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+            );
+            
+            if (recentIssue) {
+              console.log('📋 Release issue already exists:', recentIssue.html_url);
+              return;
+            }
+            
+            const commitCount = '${{ steps.commit-analysis.outputs.commit-count }}';
+            const featCount = '${{ steps.commit-analysis.outputs.feat-count }}';
+            const fixCount = '${{ steps.commit-analysis.outputs.fix-count }}';
+            const breakingCount = '${{ steps.commit-analysis.outputs.breaking-count }}';
+            const releaseType = '${{ steps.release-recommendation.outputs.release-type }}';
+            const currentVersion = '${{ steps.last-release.outputs.current-version }}';
+            
+            const body = [
+              '## 📊 Weekly Release Analysis',
+              '',
+              `**Release Type Recommended:** \`${releaseType.toUpperCase()}\``,
+              '',
+              '### 📈 Activity Summary',
+              `- **Total Commits:** ${commitCount}`,
+              `- **Features:** ${featCount}`,
+              `- **Bug Fixes:** ${fixCount}`,
+              `- **Breaking Changes:** ${breakingCount}`,
+              '',
+              '### 🎯 Recommendation',
+              `Based on the commit activity since the last release, a **${releaseType}** release is recommended.`,
+              '',
+              '### 🚀 Next Steps',
+              '1. Run `bun run version:init` to start the release process',
+              `2. Run \`bun run version:add --${releaseType}\` to generate changelog`,
+              '3. Review the generated CHANGELOG.md',
+              '4. Run `bun run version:commit` to bump version',
+              '5. Run `bun run version:push` to push release branch',
+              '',
+              '### 📋 Current Version',
+              `\`${currentVersion}\``,
+              '',
+              '---',
+              '*This issue was automatically generated by the weekly release cronjob.*'
+            ].join('\n');
+
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📦 Weekly Release Check - ${new Date().toISOString().split('T')[0]}`,
+              body: body,
+              labels: ['release', 'automated', 'weekly-check']
+            });
+            
+            console.log('📋 Created release issue:', issue.data.html_url);
+
+      - name: ✅ Summary
+        run: |
+          echo "::group::✅ Weekly Release Check Summary"
+          
+          if [ "${{ steps.release-recommendation.outputs.release-recommended }}" = "true" ]; then
+            echo "🎯 Release recommended: ${{ steps.release-recommendation.outputs.release-type }}"
+            echo "📊 Activity: ${{ steps.commit-analysis.outputs.commit-count }} commits"
+            echo "📋 Issue created for review"
+          else
+            echo "📊 No release recommended this week"
+            echo "📈 Activity: ${{ steps.commit-analysis.outputs.commit-count }} commits"
+          fi
+          
+          echo "::endgroup::" 

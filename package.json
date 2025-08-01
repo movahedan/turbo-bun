@@ -47,7 +47,15 @@
 		"prod:build": "bun run prod:compose build",
 		"prod:health": "bun run prod:compose ps --format table",
 		"//changesets": "////////////////////////////////////////////////////////////////////////////////////////////////",
-		"changesets": "bunx --install=force --bun @changesets/cli"
+		"changesets": "bunx --bun @changesets/cli",
+		"changeset": "bunx --bun @changesets/cli changeset",
+		"version": "bunx --bun @changesets/cli version",
+		"version-root": "turbo run build lint test && bunx --bun @changesets/cli version",
+		"//version": "////////////////////////////////////////////////////////////////////////////////////////////////",
+		"version:init": "bun run scripts/version.ts init",
+		"version:add": "bun run scripts/version.ts add",
+		"version:commit": "bun run scripts/version.ts commit",
+		"version:push": "bun run scripts/version.ts push"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
@@ -73,9 +81,9 @@
 	"description": "A monorepo for Turbo and Bun",
 	"author": "Soheil Movahedan",
 	"license": "MIT",
-	"private": false,
+	"private": true,
 	"publishConfig": {
-		"access": "public"
+		"access": "restricted"
 	},
 	"repository": {
 		"type": "git",
