@@ -9,6 +9,7 @@
 	"packageManager": "bun@1.2.19",
 	"scripts": {
 		"//local": "/////////////////////////////////////////////////////////////////////////////////////////////////////",
+		"postinstall": "bun run scripts/local-vscode.ts",
 		"local:setup": "bun run scripts/local-setup.ts",
 		"local:vscode": "bun run scripts/local-vscode.ts",
 		"local:cleanup": "bun run scripts/local-cleanup.ts",
@@ -47,10 +48,9 @@
 		"prod:build": "bun run prod:compose build",
 		"prod:health": "bun run prod:compose ps --format table",
 		"//version": "////////////////////////////////////////////////////////////////////////////////////////////////",
-		"version:init": "bun run scripts/version-init.ts",
-		"version:add": "bun run scripts/version-add.ts",
-		"version:commit": "bun run scripts/version-commit.ts",
-		"version:push": "bun run scripts/version-push.ts"
+		"version:add": "bun run @changesets/cli add",
+		"version:add:auto": "bun run scripts/version-add-auto.ts",
+		"version:commit": "bun run scripts/version-commit.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",

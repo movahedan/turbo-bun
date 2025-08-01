@@ -12,9 +12,11 @@ import { getAllDirectories } from "./utils/get-all-directories";
 		...
   }
 */
-export async function getAffectedPackages(): Promise<string[]> {
+export async function getAffectedPackages(
+	baseSha = "origin/main",
+): Promise<string[]> {
 	const affectedPackages =
-		await $`turbo run build --filter="...[origin/main]" --dry-run=json`
+		await $`turbo run build --filter="...[${baseSha}]" --dry-run=json`
 			.quiet()
 			.json();
 

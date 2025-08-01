@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🚀 Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -62,6 +63,7 @@ jobs:
 
       - name: 🏗️ - Build
         run: bun run build --affected
+
 
   validate-docker-compose:
     name: 🐳 Validate Docker Compose
@@ -163,4 +165,3 @@ jobs:
           docker system prune -f || true
           echo "✅ Cleanup completed"
           echo "::endgroup::"
-

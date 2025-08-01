@@ -1,11 +1,6 @@
 {
 	"name": "@repo/typescript-config",
-	"version": "0.0.1",
 	"private": true,
-	"license": "MIT",
-	"publishConfig": {
-		"access": "public"
-	},
 	"peerDependencies": {
 		"typescript": "5.8.3",
 		"bun-types": "1.2.19"
