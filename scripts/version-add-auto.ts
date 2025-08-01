@@ -18,7 +18,8 @@ interface ChangesetFile {
 
 /**
  * Determines which packages should be ignored based on their package.json configuration
- * Packages are ignored if they are private and don't have a version field
+ * Only ignore utility packages that are private and don't have a version field
+ * Main applications should still be versioned even if they depend on ignored utilities
  */
 function getPackagesToIgnore(affectedPackages: string[]): string[] {
 	const packagesToIgnore: string[] = [];
@@ -35,8 +36,13 @@ function getPackagesToIgnore(affectedPackages: string[]): string[] {
 
 			const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
 
-			// Ignore packages that are private and don't have a version field
-			if (packageJson.private === true && !packageJson.version) {
+			// Only ignore utility packages (in packages/) that are private and don't have a version field
+			// Main applications (in apps/) should always be versioned
+			if (
+				pkg.startsWith("@repo/") &&
+				packageJson.private === true &&
+				!packageJson.version
+			) {
 				packagesToIgnore.push(pkg);
 			}
 		} catch {}
