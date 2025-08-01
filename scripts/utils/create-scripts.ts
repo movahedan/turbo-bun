@@ -139,6 +139,14 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		const isLastArg = !nextArg;
 		const nextArgIsOption = !!nextArg && nextArg.startsWith("-");
 
+		// Set default values for options that are not required
+		config.options.forEach((option) => {
+			const key = option.long.replace("--", "");
+			if (!option.required && !result[key]) {
+				result[key] = option.defaultValue as InferArgValue<typeof option>;
+			}
+		});
+
 		// Handle help
 		if (arg === "-h" || arg === "--help") {
 			showHelp(config);
@@ -151,6 +159,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			throw new Error(`❌ Error: Unknown option "${arg}". Use -h for help.`);
 		}
 
+		const optionKey = option.long.replace("--", "");
 		// Handle boolean flags (no value needed)
 		if (
 			option.validator === undefined ||
@@ -171,8 +180,11 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 				);
 			}
 
-			result[option.long.replace("--", "")] =
-				consideredTrue || nextArgIsTrue || !nextArgIsFalse;
+			result[optionKey] = consideredTrue || nextArgIsTrue || !nextArgIsFalse;
+
+			if (nextArgIsTrue || nextArgIsFalse) {
+				i++;
+			}
 
 			continue;
 		}
@@ -196,12 +208,11 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		}
 
 		// Handle multiple values for the same option
-		const key = option.long.replace("--", "");
 		if (!option.multiple) {
-			result[key] = nextArg;
+			result[optionKey] = nextArg;
 		} else {
-			result[key] = (result[key] || []) as string[];
-			result[key];
+			result[optionKey] = (result[optionKey] || []) as string[];
+			result[optionKey];
 		}
 
 		i++; // Skip next argument since we consumed it
@@ -213,14 +224,6 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			throw new Error(
 				`❌ Error: ${option.short}/${option.long} is required. Use -h for help.`,
 			);
-		}
-	});
-
-	// Set default values for options that are not required
-	config.options.forEach((option) => {
-		const key = option.long.replace("--", "");
-		if (!option.required && !result[key]) {
-			result[key] = option.defaultValue as InferArgValue<typeof option>;
 		}
 	});
 

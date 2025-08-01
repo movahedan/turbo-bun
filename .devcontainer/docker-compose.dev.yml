@@ -99,7 +99,6 @@ services:
     environment:
       PORT: "3001"
       HOST: "0.0.0.0"
-      NODE_ENV: "development"
     command: bun run dev --filter=admin -- --host 0.0.0.0 --port 3001
     profiles: ["admin", "all"]
     healthcheck:

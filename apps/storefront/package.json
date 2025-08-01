@@ -7,8 +7,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"check:types": "tsc --noEmit",
-		"start": "next start",
-		"postinstall": "bun scripts/install-swc-binary.ts"
+		"start": "next start"
 	},
 	"dependencies": {
 		"@repo/logger": "workspace:*",

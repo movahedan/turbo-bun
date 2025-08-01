@@ -87,3 +87,79 @@ export async function getAllPackages(): Promise<PackageJson[]> {
 
 	return packages;
 }
+
+// Git tag-based version tracking functions
+const VERSION_TAG_PREFIX = "v";
+
+/**
+ * Get the last versioning commit SHA using Git tags
+ * Uses the latest version tag to find the commit SHA
+ * If no version tags exist, returns the initial commit SHA
+ */
+export async function getLastVersioningCommit(): Promise<string> {
+	try {
+		// Get all version tags (v*)
+		const tags =
+			await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`.text();
+		const tagList = tags.split("\n").filter(Boolean);
+
+		if (tagList.length === 0) {
+			// No version tags found, return the initial commit SHA
+			const initialCommit = await $`git rev-list --max-parents=0 HEAD`.text();
+			return initialCommit.trim();
+		}
+
+		// Get the latest version tag
+		const latestTag = tagList[0];
+
+		// Get the commit SHA that this tag points to
+		// Using git rev-list -n 1 as recommended in Stack Overflow
+		const commitSha = await $`git rev-list -n 1 ${latestTag}`.text();
+
+		return commitSha.trim();
+	} catch {
+		// Fallback to initial commit if anything goes wrong
+		const initialCommit = await $`git rev-list --max-parents=0 HEAD`.text();
+		return initialCommit.trim();
+	}
+}
+
+/**
+ * Create a version tag for the current commit
+ */
+export async function createVersionTag(version: string): Promise<void> {
+	const tagName = `${VERSION_TAG_PREFIX}${version}`;
+
+	// Check if tag already exists
+	const existingTag = await $`git tag --list "${tagName}"`.text();
+	if (existingTag.trim()) {
+		throw new Error(`Tag ${tagName} already exists`);
+	}
+
+	// Create annotated tag
+	await $`git tag -a ${tagName} -m "Release version ${version}"`.text();
+
+	// Push the tag
+	await $`git push origin ${tagName}`.text();
+}
+
+/**
+ * Get the latest version from Git tags
+ */
+export async function getLatestVersion(): Promise<string | null> {
+	try {
+		const tags =
+			await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`.text();
+		const tagList = tags.split("\n").filter(Boolean);
+
+		if (tagList.length === 0) {
+			return null;
+		}
+
+		// Extract version from tag (remove v prefix)
+		const latestTag = tagList[0];
+		return latestTag.replace(VERSION_TAG_PREFIX, "");
+	} catch {
+		return null;
+	}
+}

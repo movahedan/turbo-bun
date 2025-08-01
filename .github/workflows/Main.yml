@@ -12,15 +12,15 @@ on:
       - main
 
 jobs:
-  analyze-deployment:
-    name: 🔍 Analyze Deployment & Version Management
+  get-affected:
+    name: 🔍 Get affected from last sha
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
     outputs:
-      packages-to-deploy: ${{ steps.packages-to-deploy.outputs.packages-to-deploy }}
+      affected-services: ${{ steps.affected-services.outputs.affected-services }}
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -48,25 +48,16 @@ jobs:
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: bun install -E --no-save
 
-      - name: 🔍 - Analyze deployment packages & version management
-        id: packages-to-deploy
-        run: bun run version:commit --attach-to-output packages-to-deploy
-
-      - name: 📋 - Generate changelog and bump versions
+      - name: 🔍 - Get affected services
+        id: affected-services
         run: |
-          echo "::group::📋 Generating changelog and bumping versions"
-          bun run version:commit
-          echo "::endgroup::"
-
-      - name: 🚀 - Push version changes to main
-        run: |
-          echo "::group::🚀 Pushing version changes"
-          git push origin main
+          echo "::group::🔍 Getting affected services"
+          bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
           echo "::endgroup::"
 
   build-affected:
     name: Build Affected
-    needs: analyze-deployment
+    needs: get-affected
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
@@ -98,13 +89,13 @@ jobs:
       - name: 🏗️ Build Packages
         run: |
           echo "::group::🏗️ Building Packages"
-          bun run prod:build
+          bun run prod:build ${{ needs.get-affected.outputs.affected-services }}
           echo "::endgroup::"
 
       - name: 📋 - Display deployment info
         run: |
           echo "::group::📋 Deployment Summary"
-          echo "Packages to deploy: ${{ needs.analyze-deployment.outputs.packages-to-deploy }}"
+          echo "Packages to deploy: ${{ needs.get-affected.outputs.affected-services }}"
           echo "::endgroup::"
 
       # - name: 🐳 Login to Docker Registry
@@ -117,7 +108,7 @@ jobs:
       # - name: 🐳 Build and Push Docker Images
       #   run: |
       #     echo "::group::🐳 Building Docker Images"
-      #     for pkg in ${{ needs.analyze-deployment.outputs.packages }}; do
+      #     for pkg in ${{ needs.get-affected.outputs.affected-services }}; do
       #       if [ -f "$pkg/Dockerfile" ]; then
       #         echo "Building Docker image for $pkg..."
       #         docker build -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:${{ github.sha }} -t ${{ secrets.DOCKER_REGISTRY }}/$pkg:latest $pkg
@@ -130,7 +121,7 @@ jobs:
       # - name: 🚀 Deploy to Environment
       #   run: |
       #     echo "::group::🚀 Deploying Packages"
-      #     for pkg in ${{ needs.analyze-deployment.outputs.apps }}; do
+      #     for pkg in ${{ needs.get-affected.outputs.apps }}; do
       #       if [ -f "$pkg/Dockerfile" ]; then
       #         echo "Deploying $pkg..."
       #         # Add your deployment commands here

@@ -2,7 +2,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { $ } from "bun";
-import { createScript } from "./utils/create-scripts";
+import { createScript, type ScriptConfig } from "./utils/create-scripts";
 import { getAllDirectories } from "./utils/get-all-directories";
 
 const syncVscodeConfigScriptConfig = {
@@ -17,7 +17,7 @@ const syncVscodeConfigScriptConfig = {
 		"bun run local:vscode --settings-only",
 	],
 	options: [],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const syncVscodeConfigScript = createScript(
 	syncVscodeConfigScriptConfig,

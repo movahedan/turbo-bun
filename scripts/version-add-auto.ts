@@ -107,9 +107,7 @@ export const versionAddAuto = createScript(
 			chalk.blue("🔍 Analyzing changes for automated changeset creation..."),
 		);
 
-		// Get affected packages using existing Turbo infrastructure
-		const baseSha = (options["base-sha"] as string) || "origin/main";
-		const affectedPackages = await getAffectedPackages(baseSha);
+		const affectedPackages = await getAffectedPackages(options["base-sha"]);
 		xConsole.log(
 			chalk.blue(
 				`📦 Found ${affectedPackages.length} affected packages: ${affectedPackages.join(", ")}`,

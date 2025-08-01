@@ -44,7 +44,6 @@ jobs:
       - name: 📦 Install dependencies
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: bun install
-          
 
       - name: 🔍 - Check branch name
         run: bun run scripts/ci-branchname.ts
@@ -52,17 +51,24 @@ jobs:
       - name: ✨ - Biome check
         run: bun run check .
 
+      - name: 🔍 - Get affected packages
+        id: affected-packages
+        run: |
+          echo "::group::🔍 Getting affected packages"
+          bun run scripts/ci-attach-affected.ts --mode turbo --output-id affected-packages
+          echo "::endgroup::"
+
       - name: 🏗️ - Build packages
-        run: bun run build --filter=@repo/*
+        run: bun run build ${{ steps.affected-packages.outputs.affected-packages }}
 
       - name: 🔍 - Type check
-        run: bun run check:types --affected
+        run: bun run check:types ${{ steps.affected-packages.outputs.affected-packages }}
 
       - name: 🧪 - Test
-        run: bun run test --affected
+        run: bun test ${{ steps.affected-packages.outputs.affected-packages }}
 
       - name: 🏗️ - Build
-        run: bun run build --affected
+        run: bun run build ${{ steps.affected-packages.outputs.affected-packages }}
 
 
   validate-docker-compose:
@@ -98,14 +104,15 @@ jobs:
       - name: 🐳 Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔍 - Attach affected to github output
-        id: affected  
+      - name: 🔍 - Get affected services
+        id: affected-services
         run: |
-          echo "::group::🔍 Getting affected packages"
-          bun run scripts/ci-attach-affected.ts
+          echo "::group::🔍 Getting affected services"
+          bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
           echo "::endgroup::"
 
       - name: 🔍 - Attach service ports to github output
+        if: steps.affected-services.outputs.affected-services != ''
         id: ports
         run: |
           echo "::group::🔍 Getting service ports"
@@ -113,27 +120,38 @@ jobs:
           echo "::endgroup::"
 
       - name: 🏗️ Test Production Build
+        if: steps.affected-services.outputs.affected-services != ''
         run: |
           echo "::group::🏗️ Testing Production Build"
 
+          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
+            echo "No affected services to test"
+            exit 0
+          fi
+
           # Build production images without cache to test build process
-          bun run prod:compose build ${{ steps.affected.outputs.packages }} --no-cache --parallel
+          bun run prod:compose build ${{ steps.affected-services.outputs.affected-services }} --no-cache --parallel
+          if [ $? -ne 0 ]; then
+            echo "❌ Production builds failed"
+            exit 1
+          fi
           
           echo "✅ Production builds completed successfully"
           echo "::endgroup::"
 
       - name: 🧪 Test Production Services
+        if: steps.affected-services.outputs.affected-services != ''
         run: |
           echo "::group::🧪 Testing Production Services"
           
           # Check if we have any affected packages
-          if [ -z "${{ steps.affected.outputs.packages }}" ]; then
+          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
             echo "No affected packages to test"
             exit 0
           fi
           
           # Start services in background
-          bun run prod:compose up ${{ steps.affected.outputs.packages }} -d
+          bun run prod:compose up ${{ steps.affected-services.outputs.affected-services }} -d
           
           # Wait for services to start
           sleep 30
@@ -142,7 +160,7 @@ jobs:
           bun run prod:compose ps
           
           # Test service health (basic connectivity)
-          for service in ${{ steps.affected.outputs.packages }}; do
+          for service in ${{ steps.affected-services.outputs.affected-services }}; do
             echo "Testing $service..."
             
             # Get port from the ports output - use proper jq syntax with quotes
@@ -158,10 +176,15 @@ jobs:
           done
 
       - name: 🧹 Cleanup
-        if: always()
+        if: always() && steps.affected-services.outputs.affected-services != ''
         run: |
           echo "::group::🧹 Cleaning up Docker resources"
-          bun run prod:compose down ${{ steps.affected.outputs.packages }} --remove-orphans || true
+          if [ -z "${{ steps.affected-services.outputs.affected-services }}" ]; then
+            echo "No affected services to clean up"
+            exit 0
+          fi
+
+          bun run prod:compose down ${{ steps.affected-services.outputs.affected-services }} --remove-orphans || true
           docker system prune -f || true
           echo "✅ Cleanup completed"
           echo "::endgroup::"

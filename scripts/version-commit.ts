@@ -6,7 +6,11 @@ import chalk from "chalk";
 import { getAffectedPackages } from "./affected";
 import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
-import { readExistingChangesets } from "./version-add-auto";
+import {
+	createVersionTag,
+	getLastVersioningCommit,
+	getLatestVersion,
+} from "./utils/version-utils";
 
 const versionCommitConfig = {
 	name: "Version Commit",
@@ -45,73 +49,34 @@ function filterPackagesToDeploy(packages: string[]): string[] {
 	});
 }
 
-async function getPackagesToDeploy(
-	xConsole: typeof console,
-): Promise<string[]> {
-	try {
-		const changesetFiles = await readExistingChangesets(xConsole);
-		const bumpedPackages: string[] = [];
-
-		for (const changeset of changesetFiles) {
-			for (const pkg of Object.keys(changeset.content.packages)) {
-				if (!bumpedPackages.includes(pkg)) {
-					bumpedPackages.push(pkg);
-				}
-			}
-		}
-
-		return filterPackagesToDeploy(bumpedPackages);
-	} catch (error) {
-		xConsole.warn("Error analyzing deployment packages:", error);
-	}
-
-	// Fallback to affected packages, filtered to only versioned packages
-	return filterPackagesToDeploy(await getAffectedPackages());
-}
-
-async function getBaseSha(xConsole: typeof console): Promise<string> {
-	// Get the current commit SHA
-	const currentSha = await $`git rev-parse HEAD`.text();
-	xConsole.log(`Current SHA: ${currentSha.trim()}`);
-
-	// Check if this is a merge commit (has 2 parents)
-	const parentCount =
-		await $`git rev-list --count ${currentSha.trim()}^@`.text();
-	const isMergeCommit = Number.parseInt(parentCount.trim()) === 2;
-
-	let baseSha: string;
-
-	if (isMergeCommit) {
-		xConsole.log("🔍 This is a merge commit, finding base SHA...");
-
-		// For merge commits, we want the previous head of main before the merge
-		// This is the first parent of the merge commit
-		const firstParent = await $`git rev-parse ${currentSha.trim()}^1`.text();
-		xConsole.log(`First parent (base): ${firstParent.trim()}`);
-
-		baseSha = firstParent.trim();
-	} else {
-		xConsole.log("📋 This is a regular commit, using origin/main as base");
-		baseSha = "origin/main";
-	}
-
-	xConsole.log(`Base SHA: ${baseSha}`);
-	return baseSha;
-}
-
 export const versionCommit = createScript(
 	versionCommitConfig,
 	async function main(options, xConsole) {
-		xConsole.info(chalk.blue("🚀 Analyzing deployment packages..."));
+		xConsole.info(
+			chalk.blue("🚀 Analyzing deployment packages for production..."),
+		);
 
-		const baseSha = await getBaseSha(xConsole);
+		const baseSha = await getLastVersioningCommit();
+		xConsole.log(chalk.cyan(`📋 Using base SHA: ${baseSha}`));
+
 		await $`bun run version:add:auto --base-sha ${baseSha}`.text();
-		const packagesToDeploy = await getPackagesToDeploy(xConsole);
+		const packagesToDeploy = filterPackagesToDeploy(
+			await getAffectedPackages(baseSha),
+		);
 
 		if (options["dry-run"]) {
 			xConsole.log(chalk.yellow("🔍 Dry run, skipping commit and push"));
 		} else {
+			// Run changesets version to generate changelog and bump versions
 			await $`bun run @changesets/cli version --commit`.text();
+
+			// Get the new version and create a Git tag
+			const newVersion = await getLatestVersion();
+			if (newVersion) {
+				await createVersionTag(newVersion);
+				xConsole.log(chalk.green(`🏷️  Created version tag: v${newVersion}`));
+			}
+
 			await $`git push origin main`.text();
 		}
 
@@ -127,21 +92,14 @@ export const versionCommit = createScript(
 		if (options["attach-to-output"]) {
 			const output = `packages-to-deploy<<EOF\n${JSON.stringify(packagesToDeploy)}\nEOF\n`;
 			xConsole.log(
-				chalk.yellow("📱 Attaching packages to output:\n", output, "\n"),
+				chalk.yellow(
+					`\n📱 Attached: ${options["attach-to-output"]}=${JSON.stringify(packagesToDeploy)}\n`,
+				),
 			);
 
 			if (process.env.GITHUB_OUTPUT && !options["dry-run"]) {
 				await Bun.write(process.env.GITHUB_OUTPUT, output);
 			}
-
-			xConsole.log(
-				chalk.green(
-					"📱 Packages to deploy attached to output, access it via:",
-					"```",
-					`echo \${{ needs.<job-name>.outputs.${options["attach-to-output"]} }}`,
-					"```",
-				),
-			);
 		}
 	},
 );

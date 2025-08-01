@@ -9,7 +9,7 @@
 	"packageManager": "bun@1.2.19",
 	"scripts": {
 		"//local": "/////////////////////////////////////////////////////////////////////////////////////////////////////",
-		"postinstall": "bun run scripts/local-vscode.ts",
+		"postinstall": "bun run scripts/local-vscode.ts --verbose false",
 		"local:setup": "bun run scripts/local-setup.ts",
 		"local:vscode": "bun run scripts/local-vscode.ts",
 		"local:cleanup": "bun run scripts/local-cleanup.ts",
