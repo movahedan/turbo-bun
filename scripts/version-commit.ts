@@ -68,18 +68,80 @@ export const versionCommit = createScript(
 		if (options["dry-run"]) {
 			xConsole.log(chalk.yellow("🔍 Dry run, skipping commit and push"));
 		} else {
+			// Configure Git for GitHub Actions if running in CI
+			if (process.env.GITHUB_ACTIONS) {
+				await $`git config user.name "github-actions[bot]"`.text();
+				await $`git config user.email "github-actions[bot]@users.noreply.github.com"`.text();
+
+				// Configure Git for GitHub Actions authentication
+				if (process.env.GITHUB_TOKEN) {
+					xConsole.log(chalk.blue("🔐 Configuring Git authentication..."));
+
+					// Use GITHUB_TOKEN for authentication
+					const token = process.env.GITHUB_TOKEN;
+					const repo = process.env.GITHUB_REPOSITORY;
+
+					await $`git remote set-url origin https://x-access-token:${token}@github.com/${repo}.git`.text();
+
+					// Verify the remote URL
+					const actualRemoteUrl = await $`git remote get-url origin`.text();
+					xConsole.log(
+						chalk.cyan(
+							`🔗 Remote URL: ${actualRemoteUrl.replace(/x-access-token:[^@]+@/, "x-access-token:***@")}`,
+						),
+					);
+					xConsole.log(chalk.green("✅ Git authentication configured"));
+				} else {
+					xConsole.log(chalk.yellow("⚠️  GITHUB_TOKEN not found"));
+				}
+			} else {
+				// Local development - use default authentication
+				xConsole.log(chalk.blue("🔐 Using local Git authentication..."));
+			}
+
 			// Run changesets version to generate changelog and bump versions
-			// Don't use --ignore flag here, let changesets handle dependencies automatically
 			await $`bunx @changesets/cli version`.text();
 
-			// Get the new version and create a Git tag
+			// Check if there are changes to commit
+			const status = await $`git status --porcelain`.text();
+			if (status.trim()) {
+				// Commit the version changes
+				await $`git add .`.text();
+				await $`git commit -m "chore: bump package versions and generate changelogs
+
+- Update package.json versions for all affected packages
+- Generate CHANGELOG.md files with release notes
+- Apply changeset versioning rules (patch/minor/major)
+- Prepare for deployment pipeline"`.text();
+			} else {
+				xConsole.log(
+					chalk.yellow(
+						"ℹ️  No changes to commit - changesets already committed",
+					),
+				);
+			}
+
+			// Get the new version and create a Git tag AFTER committing
 			const newVersion = await getLatestVersion();
 			if (newVersion) {
 				await createVersionTag(newVersion);
 				xConsole.log(chalk.green(`🏷️  Created version tag: v${newVersion}`));
 			}
 
-			await $`git push origin main`.text();
+			// Check if we have commits to push
+			const aheadCount = await $`git rev-list --count origin/main..HEAD`.text();
+			if (Number.parseInt(aheadCount.trim()) > 0) {
+				// Always push to main branch (whether we committed or changesets did)
+				xConsole.log(chalk.blue("🚀 Pushing changes to main branch..."));
+				await $`git push origin main`.text();
+				xConsole.log(chalk.green("✅ Successfully pushed version changes"));
+			} else {
+				xConsole.log(
+					chalk.yellow(
+						"⚠️  No commits to push - version pipeline completed without changes",
+					),
+				);
+			}
 		}
 
 		if (packagesToDeploy.length === 0) {
