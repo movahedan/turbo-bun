@@ -75,7 +75,27 @@ export const versionCommit = createScript(
 
 				// Configure Git to use the token for authentication
 				if (process.env.TURBO_BUN_TOKEN) {
+					xConsole.log(
+						chalk.blue("🔐 Configuring Git authentication with token..."),
+					);
 					await $`git remote set-url origin https://x-access-token:${process.env.TURBO_BUN_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`.text();
+
+					// Verify the remote URL was set correctly
+					const remoteUrl = await $`git remote get-url origin`.text();
+					xConsole.log(
+						chalk.cyan(
+							`🔗 Remote URL: ${remoteUrl.replace(/x-access-token:[^@]+@/, "x-access-token:***@")}`,
+						),
+					);
+					xConsole.log(
+						chalk.green("✅ Git remote configured with token authentication"),
+					);
+				} else {
+					xConsole.log(
+						chalk.yellow(
+							"⚠️  TURBO_BUN_TOKEN not found, using default authentication",
+						),
+					);
 				}
 			}
 
