@@ -68,6 +68,12 @@ export const versionCommit = createScript(
 		if (options["dry-run"]) {
 			xConsole.log(chalk.yellow("🔍 Dry run, skipping commit and push"));
 		} else {
+			// Configure Git for GitHub Actions if running in CI
+			if (process.env.GITHUB_ACTIONS) {
+				await $`git config user.name "github-actions[bot]"`.text();
+				await $`git config user.email "github-actions[bot]@users.noreply.github.com"`.text();
+			}
+
 			// Run changesets version to generate changelog and bump versions
 			// Don't use --ignore flag here, let changesets handle dependencies automatically
 			await $`bunx @changesets/cli version`.text();
