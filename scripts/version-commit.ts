@@ -72,13 +72,23 @@ export const versionCommit = createScript(
 			// Don't use --ignore flag here, let changesets handle dependencies automatically
 			await $`bunx @changesets/cli version`.text();
 
-			// Get the new version and create a Git tag
+			// Commit the version changes
+			await $`git add .`.text();
+			await $`git commit -m "chore: bump package versions and generate changelogs
+
+- Update package.json versions for all affected packages
+- Generate CHANGELOG.md files with release notes
+- Apply changeset versioning rules (patch/minor/major)
+- Prepare for deployment pipeline"`.text();
+
+			// Get the new version and create a Git tag AFTER committing
 			const newVersion = await getLatestVersion();
 			if (newVersion) {
 				await createVersionTag(newVersion);
 				xConsole.log(chalk.green(`🏷️  Created version tag: v${newVersion}`));
 			}
 
+			// Push to main branch
 			await $`git push origin main`.text();
 		}
 
