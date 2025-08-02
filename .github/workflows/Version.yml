@@ -7,6 +7,8 @@ jobs:
   version-and-deploy:
     name: 🏷️ Version and Deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
