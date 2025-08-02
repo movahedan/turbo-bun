@@ -78,14 +78,24 @@ export const versionCommit = createScript(
 			// Don't use --ignore flag here, let changesets handle dependencies automatically
 			await $`bunx @changesets/cli version`.text();
 
-			// Commit the version changes
-			await $`git add .`.text();
-			await $`git commit -m "chore: bump package versions and generate changelogs
+			// Check if there are changes to commit
+			const status = await $`git status --porcelain`.text();
+			if (status.trim()) {
+				// Commit the version changes
+				await $`git add .`.text();
+				await $`git commit -m "chore: bump package versions and generate changelogs
 
 - Update package.json versions for all affected packages
 - Generate CHANGELOG.md files with release notes
 - Apply changeset versioning rules (patch/minor/major)
 - Prepare for deployment pipeline"`.text();
+			} else {
+				xConsole.log(
+					chalk.yellow(
+						"ℹ️  No changes to commit - changesets already committed",
+					),
+				);
+			}
 
 			// Get the new version and create a Git tag AFTER committing
 			const newVersion = await getLatestVersion();
@@ -94,8 +104,20 @@ export const versionCommit = createScript(
 				xConsole.log(chalk.green(`🏷️  Created version tag: v${newVersion}`));
 			}
 
-			// Push to main branch
-			await $`git push origin main`.text();
+			// Check if we have commits to push
+			const aheadCount = await $`git rev-list --count origin/main..HEAD`.text();
+			if (Number.parseInt(aheadCount.trim()) > 0) {
+				// Always push to main branch (whether we committed or changesets did)
+				xConsole.log(chalk.blue("🚀 Pushing changes to main branch..."));
+				await $`git push origin main`.text();
+				xConsole.log(chalk.green("✅ Successfully pushed version changes"));
+			} else {
+				xConsole.log(
+					chalk.yellow(
+						"⚠️  No commits to push - version pipeline completed without changes",
+					),
+				);
+			}
 		}
 
 		if (packagesToDeploy.length === 0) {
