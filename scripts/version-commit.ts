@@ -72,6 +72,11 @@ export const versionCommit = createScript(
 			if (process.env.GITHUB_ACTIONS) {
 				await $`git config user.name "github-actions[bot]"`.text();
 				await $`git config user.email "github-actions[bot]@users.noreply.github.com"`.text();
+
+				// Configure Git to use the token for authentication
+				if (process.env.TURBO_BUN_TOKEN) {
+					await $`git remote set-url origin https://x-access-token:${process.env.TURBO_BUN_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`.text();
+				}
 			}
 
 			// Run changesets version to generate changelog and bump versions
