@@ -78,13 +78,19 @@ export const versionCommit = createScript(
 					xConsole.log(
 						chalk.blue("🔐 Configuring Git authentication with token..."),
 					);
-					await $`git remote set-url origin https://x-access-token:${process.env.TURBO_BUN_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`.text();
+
+					// Set the remote URL with token authentication
+					const token = process.env.TURBO_BUN_TOKEN;
+					const repo = process.env.GITHUB_REPOSITORY;
+					const remoteUrl = `https://x-access-token:${token}@github.com/${repo}.git`;
+
+					await $`git remote set-url origin ${remoteUrl}`.text();
 
 					// Verify the remote URL was set correctly
-					const remoteUrl = await $`git remote get-url origin`.text();
+					const actualRemoteUrl = await $`git remote get-url origin`.text();
 					xConsole.log(
 						chalk.cyan(
-							`🔗 Remote URL: ${remoteUrl.replace(/x-access-token:[^@]+@/, "x-access-token:***@")}`,
+							`🔗 Remote URL: ${actualRemoteUrl.replace(/x-access-token:[^@]+@/, "x-access-token:***@")}`,
 						),
 					);
 					xConsole.log(
