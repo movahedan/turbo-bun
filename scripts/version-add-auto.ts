@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { $ } from "bun";
 import chalk from "chalk";
 import { getAffectedPackages } from "./affected";
@@ -14,41 +14,6 @@ interface ChangesetEntry {
 interface ChangesetFile {
 	filename: string;
 	content: ChangesetEntry;
-}
-
-/**
- * Determines which packages should be ignored based on their package.json configuration
- * Only ignore utility packages that are private and don't have a version field
- * Main applications should still be versioned even if they depend on ignored utilities
- */
-function getPackagesToIgnore(affectedPackages: string[]): string[] {
-	const packagesToIgnore: string[] = [];
-
-	for (const pkg of affectedPackages) {
-		try {
-			const packageJsonPath = pkg.startsWith("@repo/")
-				? `packages/${pkg.replace("@repo/", "")}/package.json`
-				: `apps/${pkg}/package.json`;
-
-			if (!existsSync(packageJsonPath)) {
-				continue;
-			}
-
-			const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-
-			// Only ignore utility packages (in packages/) that are private and don't have a version field
-			// Main applications (in apps/) should always be versioned
-			if (
-				pkg.startsWith("@repo/") &&
-				packageJson.private === true &&
-				!packageJson.version
-			) {
-				packagesToIgnore.push(pkg);
-			}
-		} catch {}
-	}
-
-	return packagesToIgnore;
 }
 
 const versionAddAutoConfig = {
@@ -142,27 +107,8 @@ export const versionAddAuto = createScript(
 			chalk.blue("🔍 Analyzing changes for automated changeset creation..."),
 		);
 
-		const affectedPackages = await getAffectedPackages(options["base-sha"]);
-		xConsole.log(
-			chalk.blue(
-				`📦 Found ${affectedPackages.length} affected packages: ${affectedPackages.join(", ")}`,
-			),
-		);
-
-		// Determine which packages should be ignored
-		const packagesToIgnore = getPackagesToIgnore(affectedPackages);
-		if (packagesToIgnore.length > 0) {
-			xConsole.log(
-				chalk.yellow(
-					`🚫 Auto-ignoring ${packagesToIgnore.length} packages: ${packagesToIgnore.join(", ")}`,
-				),
-			);
-		}
-
 		// Filter to only packages that should be versioned
-		const packagesToVersion = affectedPackages.filter(
-			(pkg) => !packagesToIgnore.includes(pkg),
-		);
+		const packagesToVersion = await getAffectedPackages(options["base-sha"]);
 		xConsole.log(
 			chalk.blue(
 				`📦 Found ${packagesToVersion.length} packages to version: ${packagesToVersion.join(", ")}`,

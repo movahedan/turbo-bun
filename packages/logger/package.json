@@ -1,5 +1,6 @@
 {
 	"name": "@repo/logger",
+	"version": "0.0.0",
 	"type": "module",
 	"private": true,
 	"imports": {

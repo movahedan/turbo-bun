@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { $ } from "bun";
 import chalk from "chalk";
 import { getAffectedPackages } from "./affected";
@@ -35,36 +35,6 @@ const versionCommitConfig = {
 	],
 } as const satisfies ScriptConfig;
 
-function getPackagesToIgnore(affectedPackages: string[]): string[] {
-	const packagesToIgnore: string[] = [];
-
-	for (const pkg of affectedPackages) {
-		try {
-			const packageJsonPath = pkg.startsWith("@repo/")
-				? `packages/${pkg.replace("@repo/", "")}/package.json`
-				: `apps/${pkg}/package.json`;
-
-			if (!existsSync(packageJsonPath)) {
-				continue;
-			}
-
-			const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
-
-			// Only ignore utility packages (in packages/) that are private and don't have a version field
-			// Main applications (in apps/) should always be versioned
-			if (
-				pkg.startsWith("@repo/") &&
-				packageJson.private === true &&
-				!packageJson.version
-			) {
-				packagesToIgnore.push(pkg);
-			}
-		} catch {}
-	}
-
-	return packagesToIgnore;
-}
-
 function filterPackagesToDeploy(packages: string[]): string[] {
 	return packages.filter((pkg) => {
 		try {
@@ -98,16 +68,9 @@ export const versionCommit = createScript(
 		if (options["dry-run"]) {
 			xConsole.log(chalk.yellow("🔍 Dry run, skipping commit and push"));
 		} else {
-			// Get packages to ignore based on auto-ignore logic
-			const affectedPackages = await getAffectedPackages(baseSha);
-			const packagesToIgnore = getPackagesToIgnore(affectedPackages);
-
 			// Run changesets version to generate changelog and bump versions
-			if (packagesToIgnore.length > 0) {
-				await $`bunx @changesets/cli version --ignore ${packagesToIgnore.join(" ")}`.text();
-			} else {
-				await $`bunx @changesets/cli version`.text();
-			}
+			// Don't use --ignore flag here, let changesets handle dependencies automatically
+			await $`bunx @changesets/cli version`.text();
 
 			// Get the new version and create a Git tag
 			const newVersion = await getLatestVersion();
