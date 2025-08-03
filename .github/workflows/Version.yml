@@ -12,6 +12,7 @@ jobs:
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       packages-to-deploy: ${{ steps.packages-to-deploy.outputs.packages-to-deploy }}
     steps:

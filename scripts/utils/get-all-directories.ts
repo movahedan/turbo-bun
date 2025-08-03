@@ -1,22 +1,27 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export function getAllDirectories(
-	baseDir: string,
-): { name: string; path: string }[] {
-	const directories: { name: string; path: string }[] = [
-		{ name: "root", path: "." },
-	];
+const filterPackages = (dir: string) =>
+	fs
+		.readdirSync(dir)
+		.filter(
+			(pkg) =>
+				!pkg.startsWith(".") &&
+				fs.statSync(path.join(dir, pkg)).isDirectory() &&
+				fs.statSync(path.join(dir, pkg, "package.json")).isFile(),
+		);
+
+interface Directory {
+	name: string;
+	path: string;
+}
+
+export function getAllDirectories(baseDir: string): Directory[] {
+	const directories: Directory[] = [{ name: "root", path: "." }];
 
 	const appsDir = path.join(baseDir, "apps");
 	if (fs.existsSync(appsDir)) {
-		const apps = fs
-			.readdirSync(appsDir)
-			.filter(
-				(app) =>
-					!app.startsWith(".") &&
-					fs.statSync(path.join(appsDir, app)).isDirectory(),
-			);
+		const apps = filterPackages(appsDir);
 		for (const app of apps) {
 			directories.push({ name: app, path: `apps/${app}` });
 		}
@@ -24,15 +29,8 @@ export function getAllDirectories(
 
 	const packagesDir = path.join(baseDir, "packages");
 	if (fs.existsSync(packagesDir)) {
-		const packages = fs
-			.readdirSync(packagesDir)
-			.filter(
-				(pkg) =>
-					!pkg.startsWith(".") &&
-					fs.statSync(path.join(packagesDir, pkg)).isDirectory(),
-			);
+		const packages = filterPackages(packagesDir);
 		for (const pkg of packages) {
-			// Convert kebab-case to lowercase for scope names and add @repo/ prefix
 			directories.push({ name: `@repo/${pkg}`, path: `packages/${pkg}` });
 		}
 	}
