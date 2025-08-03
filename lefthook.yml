@@ -3,11 +3,11 @@
 pre-commit:
   parallel: true
   commands:
-    check:
+    staged:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,html,css,md,mdx,yaml,yml}"
-      run: bun biome check --write --no-errors-on-unmatched {staged_files}
+      run: bun run check:staged && bun biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
-    typescript:
+    types:
       glob: "*.{ts,tsx}"
       run: bun run check:types --affected
 
@@ -21,6 +21,8 @@ pre-push:
   commands:
     branch-name:
       run: bun scripts/ci-branchname.ts
+    staged:
+      run: bun run check:staged
     check:
       run: bun check
     test:

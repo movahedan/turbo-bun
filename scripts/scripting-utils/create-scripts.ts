@@ -195,7 +195,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			result[optionKey] = nextArg;
 		} else {
 			result[optionKey] = (result[optionKey] || []) as string[];
-			result[optionKey];
+			(result[optionKey] as string[]).push(nextArg);
 		}
 
 		i++; // Skip next argument since we consumed it
