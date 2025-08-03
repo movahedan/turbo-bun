@@ -7,7 +7,8 @@
 		"#*": "./src/*"
 	},
 	"exports": {
-		"./cn": "./src/cn.ts"
+		"./cn": "./src/cn.ts",
+		"./logger": "./src/logger.ts"
 	},
 	"scripts": {
 		"check:types": "tsc --noEmit"

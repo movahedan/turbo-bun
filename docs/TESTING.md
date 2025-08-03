@@ -33,7 +33,7 @@ bun run test:coverage
 ### Package-Specific Commands
 - `turbo run test --filter=@repo/ui` - Run tests for UI package only
 - `turbo run test --filter=@repo/utils` - Run tests for Utils package only
-- `turbo run test --filter=@repo/logger` - Run tests for Logger package only
+- `turbo run test --filter=@repo/utils` - Run tests for Utils package only
 - `turbo run test --filter=@repo/api` - Run tests for API app only
 - `turbo run test --filter=@repo/storefront` - Run tests for Storefront app only
 - `turbo run test --filter=@repo/admin` - Run tests for Admin app only

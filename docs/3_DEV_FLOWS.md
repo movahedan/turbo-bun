@@ -114,7 +114,7 @@ bun run dev:up  # Start all services
 # Work on specific packages locally
 turbo run dev --filter=@repo/ui         # Start UI package development with Storybook
 turbo run dev --filter=@repo/utils      # Start utils package development
-turbo run dev --filter=@repo/logger     # Start logger package development
+turbo run dev --filter=@repo/utils     # Start utils package development
 
 # Build packages for development
 turbo run build --filter=@repo/ui       # Build UI package
@@ -367,7 +367,7 @@ BREAKING CHANGE: Component props have been restructured"
 # Work with specific packages
 turbo run dev --filter=@repo/ui          # Start UI package
 turbo run build --filter=@repo/utils     # Build utils package
-turbo run test --filter=@repo/logger     # Test logger package
+turbo run test --filter=@repo/utils     # Test utils package
 turbo run check:types --filter=@repo/*   # Type check all packages
 ```
 

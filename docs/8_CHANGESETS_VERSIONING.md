@@ -186,7 +186,6 @@ When creating a changeset, choose the appropriate version bump:
 ---
 "@repo/ui": minor
 "@repo/utils": patch
-"@repo/logger": patch
 "@repo/typescript-config": patch
 "@repo/test-preset": patch
 "admin": patch
@@ -272,7 +271,6 @@ After PR merge, the workflow:
 ---
 "@repo/ui": patch
 "@repo/utils": patch
-"@repo/logger": patch
 "@repo/typescript-config": patch
 "@repo/test-preset": patch
 "admin": patch

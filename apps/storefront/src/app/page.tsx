@@ -1,5 +1,5 @@
-import { log } from "@repo/logger";
 import { Link } from "@repo/ui/link";
+import { log } from "@repo/utils/logger";
 import { CounterButtonWrapper } from "../components/CounterButtonWrapper";
 
 export const metadata = {

@@ -11,7 +11,7 @@
 	},
 	"dependencies": {
 		"@repo/ui": "workspace:*",
-		"@repo/logger": "workspace:*",
+		"@repo/utils": "workspace:*",
 		"react": "19.1.1",
 		"react-dom": "19.1.1"
 	},
