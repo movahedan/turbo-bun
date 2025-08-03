@@ -1,108 +1,83 @@
-# 📚 Documentation-First Implementation Rule
+# 🤖 AI Development Assistant Guidelines
 
 ## 🎯 Core Principle
-**ALWAYS read and understand the project documentation before implementing any changes.** This project has extensive documentation that must be consulted to ensure consistency, avoid conflicts, and follow established patterns.
+**You are an AI development assistant working within a DevContainer-first, documentation-driven development environment. You MUST follow these strict guidelines for all interactions.**
+
+## 🚨 CRITICAL: Pre-Implementation Requirements
+
+### **MANDATORY Documentation Review**
+**BEFORE implementing ANY changes, you MUST:**
+
+1. **ALWAYS** read `docs/AI_Prompt.md` first (this file)
+2. **ALWAYS** review `docs/0_QUALITY_CHECKLIST.md` for structural requirements
+3. **ALWAYS** examine `.cursor/rules/` directory for coding standards
+4. **ALWAYS** check `docs/3_DEV_FLOWS.md` for development workflows
+5. **ALWAYS** verify DevContainer implications in `docs/5_DOCKER.md`
+
+### **Repository State Verification**
+**NEVER assume anything not present in the repository:**
+- **ALWAYS** examine actual files, scripts, and configurations
+- **ALWAYS** verify file paths and script names exist
+- **ALWAYS** check `package.json` scripts and `turbo.json` configuration
+- **ALWAYS** ensure documentation matches current implementation exactly
 
 ## 🐳 DevContainer-First Development
-**CRITICAL**: This project is primarily developed and run within DevContainers. Always consider DevContainer implications for any implementation:
 
-- [ ] **ALWAYS** test implementations within DevContainer environment
-- [ ] **ALWAYS** use DevContainer-specific commands and workflows
-- [ ] **ALWAYS** consider Docker/container compatibility for any changes
-- [ ] **ALWAYS** verify that changes work in the isolated DevContainer environment
-- [ ] **ALWAYS** use `bun run dev:*` commands for development workflows
-- [ ] **ALWAYS** check DevContainer health: `bun run dev:check`
-
-## 📋 Mandatory Documentation Review Process
-
-### 1. **Project Structure Understanding**
-Before any implementation:
-- [ ] Read `README.md` for project overview and setup
-- [ ] Review `package.json` for available scripts and dependencies
-- [ ] Understand the monorepo structure (`apps/*`, `packages/*`, `scripts/*`)
-- [ ] Check `turbo.json` for build pipeline configuration
-- [ ] Review `biome.json` for code quality rules
-- [ ] **CRITICAL**: Review DevContainer configuration in `.devcontainer/`
-
-### 2. **Development Environment Documentation**
-For environment-related changes:
-- [ ] Review `docs/2_SETUP_FLOWS.md` for organized setup flows
-- [ ] Check `docs/3_DEV_FLOWS.md` for development commands and processes
-- [ ] Read `docs/5_DOCKER.md` for Docker setup and configuration
-- [ ] Understand `.cursor/rules/` for coding standards and conventions
-
-### 3. **Quality and Testing Documentation**
-For code quality and testing changes:
-- [ ] Review `docs/0_QUALITY_CHECKLIST.md` for structural change requirements
-- [ ] Read `docs/TESTING.md` for testing strategies and patterns
-- [ ] Check `docs/7_BUILD_VITE_LIBRARY.md` for build system details
-- [ ] Review CI/CD processes in `docs/3_DEV_FLOWS.md`
-
-### 4. **Planning and Architecture Documentation**
-For architectural or planning decisions:
-- [ ] Review `docs/planning/` directory for architectural decisions
-- [ ] Check `docs/planning/16_TODO_ROADMAP_PLANNING.md` for current roadmap
-- [ ] Review environment planning docs for infrastructure decisions
-- [ ] Check authentication and security planning documents
-
-### 5. **AI-Specific Documentation**
-For AI-assisted development:
-- [ ] **CRITICAL**: Read `.cursor/rules` directory for AI-specific guidelines
-- [ ] Follow AI-specific patterns and constraints
-
-## 🔍 Documentation Search Strategy
-
-### Priority Order for Documentation Review:
-1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY)
-2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
-3. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
-4. **`docs/3_DEV_FLOWS.md`** - Development workflow and commands
-5. **`.cursor/rules/`** - Development conventions and coding standards
-6. **Relevant planning docs** - For architectural decisions
-7. **Specific feature docs** - For feature-specific implementations
-8. **`README.md`** - Project overview and quick start
-
-### Documentation Search Commands:
-```bash
-# Search for specific topics in documentation
-grep -r "keyword" docs/
-# Find documentation about specific features
-find docs/ -name "*.md" -exec grep -l "feature_name" {} \;
-# Check for recent documentation updates
-git log --oneline -- docs/
-```
-
-## 🚨 Critical Rules
-
-### 1. **DevContainer-First Development**
-- **ALWAYS** consider DevContainer implications for any implementation
-- **ALWAYS** test changes within the DevContainer environment
+### **CRITICAL DevContainer Rules:**
+- **ALWAYS** remember that you are being run in a Docker container
+- **ALWAYS** test implementations within DevContainer environment
 - **ALWAYS** use DevContainer-specific commands: `bun run dev:*`
 - **ALWAYS** verify DevContainer health: `bun run dev:check`
 - **ALWAYS** ensure Docker/container compatibility for all changes
+- **ALWAYS** test in isolated DevContainer environment before suggesting changes
 
-### 2. **AI Documentation Priority**
-- **ALWAYS** check `docs/AI_Prompt.md` first for AI-specific guidelines
-- Follow AI-specific patterns and constraints
-- Use AI_Prompt.md as the primary reference for AI interactions
+## 📋 AI-Specific Implementation Process
 
-### 3. **Quality Checklist Compliance**
-- **ALWAYS** review `docs/0_QUALITY_CHECKLIST.md` for structural changes
-- Ensure all checklist items are addressed before implementation
-- Follow the checklist for testing and validation
+### **Step 1: Documentation Analysis**
+```bash
+# Search for relevant documentation
+find docs/ -name "*.md" -exec grep -l "keyword" {} \;
+grep -r "feature_name" docs/
+```
 
-### 4. **Development Workflow Compliance**
-- **ALWAYS** follow the workflow in `docs/3_DEV_FLOWS.md`
-- Use the correct commands and processes
-- Follow the established development patterns
+### **Step 2: Repository State Verification**
+- Examine actual file structure and configurations
+- Verify all referenced files, scripts, and paths exist
+- Check current implementation against documentation
 
-### 5. **Documentation Updates**
-- **ALWAYS** update relevant documentation when making changes
-- Follow the development conventions in `.cursor/rules/`
-- Ensure documentation reflects current implementation
+### **Step 3: Implementation Planning**
+- Identify affected components and services
+- Plan testing strategy based on `docs/TESTING.md`
+- Consider impact on existing functionality
+- Plan documentation updates
 
-### 6. **Documentation Update Process**
-When asked to update documentation:
+### **Step 4: Implementation Execution**
+- Follow established patterns from `.cursor/rules/`
+- Use DevContainer-specific commands and workflows
+- Implement with strict adherence to quality standards
+- Test thoroughly using established patterns
+
+### **Step 5: Post-Implementation Validation**
+- Run quality checks: `bun run check:quick`
+- Test DevContainer setup: `bun run dev:setup`
+- Test DevContainer health: `bun run dev:check`
+- Update relevant documentation
+- Follow conventional commit standards
+
+## 🔍 Documentation Priority Order
+
+1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY FIRST READ)
+2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
+3. **`.cursor/rules/`** - Development conventions and coding standards
+4. **`docs/3_DEV_FLOWS.md`** - Development workflow and commands
+5. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
+6. **`docs/planning/`** - Architectural decisions and planning
+7. **`README.md`** - Project overview and quick start
+
+## 🚫 STRICT AI Behavior Rules
+
+### **Documentation Update Process**
+When updating documentation:
 - **ALWAYS** compare documented flows with actual repository state
 - **NEVER** assume anything not present in the repository
 - **ALWAYS** examine actual files, scripts, and configurations
@@ -111,73 +86,86 @@ When asked to update documentation:
 - **ALWAYS** verify file paths and script names exist in the repository
 - **ALWAYS** check `package.json` scripts, `turbo.json` config, and actual file structure
 - **ALWAYS** ensure documentation matches the current implementation exactly
-- **ALWAYS** check `.cursor/rules/` directory and update rules if needed to keep them synced
-- **ALWAYS** verify that `.cursor/rules/` reflects current development patterns and conventions
-- **ALWAYS** apply this process to ALL documentation in the `docs/` folder, not just specific files
-- **ALWAYS** pay special attention to `README.md` in the root of the project as the primary entry point
+- **ALWAYS** check `.cursor/rules/` directory and update rules if needed
+- **ALWAYS** verify that `.cursor/rules/` reflects current development patterns
+- **ALWAYS** apply this process to ALL documentation in the `docs/` folder
+- **ALWAYS** pay special attention to `README.md` as the primary entry point
+
+### **Implementation Rules**
+- **ALWAYS** read relevant documentation before implementing
+- **ALWAYS** understand current architecture and patterns
+- **ALWAYS** check for existing similar implementations
+- **ALWAYS** review related planning documents
+- **ALWAYS** understand the development workflow
+- **ALWAYS** review DevContainer configuration and implications
+
+### **Quality Assurance Rules**
+- **ALWAYS** follow quality checklist requirements
+- **ALWAYS** use established testing patterns
+- **ALWAYS** ensure CI/CD pipeline compatibility
+- **ALWAYS** follow conventional commit standards
+- **ALWAYS** update documentation as part of implementation
+
+## 🎯 AI Prompting Best Practices
+
+### **Clear Instructions**
+- Provide specific, actionable instructions
+- Use numbered lists for sequential tasks
+- Include expected outputs and formats
+- Specify error handling requirements
+
+### **Context Awareness**
+- Reference specific files and line numbers
+- Include relevant code snippets
+- Provide background context when needed
+- Explain the "why" behind requirements
+
+### **Iterative Refinement**
+- Start with high-level requirements
+- Refine based on initial outputs
+- Provide feedback for improvements
+- Maintain consistency across iterations
+
+### **Error Prevention**
+- Anticipate common failure points
+- Include validation steps
+- Provide fallback options
+- Specify debugging approaches
 
 ## 📝 Implementation Checklist
 
-Before implementing any change:
-
-### ✅ **Pre-Implementation Review**
+### ✅ **Pre-Implementation**
 - [ ] Read all relevant documentation files
-- [ ] Understand the current architecture and patterns
+- [ ] Understand current architecture and patterns
 - [ ] Check for existing similar implementations
 - [ ] Review related planning documents
-- [ ] Understand the development workflow
-- [ ] **CRITICAL**: Review DevContainer configuration and implications
+- [ ] Understand development workflow
+- [ ] Review DevContainer configuration
 
-### ✅ **Implementation Planning**
-- [ ] Identify affected components and services
-- [ ] Plan testing strategy based on `docs/TESTING.md`
-- [ ] Consider impact on existing functionality
-- [ ] Plan documentation updates
-- [ ] Review quality checklist requirements
-- [ ] **CRITICAL**: Plan DevContainer testing and validation
+### ✅ **Implementation**
+- [ ] Follow established patterns from `.cursor/rules/`
+- [ ] Use DevContainer-specific commands
+- [ ] Implement with strict quality standards
+- [ ] Test thoroughly using established patterns
+- [ ] Update relevant documentation
 
-### ✅ **Post-Implementation Validation**
+### ✅ **Post-Implementation**
 - [ ] Run quality checks: `bun run check:quick`
-- [ ] Test local setup: `bun run local:setup`
 - [ ] Test DevContainer setup: `bun run dev:setup`
 - [ ] Test DevContainer health: `bun run dev:check`
-- [ ] **CRITICAL**: Verify DevContainer functionality: `bun run dev:health`
-- [ ] **CRITICAL**: Test in isolated DevContainer environment
-- [ ] Update relevant documentation
+- [ ] Update documentation
 - [ ] Follow conventional commit standards
-- [ ] Ensure CI/CD pipeline compatibility
 
-## 🎯 Documentation Categories
-
-### **Core Development**
-- `docs/3_DEV_FLOWS.md` - Development workflow and commands
-- `docs/2_SETUP_FLOWS.md` - Organized setup flows
-- `.cursor/rules/` - Development conventions and coding standards
-- `docs/TESTING.md` - Testing strategies and patterns
-
-### **Infrastructure & Environment**
-- `docs/5_DOCKER.md` - Docker setup and configuration
-- `docs/3_DEV_FLOWS.md` - CI/CD processes
-- `docs/4_SCRIPTING.md` - Script development patterns
-
-### **Quality & Build System**
-- `docs/0_QUALITY_CHECKLIST.md` - Structural change requirements
-- `docs/3_DEV_FLOWS.md` - Development workflow and commands
-- `docs/7_BUILD_VITE_LIBRARY.md` - Build system details
-
-### **Planning & Architecture**
-- `docs/planning/` - Architectural decisions and planning
-- `docs/AI_Prompt.md` - AI-specific guidelines (CRITICAL)
-
-## 🚫 Common Mistakes to Avoid
+## 🚫 Common AI Mistakes to Avoid
 
 1. **Skipping Documentation Review** - Always read relevant docs first
-2. **Ignoring AI_Prompt.md** - This is the primary AI reference
-3. **Not Following Quality Checklist** - Always check structural requirements
-4. **Missing Development Workflow** - Follow established patterns
-5. **Not Updating Documentation** - Keep docs in sync with implementation
+2. **Making Assumptions** - Never assume anything not in repository
+3. **Ignoring DevContainer Context** - Always consider container implications
+4. **Not Following Quality Standards** - Always check structural requirements
+5. **Missing Documentation Updates** - Always keep docs in sync
+6. **Not Testing Thoroughly** - Always test in DevContainer environment
 
-## 💡 Best Practices
+## 💡 AI Best Practices
 
 1. **Start with AI_Prompt.md** for AI-specific guidance
 2. **Use the quality checklist** for structural changes
@@ -187,7 +175,7 @@ Before implementing any change:
 6. **Test thoroughly** using established patterns
 7. **Follow conventional commits** for version control
 
-## 🔄 Continuous Documentation Review
+## 🔄 Continuous Improvement
 
 - **Before each implementation**: Review relevant documentation
 - **During implementation**: Check documentation for patterns and standards
@@ -196,8 +184,6 @@ Before implementing any change:
 
 ---
 
-**Remember**: This project has extensive, well-organized documentation. Reading and following this documentation ensures consistency, quality, and successful implementation. The documentation is your primary source of truth for all development decisions.
+**CRITICAL REMINDER**: This project has extensive, well-organized documentation. Reading and following this documentation ensures consistency, quality, and successful implementation. The documentation is your primary source of truth for all development decisions.
 
-Read the all the docs and apply the solution according to your finding
-
-the docs are inside docs/*
+**ALWAYS** read the docs and apply solutions according to your findings. The docs are inside `docs/*`.

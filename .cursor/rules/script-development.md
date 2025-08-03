@@ -11,7 +11,8 @@ Use the modular script development system for command-line tools with automatic 
 ```ts
 #!/usr/bin/env bun
 
-import { createScript, validators } from "./utils/create-scripts";
+import { createScript, validators } from "./scripting-utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
 
 export const descriptiveNameForScript = createScript(
   // keep the config inline, it's better
@@ -31,10 +32,14 @@ export const descriptiveNameForScript = createScript(
     ],
   } as const,
   // You don't need to add any type, they are automatically assigned
-  async (args): Promise<void> => {
+  async (args, xConsole): Promise<void> => {
     // Script logic here
-
-    // Always use console.info during the script to give the user proper logging
+    xConsole.info("🚀 Starting script...");
+    
+    // Use colorify for colored output
+    xConsole.log(colorify.green("✅ Success!"));
+    xConsole.log(colorify.red("❌ Error!"));
+    xConsole.log(colorify.yellow("⚠️ Warning!"));
   },
 );
 
@@ -53,12 +58,22 @@ const script = createScript(config, myFunction);
 
 ### ✅ Good: Use inferred types
 ```ts
-async function myScript(args: InferArgs<typeof config>): Promise<void>
+async function myScript(args: InferArgs<typeof config>, xConsole: XConsole): Promise<void>
 ```
 
 ### ✅ Good: Descriptive function names
 ```ts
 async function processGitHubActions(args: { event: string; workflow: string }): Promise<void>
+```
+
+### ✅ Good: Use colorify for output styling
+```ts
+import { colorify } from "./scripting-utils/colorify";
+
+xConsole.log(colorify.green("✅ Success message"));
+xConsole.log(colorify.red("❌ Error message"));
+xConsole.log(colorify.yellow("⚠️ Warning message"));
+xConsole.log(colorify.blue("ℹ️ Info message"));
 ```
 
 ### ❌ Avoid: Manual argument parsing
@@ -80,64 +95,142 @@ const cmd = "./bin/act"; // This might not exist
 async function main(args: any): Promise<void>
 ```
 
+### ❌ Avoid: Direct console usage
+```ts
+// Don't do this
+console.log("Processing...");
+console.error("Error occurred");
+
+// Do this instead
+xConsole.log("Processing...");
+xConsole.error("Error occurred");
+```
+
 ## Available Validators
 
 ```ts
-import { validators } from "./utils/create-scripts";
+import { validators } from "./scripting-utils/create-scripts";
 
-// File exists
-validators.fileExists
-
-// Non-empty string
-validators.nonEmpty
-
-// Boolean flag
-validators.boolean()
-
-// Enum values
-validators.enum(["option1", "option2", "option3"])
-
-// Custom validator
-const customValidator = (value: string): boolean | string => {
-  if (value.startsWith("http")) return true;
-  return "Must be a valid URL";
-};
+// String validation
+validators.string("input")           // Validates string input
+validators.boolean("true")           // Validates boolean input
+validators.number("123")             // Validates number input
+validators.fileExists("./file.txt")  // Validates file exists
+validators.directoryExists("./dir")  // Validates directory exists
 ```
 
-## Command Finding
+## Available Utilities
 
-Use direct command execution using Bun's $ or Node.js exec:
-
+### Colorify Utility
 ```ts
-// Predefined commands
-const gitCmd = Bun.spawnSync(["git", "version"]);
-const dockerCmd = Bun.spawnSync(["docker", "--version"]);
-const actCmd = Bun.spawnSync(["act", "--version"]);
+import { colorify } from "./scripting-utils/colorify";
 
-// Custom paths
-const customCmd = Bun.spawnSync(["custom", "version"]);
-```
+// Available colors
+colorify.red("Error message");
+colorify.green("Success message");
+colorify.yellow("Warning message");
+colorify.blue("Info message");
+colorify.cyan("Debug message");
+colorify.gray("Muted message");
 
-## Script Configuration
-
-```ts
-{
-  name: string;                    // Script name for help output
-  description: string;             // What the script does
-  usage: string;                  // Usage pattern
-  examples: string[];             // Example commands
-  options: ScriptOption[];        // Command-line options
+// Color support detection
+if (colorify.supportsColor()) {
+  // Terminal supports colors
 }
+
+// Disable colors
+colorify.disable();
+
+// Re-enable colors
+colorify.enable();
 ```
 
-## Option Configuration
+### Directory Utilities
+```ts
+import { getAllDirectories, getAllDirectoryNames } from "./scripting-utils/get-all-directories";
+
+// Get all package directories
+const directories = await getAllDirectories();
+
+// Get directory names for commitlint scopes
+const scopes = await getAllDirectoryNames();
+```
+
+### Docker Compose Parser
+```ts
+import { parseDockerCompose } from "./scripting-utils/docker-compose-parser";
+
+// Parse docker-compose.yml
+const services = await parseDockerCompose("docker-compose.yml");
+```
+
+### Changeset Parser
+```ts
+import { parseChangesets } from "./scripting-utils/changeset-parser";
+
+// Parse changeset files
+const changesets = await parseChangesets();
+```
+
+## Console Output
 
 ```ts
-{
-  short: string;                  // Short flag (-f)
-  long: string;                   // Long flag (--file)
-  description: string;            // Help text
-  required: boolean;              // Is this option required?
-  validator: ValidatorFunction;   // Validation function
-}
+// Console methods available in main function
+xConsole.log("Info message");
+xConsole.info("Info message");
+xConsole.warn("Warning message");
+xConsole.error("Error message");
+xConsole.debug("Debug message"); // Only shown with --verbose
+```
+
+## Error Handling
+
+```ts
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    try {
+      // Your logic here
+      xConsole.log(colorify.green("✅ Success!"));
+    } catch (error) {
+      xConsole.error(colorify.red(`❌ Error: ${error.message}`));
+      process.exit(1);
+    }
+  },
+);
+```
+
+## Progress Reporting
+
+```ts
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    xConsole.info("🚀 Starting process...");
+    
+    // Process items
+    for (const item of items) {
+      xConsole.log(`Processing: ${item}`);
+      // ... processing logic
+    }
+    
+    xConsole.log(colorify.green("✅ All items processed!"));
+  },
+);
+```
+
+## Verbose Output
+
+```ts
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    xConsole.log("Basic output");
+    
+    if (args.verbose) {
+      xConsole.debug("Detailed debug information");
+      xConsole.log("Additional verbose output");
+    }
+  },
+);
 ``` 
