@@ -9,9 +9,7 @@
 	"networks": ["dev-network"],
 	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
 	"shutdownAction": "stopContainer",
-	"mounts": [
-		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-	],
+	"mounts": ["source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"],
 	"remoteEnv": {
 		"PROJECT_ROOT": "${localWorkspaceFolder}",
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
@@ -89,14 +87,13 @@
 				},
 				"conventionalCommits.scopes": [
 					"root",
-					"storefront",
 					"admin",
 					"api",
-					"@repo/ui",
-					"@repo/logger",
-					"@repo/utils",
+					"storefront",
+					"@repo/test-preset",
 					"@repo/typescript-config",
-					"@repo/test-preset"
+					"@repo/ui",
+					"@repo/utils"
 				],
 				"typescript.preferences.useAliasesForRenames": false,
 				"typescript.preferences.includePackageJsonAutoImports": "on",

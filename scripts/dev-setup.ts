@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import chalk from "chalk";
-import { createScript, validators } from "./utils/create-scripts";
-import { parseCompose } from "./utils/docker-compose-parser";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { parseCompose } from "./scripting-utils/docker-compose-parser";
 
 const devSetupConfig = {
 	name: "DevContainer Setup",
@@ -24,39 +24,30 @@ const devSetupConfig = {
 			validator: validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
-const devSetup = createScript(
-	devSetupConfig,
-	async function main(args, xConsole) {
-		xConsole.log(chalk.blue("🐳 Starting DevContainer setup..."));
+const devSetup = createScript(devSetupConfig, async function main(args, xConsole) {
+	xConsole.log(colorify.blue("🐳 Starting DevContainer setup..."));
 
-		await $`bun run dev:up --build`;
-		if (!args["skip-health-check"]) {
-			xConsole.log(chalk.blue("🏥 Running health checks..."));
-			await $`bun run dev:check`;
-		}
+	await $`bun run dev:up --build`;
+	if (!args["skip-health-check"]) {
+		xConsole.log(colorify.blue("🏥 Running health checks..."));
+		await $`bun run dev:check`;
+	}
 
-		xConsole.log(chalk.cyan("\n💡 Services are running and available at:"));
-		const parsedCompose = await parseCompose("dev");
-		const devUrls = parsedCompose.serviceUrls();
-		for (const [name, url] of Object.entries(devUrls)) {
-			xConsole.log(chalk.cyan(`   • ${name}: ${url}`));
-		}
+	xConsole.log(colorify.cyan("\n💡 Services are running and available at:"));
+	const parsedCompose = await parseCompose("dev");
+	const devUrls = parsedCompose.serviceUrls();
+	for (const [name, url] of Object.entries(devUrls)) {
+		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));
+	}
 
-		xConsole.log(
-			chalk.yellow("💡 Use 'bun run dev:cleanup' to stop services when done"),
-		);
-		xConsole.log(chalk.cyan("\n💡 Useful commands:"));
-		xConsole.log(
-			chalk.cyan(" - bun run dev:check # Check DevContainer health"),
-		);
-		xConsole.log(chalk.cyan(" - bun run dev:logs # View service logs"));
-		xConsole.log(
-			chalk.cyan(" - bun run dev:cleanup # Clean DevContainer environment"),
-		);
-	},
-);
+	xConsole.log(colorify.yellow("💡 Use 'bun run dev:cleanup' to stop services when done"));
+	xConsole.log(colorify.cyan("\n💡 Useful commands:"));
+	xConsole.log(colorify.cyan(" - bun run dev:check # Check DevContainer health"));
+	xConsole.log(colorify.cyan(" - bun run dev:logs # View service logs"));
+	xConsole.log(colorify.cyan(" - bun run dev:cleanup # Clean DevContainer environment"));
+});
 
 if (import.meta.main) {
 	devSetup();

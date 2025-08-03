@@ -8,8 +8,7 @@ const meta: Meta<typeof CounterButton> = {
 		layout: "centered",
 		docs: {
 			description: {
-				component:
-					"An interactive button component that maintains a counter state.",
+				component: "An interactive button component that maintains a counter state.",
 			},
 		},
 	},

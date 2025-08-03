@@ -1,9 +1,10 @@
-#!/usr/bin/env bun
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+#!/usr/bin/env bun;
+
+import { exists, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { $ } from "bun";
-import { createScript, type ScriptConfig } from "./utils/create-scripts";
-import { getAllDirectories } from "./utils/get-all-directories";
+import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
+import { getAllDirectoryNames } from "./scripting-utils/get-all-directories";
 
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",
@@ -24,22 +25,14 @@ export const syncVscodeConfigScript = createScript(
 	async function main(args, xConsole) {
 		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
-		// Generate scopes from monorepo structure
-		const projectRoot = join(import.meta.dir, "..");
-		const directories = getAllDirectories(projectRoot);
-		const scopes = directories.map((dir) => dir.name);
-
+		const scopes = await getAllDirectoryNames();
 		xConsole.log(`📋 Generated scopes: ${scopes.join(", ")}`);
 
 		const {
-			customizations: {
-				vscode: { extensions: recommendations = [], settings = {} } = {},
-			} = {},
+			customizations: { vscode: { extensions: recommendations = [], settings = {} } = {} } = {},
 		} = JSON.parse(
 			stripComments(
-				await Bun.file(
-					join(import.meta.dir, "..", ".devcontainer", "devcontainer.json"),
-				).text(),
+				await Bun.file(join(import.meta.dir, "..", ".devcontainer", "devcontainer.json")).text(),
 			),
 		);
 
@@ -61,37 +54,25 @@ export const syncVscodeConfigScript = createScript(
 		}
 
 		// Update devcontainer.json with new scopes
-		const devcontainerPath = join(
-			import.meta.dir,
-			"..",
-			".devcontainer",
-			"devcontainer.json",
-		);
-		const devcontainerContent = JSON.parse(
-			stripComments(await Bun.file(devcontainerPath).text()),
-		);
+		const devcontainerPath = join(import.meta.dir, "..", ".devcontainer", "devcontainer.json");
+		const devcontainerContent = JSON.parse(stripComments(await Bun.file(devcontainerPath).text()));
 
 		// Update the scopes in devcontainer.json
-		devcontainerContent.customizations.vscode.settings[
-			"conventionalCommits.scopes"
-		] = scopes;
+		devcontainerContent.customizations.vscode.settings["conventionalCommits.scopes"] = scopes;
 
 		// Write back the updated devcontainer.json
-		writeFileSync(
-			devcontainerPath,
-			JSON.stringify(devcontainerContent, null, 2),
-		);
+		await Bun.write(devcontainerPath, JSON.stringify(devcontainerContent, null, 2));
 		await $`bun run biome check --write ${devcontainerPath}`;
 		xConsole.log(`✅ Updated ${devcontainerPath} with new scopes!`);
 
 		const vscodeDir = join(import.meta.dir, "..", ".vscode");
-		if (!existsSync(vscodeDir)) mkdirSync(vscodeDir, { recursive: true });
+		if (!exists(vscodeDir)) mkdir(vscodeDir, { recursive: true });
 		const extensionsPath = join(vscodeDir, "extensions.json");
 		const settingsPath = join(vscodeDir, "settings.json");
 
-		writeFileSync(extensionsPath, extensionsConfigString);
+		await Bun.write(extensionsPath, extensionsConfigString);
 		xConsole.log(`✅ Updated ${extensionsPath}!`);
-		writeFileSync(settingsPath, settingsConfigString);
+		await Bun.write(settingsPath, settingsConfigString);
 		xConsole.log(`✅ Updated ${settingsPath}!`);
 		xConsole.log("✅ VS Code configuration synced successfully!");
 	},

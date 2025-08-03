@@ -25,7 +25,8 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineWidth": 100
 	},
 	"assist": {
 		"actions": {
@@ -62,6 +63,9 @@
 				"useExportType": "error",
 				"noUselessElse": "error",
 				"useShorthandFunctionType": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "error"
 			}
 		}
 	},

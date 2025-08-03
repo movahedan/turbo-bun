@@ -1,12 +1,11 @@
 #!/usr/bin/env bun
 
-import fs from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
-import chalk from "chalk";
-import type { ScriptConfig } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
-import { getAllDirectories } from "./utils/get-all-directories";
+import { colorify } from "./scripting-utils/colorify";
+import type { ScriptConfig } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { getAllDirectories } from "./scripting-utils/get-all-directories";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",
@@ -17,61 +16,54 @@ This includes DevContainer cleanup. To stop the VS Code DevContainer itself, run
 	options: [],
 } as const satisfies ScriptConfig;
 
-const cleanup = createScript(
-	cleanupConfig,
-	async (_, vConsole): Promise<void> => {
-		vConsole.log(chalk.blue("🧹 Starting comprehensive cleanup..."));
+const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> => {
+	vConsole.log(colorify.blue("🧹 Starting comprehensive cleanup..."));
 
-		function removeFile(filePath: string) {
-			if (fs.existsSync(filePath)) {
-				fs.rmSync(filePath, { recursive: true, force: true });
-				vConsole.log(chalk.gray(`  Removed: ${filePath}`));
+	async function removeFile(filePath: string) {
+		if (await Bun.file(filePath).exists()) {
+			await Bun.file(filePath).delete();
+			vConsole.log(colorify.gray(`  Removed: ${filePath}`));
+		}
+	}
+	async function stepArtifacts() {
+		vConsole.log(colorify.yellow("🗂️ Cleaning development artifacts..."));
+		const directories = await getAllDirectories();
+		for (const directory of directories) {
+			for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
+				await removeFile(path.join(directory, ARTIFACT));
 			}
 		}
-		async function stepArtifacts() {
-			vConsole.log(chalk.yellow("🗂️ Cleaning development artifacts..."));
-			const directories = getAllDirectories(process.cwd());
-			for (const directory of directories) {
-				const dirPath = path.resolve(process.cwd(), directory.path);
+	}
+	await stepArtifacts();
 
-				for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
-					removeFile(path.join(dirPath, ARTIFACT));
-				}
-			}
-		}
-		await stepArtifacts();
+	async function stepLogs() {
+		vConsole.log(colorify.yellow("📝 Cleaning logs and temp files..."));
+		await $`find . -name "*.log" -type f -delete`;
+		await $`find . -name "logs" -type d -exec rm -rf {} + 2>/dev/null || true`;
+		await $`find . -name "*.tmp" -type f -delete`;
+		await $`find . -name "*.temp" -type f -delete`;
+		await $`find . -name ".DS_Store" -type f -delete`;
+		await $`find . -name "Thumbs.db" -type f -delete`;
+	}
+	await stepLogs();
 
-		async function stepLogs() {
-			vConsole.log(chalk.yellow("📝 Cleaning logs and temp files..."));
-			await $`find . -name "*.log" -type f -delete`;
-			await $`find . -name "logs" -type d -exec rm -rf {} + 2>/dev/null || true`;
-			await $`find . -name "*.tmp" -type f -delete`;
-			await $`find . -name "*.temp" -type f -delete`;
-			await $`find . -name ".DS_Store" -type f -delete`;
-			await $`find . -name "Thumbs.db" -type f -delete`;
-		}
-		await stepLogs();
+	async function stepNodeModules() {
+		vConsole.log(colorify.yellow("📦 Cleaning node_modules in directories..."));
+		await $`find . -type d -name "node_modules" -exec rm -rf {} +`.nothrow();
+	}
+	await stepNodeModules();
 
-		async function stepNodeModules() {
-			vConsole.log(chalk.yellow("📦 Cleaning node_modules in directories..."));
-			await $`find . -type d -name "node_modules" -exec rm -rf {} +`.nothrow();
-		}
-		await stepNodeModules();
+	async function stepVSCode() {
+		vConsole.log(colorify.yellow("🎯 Cleaning VS Code configuration..."));
+		await $`rm -rf .vscode`;
+	}
+	await stepVSCode();
 
-		async function stepVSCode() {
-			vConsole.log(chalk.yellow("🎯 Cleaning VS Code configuration..."));
-			await $`rm -rf .vscode`;
-		}
-		await stepVSCode();
-
-		vConsole.log(chalk.green("✅ Cleanup completed successfully!"));
-		vConsole.log(chalk.cyan("\n💡 To start fresh, run:"));
-		vConsole.log(chalk.cyan("  - bun run local:setup # For local development"));
-		vConsole.log(
-			chalk.cyan("  - bun run dev:setup # For DevContainer development"),
-		);
-	},
-);
+	vConsole.log(colorify.green("✅ Cleanup completed successfully!"));
+	vConsole.log(colorify.cyan("\n💡 To start fresh, run:"));
+	vConsole.log(colorify.cyan("  - bun run local:setup # For local development"));
+	vConsole.log(colorify.cyan("  - bun run dev:setup # For DevContainer development"));
+});
 
 if (import.meta.main) {
 	cleanup();

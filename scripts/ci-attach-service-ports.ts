@@ -1,11 +1,7 @@
 #!/usr/bin/env bun
 
-import {
-	createScript,
-	type ScriptConfig,
-	validators,
-} from "./utils/create-scripts";
-import { parseCompose } from "./utils/docker-compose-parser";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { parseCompose } from "./scripting-utils/docker-compose-parser";
 
 const ciAttachServicePortsConfig = {
 	name: "GitHub Attach Service Ports",

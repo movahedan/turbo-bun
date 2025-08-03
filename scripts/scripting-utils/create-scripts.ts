@@ -1,10 +1,7 @@
 /**
  * Utility to create a script with automatic error handling and type safety
  */
-export function createScript<
-	Config extends ScriptConfig,
-	Return extends Promise<void> | void,
->(
+export function createScript<Config extends ScriptConfig, Return extends Promise<void> | void>(
 	config: Config,
 	fn: (
 		args: InferArgs<typeof defaultConfig> & InferArgs<Config>,
@@ -14,9 +11,7 @@ export function createScript<
 		exitOnError?: boolean;
 		showStack?: boolean;
 	} = {},
-): (
-	passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>,
-) => Return {
+): (passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>) => Return {
 	return (passedArgs) => {
 		// Parse command line args if no passed args
 		const cliArgs =
@@ -90,9 +85,7 @@ export interface ParsedArgs {
 	[key: string]: string | boolean | string[] | undefined;
 }
 
-type InferArgName<T extends ArgOption> = T["long"] extends `--${infer Name}`
-	? Name
-	: never;
+type InferArgName<T extends ArgOption> = T["long"] extends `--${infer Name}` ? Name : never;
 
 type InferArgValue<T extends ArgOption> = T["multiple"] extends true
 	? string[]
@@ -116,8 +109,7 @@ type OptionalOptions<T extends ScriptConfigOptions> = {
  * Type utility to infer argument types from ScriptConfig
  * Combines required and optional options
  */
-export type InferArgs<T extends ScriptConfigOptions> = RequiredOptions<T> &
-	OptionalOptions<T>;
+export type InferArgs<T extends ScriptConfigOptions> = RequiredOptions<T> & OptionalOptions<T>;
 
 /**
  * Parse command line arguments based on script configuration
@@ -165,11 +157,9 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			const consideredTrue = isLastArg || nextArgIsOption;
 
 			const nextArgIsTrue =
-				nextArg?.toLowerCase().toString() === "true" ||
-				nextArg?.toLowerCase().toString() === "1";
+				nextArg?.toLowerCase().toString() === "true" || nextArg?.toLowerCase().toString() === "1";
 			const nextArgIsFalse =
-				nextArg?.toLowerCase().toString() === "false" ||
-				nextArg?.toLowerCase().toString() === "0";
+				nextArg?.toLowerCase().toString() === "false" || nextArg?.toLowerCase().toString() === "0";
 
 			if (!consideredTrue && !nextArgIsTrue && !nextArgIsFalse) {
 				throw new Error(
@@ -188,9 +178,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 
 		// Handle value options
 		if (isLastArg || nextArgIsOption) {
-			throw new Error(
-				`❌ Error: ${option.short}/${option.long} requires a value`,
-			);
+			throw new Error(`❌ Error: ${option.short}/${option.long} requires a value`);
 		}
 
 		// Validate the value
@@ -199,9 +187,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			throw new Error(`❌ Error: ${validation}`);
 		}
 		if (!validation) {
-			throw new Error(
-				`❌ Error: Invalid value for ${option.short}/${option.long}`,
-			);
+			throw new Error(`❌ Error: Invalid value for ${option.short}/${option.long}`);
 		}
 
 		// Handle multiple values for the same option
@@ -209,7 +195,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 			result[optionKey] = nextArg;
 		} else {
 			result[optionKey] = (result[optionKey] || []) as string[];
-			result[optionKey];
+			(result[optionKey] as string[]).push(nextArg);
 		}
 
 		i++; // Skip next argument since we consumed it
@@ -218,9 +204,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 	// Validate required options
 	config.options.forEach((option) => {
 		if (option.required && !result[option.long.replace("--", "")]) {
-			throw new Error(
-				`❌ Error: ${option.short}/${option.long} is required. Use -h for help.`,
-			);
+			throw new Error(`❌ Error: ${option.short}/${option.long} is required. Use -h for help.`);
 		}
 	});
 

@@ -16,9 +16,7 @@ describe("cn (className utility)", () => {
 	});
 
 	it("should handle object inputs", () => {
-		expect(cn({ class1: true, class2: false, class3: true })).toBe(
-			"class1 class3",
-		);
+		expect(cn({ class1: true, class2: false, class3: true })).toBe("class1 class3");
 	});
 
 	it("should handle mixed inputs", () => {

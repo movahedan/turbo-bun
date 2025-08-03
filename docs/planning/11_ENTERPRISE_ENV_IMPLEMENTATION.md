@@ -43,7 +43,6 @@ interface TurboobunWithEnvManagement {
   packages: {
     '@repo/ui': 'Shared UI components';
     '@repo/utils': 'Utility functions';
-    '@repo/logger': 'Logging utilities';
     '@repo/test-preset': 'Testing configurations';
     '@repo/env-manager': 'NEW: Environment management';
     '@repo/auth-provider': 'NEW: Authentication provider';

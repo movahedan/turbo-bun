@@ -2,17 +2,12 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { $ } from "bun";
-import chalk from "chalk";
-import {
-	createScript,
-	type ScriptConfig,
-	validators,
-} from "./utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const updatePackageJsonConfig = {
 	name: "update-package-json",
-	description:
-		"Update the package.json exports attributes based on the files in the package",
+	description: "Update the package.json exports attributes based on the files in the package",
 	usage: "bun run update-package-json [options]",
 	examples: ["bun run update-package-json"],
 	options: [
@@ -30,12 +25,9 @@ const updatePackageJsonConfig = {
 export const updatePackageJson = createScript(
 	updatePackageJsonConfig,
 	async function run(args, vConsole) {
-		vConsole.log(chalk.blue("🧹 Starting package.json update..."));
+		vConsole.log(colorify.blue("🧹 Starting package.json update..."));
 
-		vConsole.log(chalk.blue("🔍 Finding package.json..."));
 		const packageJsonPath = path.join(process.cwd(), "package.json");
-		vConsole.log(chalk.blue(`🔍 Found package.json at ${packageJsonPath}`));
-
 		const packageDir = path.dirname(packageJsonPath);
 		const srcDir = args.src ? path.join(packageDir, "src") : packageDir;
 		const files = await readdir(srcDir, {
@@ -44,8 +36,8 @@ export const updatePackageJson = createScript(
 		});
 
 		vConsole.log(
-			chalk.blue(`🔍 Found ${files.length} exportable modules:`),
-			chalk.cyan(files.map((f) => f.name).join(" ")),
+			colorify.blue(`🔍 Found ${files.length} exportable modules:`),
+			colorify.cyan(files.map((f) => f.name).join(" ")),
 		);
 
 		async function getNewExports() {
@@ -53,9 +45,7 @@ export const updatePackageJson = createScript(
 
 			for (const file of files) {
 				const shouldSkip =
-					!file.isDirectory() &&
-					!file.name.endsWith(".ts") &&
-					!file.name.endsWith(".tsx");
+					!file.isDirectory() && !file.name.endsWith(".ts") && !file.name.endsWith(".tsx");
 				if (shouldSkip) continue;
 
 				if (file.name === "index.ts") {
@@ -78,7 +68,7 @@ export const updatePackageJson = createScript(
 		const newExports = await getNewExports();
 
 		if (args["dry-run"]) {
-			vConsole.log(chalk.yellow("🔍 Dry run mode, skipping write:"));
+			vConsole.log(colorify.yellow("🔍 Dry run mode, skipping write:"));
 			vConsole.log(JSON.stringify(newExports, null, 2));
 			return;
 		}
@@ -88,7 +78,7 @@ export const updatePackageJson = createScript(
 
 		await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
 		await $`bun biome check --write --no-errors-on-unmatched ${packageJsonPath}`;
-		vConsole.log(chalk.green("✅ Package.json updated successfully"));
+		vConsole.log(colorify.green("✅ Package.json updated successfully"));
 	},
 );
 

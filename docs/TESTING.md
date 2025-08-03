@@ -9,9 +9,9 @@ This repository uses Bun for testing with a comprehensive setup that includes wa
 bun run test
 ```
 
-### Run tests in watch mode
+### Run tests for affected packages
 ```bash
-bun run test:watch
+bun run test --affected
 ```
 
 ### Run tests with coverage
@@ -23,20 +23,17 @@ bun run test:coverage
 
 ### Root Level Commands
 - `bun run test` - Run all tests across all packages
-- `bun run test:watch` - Run all tests in watch mode
+- `bun run test --affected` - Run tests only for affected packages
 - `bun run test:coverage` - Run all tests with coverage reporting
-- `bun run test:affected` - Run tests only for affected packages
-- `bun run test:affected:watch` - Run affected tests in watch mode
-- `bun run test:force` - Force run all tests (bypass cache)
-- `bun run test:parallel` - Run tests in parallel mode
+- `bun run test --clearCache` - Clear test cache and run tests
+- `turbo run test --parallel` - Run tests in parallel mode
 
 ### Package-Specific Commands
 - `turbo run test --filter=@repo/ui` - Run tests for UI package only
 - `turbo run test --filter=@repo/utils` - Run tests for Utils package only
-- `turbo run test --filter=@repo/logger` - Run tests for Logger package only
-- `turbo run test --filter=@repo/api` - Run tests for API app only
-- `turbo run test --filter=@repo/storefront` - Run tests for Storefront app only
-- `turbo run test --filter=@repo/admin` - Run tests for Admin app only
+- `turbo run test --filter=admin` - Run tests for Admin app only
+- `turbo run test --filter=storefront` - Run tests for Storefront app only
+- `turbo run test --filter=api` - Run tests for API app only
 
 ## 🎯 Individual Package Testing
 
@@ -44,8 +41,19 @@ Each package has its own test scripts:
 
 ### Apps (React-based)
 ```bash
+# Admin app
+cd apps/admin
 bun run test          # Run tests
-bun run test:watch    # Run tests in watch mode
+bun run test:coverage # Run tests with coverage
+
+# Storefront app
+cd apps/storefront
+bun run test          # Run tests
+bun run test:coverage # Run tests with coverage
+
+# API app
+cd apps/api
+bun run test          # Run tests
 bun run test:coverage # Run tests with coverage
 ```
 
@@ -54,19 +62,16 @@ bun run test:coverage # Run tests with coverage
 # UI package (React components)
 cd packages/ui
 bun run test          # Run tests with DOM environment
-bun run test:watch    # Run tests in watch mode
 bun run test:coverage # Run tests with coverage
 
 # Utils package
 cd packages/utils
 bun run test          # Run tests
-bun run test:watch    # Run tests in watch mode
 bun run test:coverage # Run tests with coverage
 
-# Logger package
-cd packages/logger
+# Test preset package
+cd packages/test-preset
 bun run test          # Run tests
-bun run test:watch    # Run tests in watch mode
 bun run test:coverage # Run tests with coverage
 ```
 
@@ -98,150 +103,322 @@ bun run packages/test-preset/test-config.ts --help
 ## 🏗️ Test Configuration
 
 ### Centralized Setup
-All tests use a centralized setup file: `packages/test-preset/test-setup.ts`
+The project uses a centralized test configuration through the `@repo/test-preset` package:
 
-This file provides:
-- DOM environment setup for React tests
-- Testing Library configuration
-- Global test utilities
-- Environment variable configuration
+```json
+// packages/test-preset/package.json
+{
+  "name": "@repo/test-preset",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./jest.config.js",
+    "./setup": "./setup.ts"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.12",
+    "jest": "29.7.0",
+    "jest-environment-jsdom": "29.7.0"
+  }
+}
+```
 
-### Bun Configuration
-The `bunfig.toml` file contains:
-- Test preload configuration
-- Environment variables
-- Timeout settings
-- Coverage settings
-- Watch mode configuration
+### Test Preset Configuration
+```javascript
+// packages/test-preset/jest.config.js
+export default {
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/setup.ts"],
+  moduleNameMapping: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.stories.{ts,tsx}",
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+};
+```
 
-### Turbo Configuration
-The `turbo.json` file defines:
-- Test task dependencies
-- Input/output file patterns
-- Caching strategies
-- Parallel execution settings
+### Package-Level Configuration
+Each package extends the test preset:
 
-## 📝 Writing Tests
+```json
+// packages/ui/package.json
+{
+  "devDependencies": {
+    "@repo/test-preset": "workspace:*"
+  },
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  }
+}
+```
 
-### Basic Test Structure
+## 🧪 Test Types and Patterns
+
+### Unit Tests
 ```typescript
-import { describe, expect, it } from "bun:test";
-import { render, screen } from "@testing-library/react";
-import { Button } from "./Button";
+// Example unit test
+import { render, screen } from '@testing-library/react';
+import { Button } from './Button';
 
-describe("Button", () => {
-  it("renders correctly", () => {
+describe('Button Component', () => {
+  it('renders with correct text', () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByRole("button")).toBeInTheDocument();
+    expect(screen.getByText('Click me')).toBeInTheDocument();
   });
-});
-```
 
-### Using Test Utilities
-```typescript
-import { utils } from "../../packages/test-preset/test-setup";
-
-describe("MyComponent", () => {
-  it("waits for async operations", async () => {
-    await utils.wait(100); // Wait for 100ms
-    // ... test logic
-  });
-});
-```
-
-### React Component Testing
-```typescript
-import { describe, expect, it } from "bun:test";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { Button } from "./Button";
-
-describe("Button", () => {
-  it("handles click events", () => {
-    const handleClick = mock();
+  it('handles click events', () => {
+    const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
     
-    fireEvent.click(screen.getByRole("button"));
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    screen.getByText('Click me').click();
+    expect(handleClick).toHaveBeenCalled();
   });
 });
 ```
 
-## 🎨 Test Patterns
+### Integration Tests
+```typescript
+// Example integration test
+import { render, screen, waitFor } from '@testing-library/react';
+import { UserProfile } from './UserProfile';
 
-### Component Testing
-- Use `@testing-library/react` for React component tests
-- Test user interactions, not implementation details
-- Use semantic queries (getByRole, getByLabelText, etc.)
-
-### Utility Testing
-- Test pure functions with simple assertions
-- Mock external dependencies
-- Test edge cases and error conditions
-
-### Integration Testing
-- Test component interactions
-- Test API integrations
-- Test user workflows
-
-## 🔍 Debugging Tests
-
-### Watch Mode Debugging
-- Tests automatically re-run on file changes
-- Console output shows test results in real-time
-- Failed tests are highlighted
-
-### Coverage Analysis
-```bash
-# Generate coverage report
-bun run test:coverage
-
-# View coverage in browser
-open coverage/lcov-report/index.html
+describe('UserProfile Integration', () => {
+  it('loads and displays user data', async () => {
+    render(<UserProfile userId="123" />);
+    
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    
+    await waitFor(() => {
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+    });
+  });
+});
 ```
 
-### Test Isolation
-- Each test runs in isolation
-- Global state is reset between tests
-- DOM is cleaned up automatically
+### API Tests
+```typescript
+// Example API test
+import request from 'supertest';
+import { app } from '../src/app';
+
+describe('API Endpoints', () => {
+  it('GET /api/users returns user list', async () => {
+    const response = await request(app)
+      .get('/api/users')
+      .expect(200);
+    
+    expect(response.body).toHaveProperty('users');
+    expect(Array.isArray(response.body.users)).toBe(true);
+  });
+});
+```
+
+## 📊 Coverage and Reporting
+
+### Coverage Configuration
+```toml
+# bunfig.toml
+[test]
+coverage = true
+coverage-reporter = ["text", "html", "lcov"]
+coverage-directory = "coverage"
+```
+
+### Coverage Thresholds
+```javascript
+// jest.config.js
+export default {
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+    './src/components/': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+  },
+};
+```
+
+### Coverage Reports
+```bash
+# Generate coverage reports
+bun run test:coverage
+
+# View HTML coverage report
+open coverage/lcov-report/index.html
+
+# Generate coverage for specific package
+cd packages/ui && bun run test:coverage
+```
+
+## 🔄 Test Workflow
+
+### Development Workflow
+```bash
+# 1. Make changes to code
+# 2. Run tests for affected packages
+bun run test --affected
+
+# 3. Run full test suite before commit
+bun run test
+
+# 4. Check coverage
+bun run test:coverage
+```
+
+### CI/CD Integration
+```yaml
+# .github/workflows/test.yml
+- name: Run Tests
+  run: bun run test
+
+- name: Run Tests with Coverage
+  run: bun run test:coverage
+
+- name: Upload Coverage
+  uses: codecov/codecov-action@v3
+  with:
+    file: ./coverage/lcov.info
+```
 
 ## 🚨 Troubleshooting
 
 ### Common Issues
 
-1. **Tests not running in watch mode**
-   - Ensure you're using `bun run test:watch`
-   - Check that files are being watched (no .gitignore issues)
+#### **Test Cache Issues**
+```bash
+# Clear test cache
+bun run test --clearCache
+turbo run test --clearCache
 
-2. **DOM environment not available**
-   - Ensure `--dom` flag is used for React component tests
-   - Check that `@happy-dom/global-registrator` is installed
+# Force run tests
+bun run test --force
+```
 
-3. **Coverage not generating**
-   - Ensure `--coverage` flag is used
-   - Check that coverage directory is writable
+#### **Coverage Issues**
+```bash
+# Regenerate coverage
+rm -rf coverage/
+bun run test:coverage
 
-4. **Tests running slowly**
-   - Use `--parallel` flag for parallel execution
-   - Consider using `--affected` to only run changed tests
+# Check coverage configuration
+cat bunfig.toml | grep coverage
+```
 
-### Performance Tips
-- Use `bun run test:affected` for faster feedback during development
-- Use `bun run test:parallel` for faster execution
-- Use watch mode for continuous feedback
-- Configure appropriate timeouts in `bunfig.toml`
+#### **Environment Issues**
+```bash
+# Check test environment
+bun run test --verbose
 
-## 📚 Additional Resources
+# Debug test setup
+NODE_ENV=test bun run test --debug
+```
 
-- [Bun Test Documentation](https://bun.sh/docs/cli/test)
-- [Testing Library Documentation](https://testing-library.com/)
-- [Jest DOM Matchers](https://github.com/testing-library/jest-dom)
-- [Turbo Test Configuration](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks#test)
+### Performance Optimization
 
-## 🤝 Contributing
+#### **Parallel Testing**
+```bash
+# Run tests in parallel
+turbo run test --parallel
 
-When adding new tests:
-1. Follow the existing test patterns
-2. Use the centralized test setup
-3. Add appropriate test scripts to package.json
-4. Update this documentation if needed
-5. Ensure tests pass in both normal and watch modes 
+# Parallel with specific packages
+turbo run test --filter=@repo/ui --parallel
+```
+
+#### **Affected Testing**
+```bash
+# Test only changed packages
+bun run test --affected
+
+# Test specific affected packages
+turbo run test --filter=@repo/ui --affected
+```
+
+## 📚 Best Practices
+
+### **Test Organization**
+- **Unit tests**: Test individual functions and components
+- **Integration tests**: Test component interactions
+- **E2E tests**: Test complete user workflows
+- **API tests**: Test backend endpoints
+
+### **Test Naming**
+```typescript
+// Good test names
+describe('UserService', () => {
+  it('should create a new user when valid data is provided', () => {});
+  it('should throw error when email is invalid', () => {});
+  it('should update user profile successfully', () => {});
+});
+
+// Avoid generic names
+describe('UserService', () => {
+  it('should work', () => {}); // ❌ Too generic
+  it('test', () => {}); // ❌ Too generic
+});
+```
+
+### **Test Structure**
+```typescript
+describe('Component', () => {
+  // Setup
+  beforeEach(() => {
+    // Setup code
+  });
+
+  // Tests
+  it('should do something', () => {
+    // Arrange
+    const props = { /* ... */ };
+    
+    // Act
+    render(<Component {...props} />);
+    
+    // Assert
+    expect(screen.getByText('Expected')).toBeInTheDocument();
+  });
+
+  // Cleanup
+  afterEach(() => {
+    // Cleanup code
+  });
+});
+```
+
+### **Mocking and Stubbing**
+```typescript
+// Mock external dependencies
+jest.mock('axios', () => ({
+  get: jest.fn(),
+  post: jest.fn(),
+}));
+
+// Mock React components
+jest.mock('./ExpensiveComponent', () => ({
+  ExpensiveComponent: () => <div>Mocked Component</div>,
+}));
+```
+
+---
+
+**Ready to write comprehensive tests?** Follow these patterns for robust, maintainable test suites! 🧪 

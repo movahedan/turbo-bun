@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
-import { createScript, validators } from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const ciBranchNameConfig = {
 	name: "CI Branch Name Checker",
@@ -20,15 +20,14 @@ const ciBranchNameConfig = {
 			validator: validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const ciBranchName = createScript(
 	ciBranchNameConfig,
 	async function main(args, xConsole): Promise<void> {
 		// In GitHub Actions, we might not have a proper branch name for pull requests
 		// Skip the check if we're in a CI environment and don't have a valid branch name
-		const isCI =
-			process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+		const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
 
 		const { stdout: currentBranch } = await $`git branch --show-current`;
 
@@ -71,9 +70,7 @@ export const ciBranchName = createScript(
 			xConsole.log(`🔍 Checking branch name: ${name}`);
 			xConsole.log(`📋 Patterns to match: ${Object.keys(patterns).join(", ")}`);
 
-			const isValid = Object.values(patterns).some((pattern) =>
-				pattern.test(name),
-			);
+			const isValid = Object.values(patterns).some((pattern) => pattern.test(name));
 
 			xConsole.log("✅ Branch name is valid!");
 

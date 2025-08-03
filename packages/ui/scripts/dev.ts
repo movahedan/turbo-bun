@@ -1,18 +1,15 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import chalk from "chalk";
 
 let checkInterval: NodeJS.Timeout;
 
 async function main() {
-	console.log(chalk.cyan("🚀 Starting UI development environment..."));
-	console.log(
-		chalk.yellow("📁 Watching src/ for changes and running prebuild"),
-	);
-	console.log(chalk.blue("📚 Starting Storybook\n"));
+	console.log("🚀 Starting UI development environment...");
+	console.log("📁 Watching src/ for changes and running prebuild");
+	console.log("📚 Starting Storybook\n");
 
-	console.log(chalk.green("🔄 Running initial prebuild..."));
+	console.log("🔄 Running initial prebuild...");
 	await $`bun run prebuild`;
 
 	// Set up a simple polling mechanism for file changes
@@ -27,29 +24,29 @@ async function main() {
 			const { stdout } = await $`find src -type f -newer .last-check.log`;
 
 			if (stdout.toString().trim()) {
-				console.log(chalk.green("📝 Files changed, running prebuild..."));
-				console.log(chalk.yellow("🔄 Running prebuild..."));
+				console.log("📝 Files changed, running prebuild...");
+				console.log("🔄 Running prebuild...");
 
 				try {
 					await $`bun run prebuild`;
-					console.log(chalk.green("✅ Prebuild completed"));
+					console.log("✅ Prebuild completed");
 				} catch (error) {
-					console.error(chalk.red(`❌ Prebuild failed: ${error}`));
+					console.error(`❌ Prebuild failed: ${error}`);
 				}
 			}
 		} catch (error) {
-			console.error(chalk.red(`❌ Polling error: ${error}`));
+			console.error(`❌ Polling error: ${error}`);
 		}
 	}, delay);
 
 	// Run Storybook directly instead of spawning it
-	console.log(chalk.blue("🎬 Starting Storybook directly..."));
+	console.log("🎬 Starting Storybook directly...");
 	await $`bun run dev:storybook -- --port ${process.env.PORT || process.env.REPO_PORTS_UI} --host ${process.env.HOST}`;
 }
 
 // Handle process termination
 const cleanup = () => {
-	console.log(chalk.magenta("\n🛑 Shutting down development environment..."));
+	console.log("\n🛑 Shutting down development environment...");
 	clearInterval(checkInterval);
 	process.exit(0);
 };
@@ -59,6 +56,6 @@ process.on("SIGTERM", cleanup);
 
 // Start the main function
 main().catch((error) => {
-	console.error(chalk.red(`❌ Fatal error: ${error}`));
+	console.error(`❌ Fatal error: ${error}`);
 	process.exit(1);
 });

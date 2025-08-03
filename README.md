@@ -25,7 +25,7 @@
 - **[Scripting Guide](./docs/4_SCRIPTING.md)** - Modular, type-safe script development
 - **[Docker & DevContainer](./docs/5_DOCKER.md)** - Implementation details and hidden features
 - **[Renovate Configuration](./docs/6_RENOVATE.md)** - Automated dependency management
-- **[Build Vite Library](./docs/7_BUILD_VITE_LIBRARY.md)** - Complete TypeScript library build workflow
+- **[Auto-Versioning System](./docs/7_AUTO_VERSIONING.md)** - Intelligent version management and deployment tracking
 - **[Quality Checklist](./docs/0_QUALITY_CHECKLIST.md)** - Test infrastructure changes before deployment
 - **[AI Prompt](./docs/AI_Prompt.md)** - Automated testing and validation for AI assistants
 
@@ -176,9 +176,8 @@ The monorepo uses [Renovate](https://docs.renovatebot.com) for intelligent depen
 | `api` | App | [Express](https://expressjs.com/en/guide/routing.html) + [TypeScript](https://www.typescriptlang.org/docs/) | 3003 | Backend API server |
 | `@repo/ui` | Package | [React](https://react.dev/learn) | 3004 | Shared UI components with Storybook |
 | `@repo/utils` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Utility functions |
-| `@repo/logger` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | Logging utilities |
 | `@repo/test-preset` | Package | [Jest](https://jestjs.io/docs/getting-started) | - | Testing configurations |
-| `@repo/config-typescript` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | TypeScript configurations |
+| `@repo/typescript-config` | Package | [TypeScript](https://www.typescriptlang.org/docs/) | - | TypeScript configurations |
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

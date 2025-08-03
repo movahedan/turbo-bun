@@ -1,7 +1,7 @@
 import { describe, expect, it, spyOn } from "bun:test";
-import { log } from "./index";
+import { log } from "./logger";
 
-describe("@repo/logger", () => {
+describe("@repo/utils - logger", () => {
 	it("prints a message", () => {
 		const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
 

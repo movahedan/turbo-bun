@@ -2,12 +2,9 @@
 
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
-import chalk from "chalk";
-import { createScript, validators } from "./utils/create-scripts";
-import {
-	parseCompose,
-	type ServiceHealth,
-} from "./utils/docker-compose-parser";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { parseCompose, type ServiceHealth } from "./scripting-utils/docker-compose-parser";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",
@@ -23,43 +20,32 @@ const devCheckConfig = {
 			validator: validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
-const devCheck = createScript(
-	devCheckConfig,
-	async function main(args, xConsole) {
-		xConsole.log(chalk.blue("🧪 Starting DevContainer Health Check..."));
+const devCheck = createScript(devCheckConfig, async function main(args, xConsole) {
+	xConsole.log(colorify.blue("🧪 Starting DevContainer Health Check..."));
 
-		await $`bun run dev:up --build`;
-		const parsedCompose = await parseCompose("dev");
-		await monitorServiceHealth(
-			parsedCompose.serviceHealth,
-			parsedCompose.exposedServices,
-			xConsole,
-		);
+	await $`bun run dev:up --build`;
+	const parsedCompose = await parseCompose("dev");
+	await monitorServiceHealth(parsedCompose.serviceHealth, parsedCompose.exposedServices, xConsole);
 
-		xConsole.log(chalk.blue("\n📊 Services are available at:"));
-		const devUrls = parsedCompose.serviceUrls();
-		for (const [name, url] of Object.entries(devUrls)) {
-			xConsole.log(chalk.cyan(`   • ${name}: ${url}`));
-		}
+	xConsole.log(colorify.blue("\n📊 Services are available at:"));
+	const devUrls = parsedCompose.serviceUrls();
+	for (const [name, url] of Object.entries(devUrls)) {
+		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));
+	}
 
+	xConsole.log(colorify.green("✅ DevContainer health check completed successfully!"));
+
+	if (args.shutdown) {
+		xConsole.log(colorify.yellow("🧹 Cleaning up services..."));
+		await $`bun run dev:down`;
+	} else {
 		xConsole.log(
-			chalk.green("✅ DevContainer health check completed successfully!"),
+			colorify.yellow("💡 Use 'bun run dev:check --shutdown' to stop services when done"),
 		);
-
-		if (args.shutdown) {
-			xConsole.log(chalk.yellow("🧹 Cleaning up services..."));
-			await $`bun run dev:down`;
-		} else {
-			xConsole.log(
-				chalk.yellow(
-					"💡 Use 'bun run dev:check --shutdown' to stop services when done",
-				),
-			);
-		}
-	},
-);
+	}
+});
 
 if (import.meta.main) {
 	devCheck();
@@ -72,17 +58,17 @@ const icons: Record<ServiceHealth["status"], string> = {
 	none: "❓",
 };
 const colors: Record<ServiceHealth["status"], (text: string) => string> = {
-	healthy: chalk.green,
-	starting: chalk.yellow,
-	unhealthy: chalk.red,
-	none: chalk.gray,
+	healthy: colorify.green,
+	starting: colorify.yellow,
+	unhealthy: colorify.red,
+	none: colorify.gray,
 };
 async function monitorServiceHealth(
 	serviceHealth: Awaited<ReturnType<typeof parseCompose>>["serviceHealth"],
 	services: Awaited<ReturnType<typeof parseCompose>>["exposedServices"],
 	xConsole: typeof console,
 ) {
-	xConsole.log(chalk.yellow("⏳ Waiting for services to become healthy..."));
+	xConsole.log(colorify.yellow("⏳ Waiting for services to become healthy..."));
 
 	const retryInterval = 5_000;
 	const maxRetries = 6; // 6 * retryInterval = 30 seconds total
@@ -93,7 +79,7 @@ async function monitorServiceHealth(
 	while (retryCount < maxRetries && !allHealthy) {
 		if (retryCount > 0) {
 			xConsole.log(
-				chalk.yellow(
+				colorify.yellow(
 					`🔄 Retry ${retryCount}/${maxRetries} - Checking health again in 5 seconds...`,
 				),
 			);
@@ -113,7 +99,7 @@ async function monitorServiceHealth(
 	}
 
 	// Print detailed health status
-	xConsole.log(chalk.blue("\n📊 Final Service Health Status:"));
+	xConsole.log(colorify.blue("\n📊 Final Service Health Status:"));
 	xConsole.log("-".repeat(50));
 	if (!healthResult) {
 		throw new Error("Failed to get health status from services");
@@ -136,5 +122,5 @@ async function monitorServiceHealth(
 		);
 	}
 
-	xConsole.log(chalk.green("✅ All services are healthy"));
+	xConsole.log(colorify.green("✅ All services are healthy"));
 }

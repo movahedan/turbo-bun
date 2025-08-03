@@ -5,9 +5,7 @@ import { Button } from "./button";
 describe("Button", () => {
 	it("renders without crashing", () => {
 		render(<Button>Click me</Button>);
-		expect(
-			screen.getByRole("button", { name: "Click me" }),
-		).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Click me" })).toBeInTheDocument();
 	});
 
 	it("renders with default props", () => {
