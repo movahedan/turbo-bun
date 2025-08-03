@@ -87,14 +87,13 @@
 				},
 				"conventionalCommits.scopes": [
 					"root",
-					"storefront",
 					"admin",
 					"api",
-					"@repo/ui",
-					"@repo/logger",
-					"@repo/utils",
+					"storefront",
+					"@repo/test-preset",
 					"@repo/typescript-config",
-					"@repo/test-preset"
+					"@repo/ui",
+					"@repo/utils"
 				],
 				"typescript.preferences.useAliasesForRenames": false,
 				"typescript.preferences.includePackageJsonAutoImports": "on",

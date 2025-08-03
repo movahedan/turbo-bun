@@ -1,14 +1,7 @@
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { UserConfig } from "@commitlint/types";
-import { getAllDirectories } from "./scripts/scripting-utils/get-all-directories";
+import { getAllDirectoryNames } from "./scripts/scripting-utils/get-all-directories";
 
-// Get valid scopes from monorepo structure
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const projectRoot = join(__dirname);
-const directories = await getAllDirectories(projectRoot);
-const validScopes = directories.map((dir) => dir.name);
+const validScopes = await getAllDirectoryNames();
 
 const config: UserConfig = {
 	extends: ["@commitlint/config-conventional"],
@@ -35,10 +28,9 @@ const config: UserConfig = {
 		"type-empty": [2, "never"],
 		"scope-case": [2, "always", "lower-case"],
 		"scope-enum": [2, "always", validScopes],
-		"subject-case": [2, "always", "lower-case"],
 		"subject-empty": [2, "never"],
 		"subject-full-stop": [2, "never", "."],
-		"header-max-length": [2, "always", 72],
+		"header-max-length": [2, "always", 100],
 	},
 };
 

@@ -63,6 +63,9 @@
 				"useExportType": "error",
 				"noUselessElse": "error",
 				"useShorthandFunctionType": "error"
+			},
+			"suspicious": {
+				"noExplicitAny": "error"
 			}
 		}
 	},

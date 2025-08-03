@@ -27,12 +27,10 @@ const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> =
 	}
 	async function stepArtifacts() {
 		vConsole.log(colorify.yellow("🗂️ Cleaning development artifacts..."));
-		const directories = await getAllDirectories(process.cwd());
+		const directories = await getAllDirectories();
 		for (const directory of directories) {
-			const dirPath = path.resolve(process.cwd(), directory.path);
-
 			for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
-				await removeFile(path.join(dirPath, ARTIFACT));
+				await removeFile(path.join(directory, ARTIFACT));
 			}
 		}
 	}

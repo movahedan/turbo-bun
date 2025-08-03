@@ -1,50 +1,64 @@
-import { readdir } from "node:fs/promises";
-import path from "node:path";
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
-const filterPackages = async (dir: string) => {
-	const entries = await readdir(dir);
-	const packages = [];
+type DirectoryPath = string;
 
-	for (const entry of entries) {
-		if (entry.startsWith(".")) continue;
+export async function getAllDirectories(baseDir?: DirectoryPath): Promise<DirectoryPath[]> {
+	const projectRoot = baseDir ?? join(import.meta.dir, "../..");
 
-		const entryPath = path.join(dir, entry);
-		const stat = await Bun.file(entryPath).stat();
+	const discoverDirectories = (dir: DirectoryPath, depth = 0): DirectoryPath[] => {
+		if (depth > 3) return [];
 
-		if (stat.isDirectory()) {
-			const packageJsonPath = path.join(entryPath, "package.json");
-			if (await Bun.file(packageJsonPath).exists()) {
-				packages.push(entry);
-			}
+		try {
+			return readdirSync(dir)
+				.map((item) => ({ name: item, path: join(dir, item) }))
+				.flatMap(({ name, path }) => {
+					const results: DirectoryPath[] = [];
+
+					const [, , category, , packagePath] = path.split("/");
+					if (category !== "node_modules" && packagePath === "package.json") {
+						const basePath = path.replace(/\/package\.json$/, "");
+						results.push(basePath);
+					}
+
+					try {
+						if (statSync(path).isDirectory()) {
+							if (["apps", "packages"].includes(name)) {
+								results.push(path);
+							}
+							results.push(...discoverDirectories(path, depth + 1));
+						}
+					} catch {
+						return [];
+					}
+
+					return results;
+				});
+		} catch {
+			return [];
 		}
-	}
+	};
 
-	return packages;
-};
-
-interface Directory {
-	name: string;
-	path: string;
+	return discoverDirectories(projectRoot);
 }
 
-export async function getAllDirectories(baseDir: string): Promise<Directory[]> {
-	const directories: Directory[] = [{ name: "root", path: "." }];
-
-	const appsDir = path.join(baseDir, "apps");
-	if (await Bun.file(appsDir).exists()) {
-		const apps = await filterPackages(appsDir);
-		for (const app of apps) {
-			directories.push({ name: app, path: `apps/${app}` });
-		}
-	}
-
-	const packagesDir = path.join(baseDir, "packages");
-	if (await Bun.file(packagesDir).exists()) {
-		const packages = await filterPackages(packagesDir);
-		for (const pkg of packages) {
-			directories.push({ name: `@repo/${pkg}`, path: `packages/${pkg}` });
-		}
-	}
-
-	return directories;
+export async function getAllDirectoryNames(): Promise<string[]> {
+	const directories = await getAllDirectories();
+	const result = directories
+		.map((dir) =>
+			dir
+				.replace(`${process.cwd()}/`, "")
+				.replace("packages", "root")
+				.replace("apps", "")
+				.replace(/^\//, "")
+				.replace("root/", "@repo/"),
+		)
+		.filter(Boolean);
+	return result
+		.sort((a, b) => {
+			if (b.startsWith("root") && !a.startsWith("root")) return -1;
+			if (b.startsWith("@repo") && !a.startsWith("@repo")) return 1;
+			return b.toLowerCase().localeCompare(a.toLowerCase());
+		})
+		.reverse();
 }

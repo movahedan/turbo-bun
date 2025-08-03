@@ -4,7 +4,7 @@ import { exists, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { $ } from "bun";
 import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
-import { getAllDirectories } from "./scripting-utils/get-all-directories";
+import { getAllDirectoryNames } from "./scripting-utils/get-all-directories";
 
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",
@@ -25,11 +25,7 @@ export const syncVscodeConfigScript = createScript(
 	async function main(args, xConsole) {
 		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
-		// Generate scopes from monorepo structure
-		const projectRoot = join(import.meta.dir, "..");
-		const directories = await getAllDirectories(projectRoot);
-		const scopes = directories.map((dir) => dir.name);
-
+		const scopes = await getAllDirectoryNames();
 		xConsole.log(`📋 Generated scopes: ${scopes.join(", ")}`);
 
 		const {
