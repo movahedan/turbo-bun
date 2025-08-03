@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 import { readdir } from "node:fs/promises";
 import { $ } from "bun";
-import { getAffectedPackages } from "./affected";
+import { getAffectedPackages } from "./scripting-utils/affected";
 import { parseChangeset, type VersionPackages } from "./scripting-utils/changeset-parser";
-import { createScript } from "./scripting-utils/create-scripts";
+import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
 
 // Versioning -------------------------------------------------------------------------------------
 const VERSION_TAG_PREFIX = "v";
@@ -93,7 +93,7 @@ export const versionCommit = createScript(
 				defaultValue: "",
 			},
 		],
-	} as const,
+	} as const satisfies ScriptConfig,
 	async function main({ "dry-run": dryRun, "attach-to-output-id": outputId }, xConsole) {
 		xConsole.info("🚀 Analyzing deployment packages for production...");
 

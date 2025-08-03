@@ -3,7 +3,7 @@
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
 import { colorify } from "./scripting-utils/colorify";
-import { createScript, validators } from "./scripting-utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 import { parseCompose, type ServiceHealth } from "./scripting-utils/docker-compose-parser";
 
 const devCheckConfig = {
@@ -20,7 +20,7 @@ const devCheckConfig = {
 			validator: validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 const devCheck = createScript(devCheckConfig, async function main(args, xConsole) {
 	xConsole.log(colorify.blue("🧪 Starting DevContainer Health Check..."));

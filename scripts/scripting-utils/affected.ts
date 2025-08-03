@@ -1,6 +1,6 @@
 import { $ } from "bun";
-import { parseCompose } from "./scripting-utils/docker-compose-parser";
-import { getAllDirectories } from "./scripting-utils/get-all-directories";
+import { parseCompose } from "./docker-compose-parser";
+import { getAllDirectories } from "./get-all-directories";
 
 /* Sample output of turbo command:
   {

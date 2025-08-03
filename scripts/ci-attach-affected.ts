@@ -1,5 +1,8 @@
 #!/usr/bin/env bun
-import { getAffectedPackages, getAffectedServicesWithDependencies } from "./affected";
+import {
+	getAffectedPackages,
+	getAffectedServicesWithDependencies,
+} from "./scripting-utils/affected";
 import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const ciAttachAffectedConfig = {

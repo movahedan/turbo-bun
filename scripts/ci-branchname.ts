@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
-import { createScript, validators } from "./scripting-utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const ciBranchNameConfig = {
 	name: "CI Branch Name Checker",
@@ -20,7 +20,7 @@ const ciBranchNameConfig = {
 			validator: validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const ciBranchName = createScript(
 	ciBranchNameConfig,

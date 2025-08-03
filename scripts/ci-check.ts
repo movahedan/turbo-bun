@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
-import { createScript, validators } from "./scripting-utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const ciCheckConfig = {
 	name: "GitHub Actions Local Testing",
@@ -34,7 +34,7 @@ const ciCheckConfig = {
 			validator: validators.fileExists,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const ciCheck = createScript(ciCheckConfig, async function main(args) {
 	console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
