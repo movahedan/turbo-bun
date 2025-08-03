@@ -2,8 +2,8 @@
 import { readdir } from "node:fs/promises";
 import { $ } from "bun";
 import { getAffectedPackages } from "./affected";
-import { parseChangeset, type VersionPackages } from "./utils/changeset-parser";
-import { createScript } from "./utils/create-scripts";
+import { parseChangeset, type VersionPackages } from "./scripting-utils/changeset-parser";
+import { createScript } from "./scripting-utils/create-scripts";
 
 // Versioning -------------------------------------------------------------------------------------
 const VERSION_TAG_PREFIX = "v";

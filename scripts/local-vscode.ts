@@ -3,8 +3,8 @@
 import { exists, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { $ } from "bun";
-import { createScript, type ScriptConfig } from "./utils/create-scripts";
-import { getAllDirectories } from "./utils/get-all-directories";
+import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
+import { getAllDirectories } from "./scripting-utils/get-all-directories";
 
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",

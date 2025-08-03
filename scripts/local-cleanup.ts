@@ -2,10 +2,10 @@
 
 import path from "node:path";
 import { $ } from "bun";
-import { colorify } from "./utils/colorify";
-import type { ScriptConfig } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
-import { getAllDirectories } from "./utils/get-all-directories";
+import { colorify } from "./scripting-utils/colorify";
+import type { ScriptConfig } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { getAllDirectories } from "./scripting-utils/get-all-directories";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",

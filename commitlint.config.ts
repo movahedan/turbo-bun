@@ -1,7 +1,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { UserConfig } from "@commitlint/types";
-import { getAllDirectories } from "./scripts/utils/get-all-directories";
+import { getAllDirectories } from "./scripts/scripting-utils/get-all-directories";
 
 // Get valid scopes from monorepo structure
 const __filename = fileURLToPath(import.meta.url);

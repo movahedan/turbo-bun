@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./utils/colorify";
-import type { ScriptConfig } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
+import type { ScriptConfig } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
 
 const devRmConfig = {
 	name: "DevContainer Removal",

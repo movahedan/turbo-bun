@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { getAffectedPackages, getAffectedServicesWithDependencies } from "./affected";
-import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",

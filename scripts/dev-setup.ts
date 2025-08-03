@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./utils/colorify";
-import { createScript, validators } from "./utils/create-scripts";
-import { parseCompose } from "./utils/docker-compose-parser";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, validators } from "./scripting-utils/create-scripts";
+import { parseCompose } from "./scripting-utils/docker-compose-parser";
 
 const devSetupConfig = {
 	name: "DevContainer Setup",

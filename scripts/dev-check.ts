@@ -2,9 +2,9 @@
 
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
-import { colorify } from "./utils/colorify";
-import { createScript, validators } from "./utils/create-scripts";
-import { parseCompose, type ServiceHealth } from "./utils/docker-compose-parser";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, validators } from "./scripting-utils/create-scripts";
+import { parseCompose, type ServiceHealth } from "./scripting-utils/docker-compose-parser";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",

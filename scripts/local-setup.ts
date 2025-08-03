@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./utils/colorify";
-import { createScript, validators } from "./utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
+import { createScript, validators } from "./scripting-utils/create-scripts";
 
 const setupLocalConfig = {
 	name: "Local Development Setup",

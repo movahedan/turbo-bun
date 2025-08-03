@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
-import { createScript, validators } from "./utils/create-scripts";
+import { createScript, validators } from "./scripting-utils/create-scripts";
 
 const ciCheckConfig = {
 	name: "GitHub Actions Local Testing",

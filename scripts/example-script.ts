@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
 
 const exampleScriptConfig = {
 	name: "Example Script",
