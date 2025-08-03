@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import chalk from "chalk";
+import { colorify } from "./utils/colorify";
 import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 
@@ -16,19 +16,19 @@ To stop the VS Code DevContainer, run \`bun run dev:rm\` from the host machine.`
 } as const satisfies ScriptConfig;
 
 const devCleanup = createScript(devCleanupConfig, async (_, vConsole): Promise<void> => {
-	vConsole.log(chalk.blue("🧹 Starting DevContainer cleanup..."));
+	vConsole.log(colorify.blue("🧹 Starting DevContainer cleanup..."));
 
 	async function stepDockerServices() {
-		vConsole.log(chalk.yellow("🐳 Stopping DevContainer services..."));
+		vConsole.log(colorify.yellow("🐳 Stopping DevContainer services..."));
 		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes`;
 		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
 	}
 	await stepDockerServices();
 
-	vConsole.log(chalk.green("✅ DevContainer cleanup completed successfully!"));
-	vConsole.log(chalk.cyan("\n💡 To start fresh on devcontainer, run:"));
-	vConsole.log(chalk.cyan("  - bun run dev:setup"));
-	vConsole.log(chalk.cyan("  - bun run dev:rm # To stop VS Code DevContainer (host only)"));
+	vConsole.log(colorify.green("✅ DevContainer cleanup completed successfully!"));
+	vConsole.log(colorify.cyan("\n💡 To start fresh on devcontainer, run:"));
+	vConsole.log(colorify.cyan("  - bun run dev:setup"));
+	vConsole.log(colorify.cyan("  - bun run dev:rm # To stop VS Code DevContainer (host only)"));
 });
 
 if (import.meta.main) {

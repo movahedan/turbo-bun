@@ -6,7 +6,7 @@
 //  */
 
 // import { $ } from "bun";
-// import chalk from "chalk";
+// import { colorify } from "./colorify";
 
 // interface TestConfig {
 // 	mode: "watch" | "coverage" | "normal";
@@ -41,11 +41,11 @@
 // 	async runTests(): Promise<void> {
 // 		const args = this.buildArgs();
 
-// 		console.log(chalk.blue("🧪 Running tests with configuration:"));
-// 		console.log(chalk.gray(`Mode: ${this.config.mode}`));
-// 		console.log(chalk.gray(`Parallel: ${this.config.parallel}`));
-// 		console.log(chalk.gray(`Coverage: ${this.config.coverage}`));
-// 		console.log(chalk.gray(`Filter: ${this.config.filter || "all"}`));
+// 		console.log(colorify.blue("🧪 Running tests with configuration:"));
+// 		console.log(colorify.gray(`Mode: ${this.config.mode}`));
+// 		console.log(colorify.gray(`Parallel: ${this.config.parallel}`));
+// 		console.log(colorify.gray(`Coverage: ${this.config.coverage}`));
+// 		console.log(colorify.gray(`Filter: ${this.config.filter || "all"}`));
 
 // 		try {
 // 			if (this.config.mode === "watch") {
@@ -54,7 +54,7 @@
 // 				await this.runNormalMode();
 // 			}
 // 		} catch (error) {
-// 			console.error(chalk.red("❌ Test run failed:"), error);
+// 			console.error(colorify.red("❌ Test run failed:"), error);
 // 			process.exit(1);
 // 		}
 // 	}
@@ -97,8 +97,8 @@
 // 	 * Run tests in watch mode
 // 	 */
 // 	private async runWatchMode(): Promise<void> {
-// 		console.log(chalk.yellow("👀 Starting watch mode..."));
-// 		console.log(chalk.gray("Press Ctrl+C to stop watching"));
+// 		console.log(colorify.yellow("👀 Starting watch mode..."));
+// 		console.log(colorify.gray("Press Ctrl+C to stop watching"));
 
 // 		const args = this.buildArgs();
 // 		await $`turbo run test:watch ${args}`;
@@ -242,7 +242,7 @@
 // 			case "--help":
 // 			case "-h":
 // 				console.log(`
-// ${chalk.blue("🧪 Bun Test Manager")}
+// ${colorify.blue("🧪 Bun Test Manager")}
 
 // Usage: bun run @repo/test-preset/config [options]
 

@@ -2,7 +2,7 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { $ } from "bun";
-import chalk from "chalk";
+import { colorify } from "./utils/colorify";
 import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
 
 const updatePackageJsonConfig = {
@@ -25,7 +25,7 @@ const updatePackageJsonConfig = {
 export const updatePackageJson = createScript(
 	updatePackageJsonConfig,
 	async function run(args, vConsole) {
-		vConsole.log(chalk.blue("🧹 Starting package.json update..."));
+		vConsole.log(colorify.blue("🧹 Starting package.json update..."));
 
 		const packageJsonPath = path.join(process.cwd(), "package.json");
 		const packageDir = path.dirname(packageJsonPath);
@@ -36,8 +36,8 @@ export const updatePackageJson = createScript(
 		});
 
 		vConsole.log(
-			chalk.blue(`🔍 Found ${files.length} exportable modules:`),
-			chalk.cyan(files.map((f) => f.name).join(" ")),
+			colorify.blue(`🔍 Found ${files.length} exportable modules:`),
+			colorify.cyan(files.map((f) => f.name).join(" ")),
 		);
 
 		async function getNewExports() {
@@ -68,7 +68,7 @@ export const updatePackageJson = createScript(
 		const newExports = await getNewExports();
 
 		if (args["dry-run"]) {
-			vConsole.log(chalk.yellow("🔍 Dry run mode, skipping write:"));
+			vConsole.log(colorify.yellow("🔍 Dry run mode, skipping write:"));
 			vConsole.log(JSON.stringify(newExports, null, 2));
 			return;
 		}
@@ -78,7 +78,7 @@ export const updatePackageJson = createScript(
 
 		await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2));
 		await $`bun biome check --write --no-errors-on-unmatched ${packageJsonPath}`;
-		vConsole.log(chalk.green("✅ Package.json updated successfully"));
+		vConsole.log(colorify.green("✅ Package.json updated successfully"));
 	},
 );
 

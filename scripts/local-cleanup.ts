@@ -2,7 +2,7 @@
 
 import path from "node:path";
 import { $ } from "bun";
-import chalk from "chalk";
+import { colorify } from "./utils/colorify";
 import type { ScriptConfig } from "./utils/create-scripts";
 import { createScript } from "./utils/create-scripts";
 import { getAllDirectories } from "./utils/get-all-directories";
@@ -17,16 +17,16 @@ This includes DevContainer cleanup. To stop the VS Code DevContainer itself, run
 } as const satisfies ScriptConfig;
 
 const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> => {
-	vConsole.log(chalk.blue("🧹 Starting comprehensive cleanup..."));
+	vConsole.log(colorify.blue("🧹 Starting comprehensive cleanup..."));
 
 	async function removeFile(filePath: string) {
 		if (await Bun.file(filePath).exists()) {
 			await Bun.file(filePath).delete();
-			vConsole.log(chalk.gray(`  Removed: ${filePath}`));
+			vConsole.log(colorify.gray(`  Removed: ${filePath}`));
 		}
 	}
 	async function stepArtifacts() {
-		vConsole.log(chalk.yellow("🗂️ Cleaning development artifacts..."));
+		vConsole.log(colorify.yellow("🗂️ Cleaning development artifacts..."));
 		const directories = await getAllDirectories(process.cwd());
 		for (const directory of directories) {
 			const dirPath = path.resolve(process.cwd(), directory.path);
@@ -39,7 +39,7 @@ const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> =
 	await stepArtifacts();
 
 	async function stepLogs() {
-		vConsole.log(chalk.yellow("📝 Cleaning logs and temp files..."));
+		vConsole.log(colorify.yellow("📝 Cleaning logs and temp files..."));
 		await $`find . -name "*.log" -type f -delete`;
 		await $`find . -name "logs" -type d -exec rm -rf {} + 2>/dev/null || true`;
 		await $`find . -name "*.tmp" -type f -delete`;
@@ -50,21 +50,21 @@ const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> =
 	await stepLogs();
 
 	async function stepNodeModules() {
-		vConsole.log(chalk.yellow("📦 Cleaning node_modules in directories..."));
+		vConsole.log(colorify.yellow("📦 Cleaning node_modules in directories..."));
 		await $`find . -type d -name "node_modules" -exec rm -rf {} +`.nothrow();
 	}
 	await stepNodeModules();
 
 	async function stepVSCode() {
-		vConsole.log(chalk.yellow("🎯 Cleaning VS Code configuration..."));
+		vConsole.log(colorify.yellow("🎯 Cleaning VS Code configuration..."));
 		await $`rm -rf .vscode`;
 	}
 	await stepVSCode();
 
-	vConsole.log(chalk.green("✅ Cleanup completed successfully!"));
-	vConsole.log(chalk.cyan("\n💡 To start fresh, run:"));
-	vConsole.log(chalk.cyan("  - bun run local:setup # For local development"));
-	vConsole.log(chalk.cyan("  - bun run dev:setup # For DevContainer development"));
+	vConsole.log(colorify.green("✅ Cleanup completed successfully!"));
+	vConsole.log(colorify.cyan("\n💡 To start fresh, run:"));
+	vConsole.log(colorify.cyan("  - bun run local:setup # For local development"));
+	vConsole.log(colorify.cyan("  - bun run dev:setup # For DevContainer development"));
 });
 
 if (import.meta.main) {
