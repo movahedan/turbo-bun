@@ -22,6 +22,7 @@ Our script system provides type-safe command-line tools with automatic argument 
 - ✅ **Automatic error handling** with consistent messaging
 - ✅ **Built-in help system** with usage examples
 - ✅ **Console output management** with verbosity controls
+- ✅ **Custom colorify utility** for terminal output styling
 
 ## 🚀 Quick Start
 
@@ -30,8 +31,9 @@ Our script system provides type-safe command-line tools with automatic argument 
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
+import { validators } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
 
 const scriptConfig = {
   name: "My Script",
@@ -58,7 +60,7 @@ export const myScript = createScript(
     xConsole.log("📁 Processing:", args.input);
     
     // Your script logic here
-    xConsole.log("✅ Script completed successfully!");
+    xConsole.log(colorify.green("✅ Script completed successfully!"));
   },
 );
 
@@ -90,385 +92,377 @@ Every script follows this pattern:
 #!/usr/bin/env bun
 
 // 1. Imports
-import { validators } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
+import { validators } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
 
 // 2. Configuration
 const scriptConfig = {
   name: "Script Name",
   description: "What the script does",
   usage: "bun run script-name [options]",
-  examples: ["bun run script-name --option value"],
+  examples: [
+    "bun run script-name --option value",
+  ],
   options: [
-    // Define your options here
+    {
+      short: "-o",
+      long: "--option",
+      description: "Option description",
+      required: false,
+      defaultValue: "default",
+      validator: validators.string,
+    },
   ],
 } as const;
 
-// 3. Script Implementation
-export const scriptName = createScript(
+// 3. Main function
+export const myScript = createScript(
   scriptConfig,
   async function main(args, xConsole) {
     // Script logic here
+    xConsole.log(colorify.blue("Processing..."));
+    
+    // Use colorify for colored output
+    xConsole.log(colorify.green("Success!"));
+    xConsole.log(colorify.red("Error!"));
+    xConsole.log(colorify.yellow("Warning!"));
   },
 );
 
-// 4. Entry point
-if (import.meta.main) {
-  scriptName();
-}
-```
-
-### Configuration Options
-
-```typescript
-interface ScriptConfig {
-  name: string;                    // Script name for help output
-  description: string;             // What the script does
-  usage: string;                  // Usage pattern
-  examples: readonly string[];    // Example commands
-  options: readonly ArgOption[];  // Command-line options
-}
-
-interface ArgOption {
-  short: string;                  // Short flag (-f)
-  long: string;                   // Long flag (--file)
-  description: string;            // Help text
-  required?: boolean;             // Is this option required?
-  defaultValue?: string | boolean | number;  // Default value
-  validator?: ValidatorFunction;  // Validation function
-}
-```
-
-## 🛠️ Validators & Console
-
-### Built-in Validators
-
-```typescript
-import { validators } from "./utils/create-scripts";
-
-// File validation
-validators.fileExists        // File must exist
-validators.nonEmpty         // String must not be empty
-
-// Type validation
-validators.boolean()        // Boolean flag
-validators.enum(["a", "b", "c"])  // Must be one of the values
-
-// Custom validation
-validators.custom((value) => {
-  if (value.startsWith("http")) return true;
-  return "Must be a valid URL";
-})
-```
-
-### Console Output
-
-Use `xConsole` for consistent output with automatic verbosity control:
-
-```typescript
-async function main(args, xConsole) {
-  // ✅ Use xConsole for all output
-  xConsole.log("📁 Processing file:", args.file);
-  xConsole.log("✅ Script completed successfully!");
-  
-  // Verbose output (only shown when --verbose is true)
-  xConsole.log("🔍 Debug information");
-  
-  // Quiet output (hidden when --quiet is true)
-  xConsole.warn("⚠️ Warning message");
-  
-  // ❌ Avoid direct console.log usage
-  // console.log("Processing file:", args.file);
-}
-```
-
-### Command Execution
-
-```typescript
-import { $ } from "bun";
-
-// Execute commands directly
-const result = await $`git status`;
-const dockerPs = await $`docker ps`;
-
-// With error handling
-try {
-  await $`docker build -t myapp .`;
-  xConsole.log("✅ Build completed!");
-} catch (error) {
-  xConsole.error("❌ Build failed:", error.message);
-}
-```
-
-## 🎨 Best Practices
-
-### 1. Script Organization
-
-```typescript
-// ✅ Good: Clear separation of concerns
-async function processFiles(args, xConsole) {
-  // 1. Validate inputs
-  // 2. Find required commands
-  // 3. Execute logic
-  // 4. Handle results
-}
-
-// ✅ Good: Descriptive function names
-async function processGitHubActions(args, xConsole)
-async function setupLocalEnvironment(args, xConsole)
-
-// ❌ Avoid: Generic names
-async function main(args: any): Promise<void>
-```
-
-### 2. Error Handling
-
-```typescript
-// ✅ Good: Let createScript handle common errors
-const script = createScript(config, myFunction);
-
-// ✅ Good: Use try-catch for specific operations
-try {
-  await $`docker build -t myapp .`;
-  xConsole.log("✅ Build successful");
-} catch (error) {
-  xConsole.error("❌ Build failed:", error.message);
-  process.exit(1);
-}
-```
-
-### 3. Type Safety
-
-```typescript
-// ✅ Good: Use inferred types
-async function myScript(args: InferArgs<typeof config>, xConsole)
-
-// ❌ Avoid: Any types
-async function myScript(args: any): Promise<void>
-```
-
-### 4. Modular Design
-
-```typescript
-// ✅ Good: Export for modularity and testing
-export const myScript = createScript(config, async function main(args, xConsole) {
-  // Script logic
-});
-
+// 4. Main execution
 if (import.meta.main) {
   myScript();
 }
 ```
 
-## 📚 Examples
+### Available Utilities
 
-### Real-world Scripts
-
-#### CI Check Script
-
+#### **Colorify Utility**
 ```typescript
-#!/usr/bin/env bun
+import { colorify } from "./scripting-utils/colorify";
 
-import { validators } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
-import { $ } from "bun";
+// Available colors
+colorify.red("Error message");
+colorify.green("Success message");
+colorify.yellow("Warning message");
+colorify.blue("Info message");
+colorify.cyan("Debug message");
+colorify.gray("Muted message");
 
-const ciCheckConfig = {
-  name: "CI Check",
-  description: "Run CI checks locally",
-  usage: "bun run ci-check [--workflow <workflow>]",
-  examples: [
-    "bun run ci-check",
-    "bun run ci-check --workflow .github/workflows/test.yml",
-  ],
-  options: [
-    {
-      short: "-w",
-      long: "--workflow",
-      description: "Workflow file to test",
-      required: false,
-      defaultValue: ".github/workflows/ci.yml",
-      validator: validators.fileExists,
-    },
-  ],
-} as const;
-
-export const ciCheck = createScript(
-  ciCheckConfig,
-  async function main(args, xConsole) {
-    xConsole.log("🔍 Running CI checks...");
-    
-    // Check if act is available
-    try {
-      await $`which act`.quiet();
-    } catch {
-      xConsole.error("❌ 'act' not found. Install it to run GitHub Actions locally.");
-      process.exit(1);
-    }
-    
-    // Run the workflow
-    await $`act --list`;
-    xConsole.log("✅ CI checks completed!");
-  },
-);
-
-if (import.meta.main) {
-  ciCheck();
+// Color support detection
+if (colorify.supportsColor()) {
+  // Terminal supports colors
 }
+
+// Disable colors
+colorify.disable();
+
+// Re-enable colors
+colorify.enable();
 ```
 
-#### Local Setup Script
+#### **Directory Utilities**
+```typescript
+import { getAllDirectories, getAllDirectoryNames } from "./scripting-utils/get-all-directories";
 
+// Get all package directories
+const directories = await getAllDirectories();
+
+// Get directory names for commitlint scopes
+const scopes = await getAllDirectoryNames();
+```
+
+#### **Docker Compose Parser**
+```typescript
+import { parseDockerCompose } from "./scripting-utils/docker-compose-parser";
+
+// Parse docker-compose.yml
+const services = await parseDockerCompose("docker-compose.yml");
+```
+
+#### **Changeset Parser**
+```typescript
+import { parseChangesets } from "./scripting-utils/changeset-parser";
+
+// Parse changeset files
+const changesets = await parseChangesets();
+```
+
+## 🔧 Validators & Console
+
+### Built-in Validators
+
+```typescript
+import { validators } from "./scripting-utils/create-scripts";
+
+// String validation
+validators.string("input")           // Validates string input
+validators.boolean("true")           // Validates boolean input
+validators.number("123")             // Validates number input
+validators.fileExists("./file.txt")  // Validates file exists
+validators.directoryExists("./dir")  // Validates directory exists
+```
+
+### Console Output
+
+```typescript
+// Console methods available in main function
+xConsole.log("Info message");
+xConsole.info("Info message");
+xConsole.warn("Warning message");
+xConsole.error("Error message");
+xConsole.debug("Debug message"); // Only shown with --verbose
+```
+
+## 📋 Best Practices
+
+### 1. **Error Handling**
+```typescript
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    try {
+      // Your logic here
+      xConsole.log(colorify.green("✅ Success!"));
+    } catch (error) {
+      xConsole.error(colorify.red(`❌ Error: ${error.message}`));
+      process.exit(1);
+    }
+  },
+);
+```
+
+### 2. **Progress Reporting**
+```typescript
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    xConsole.info("🚀 Starting process...");
+    
+    // Process items
+    for (const item of items) {
+      xConsole.log(`Processing: ${item}`);
+      // ... processing logic
+    }
+    
+    xConsole.log(colorify.green("✅ All items processed!"));
+  },
+);
+```
+
+### 3. **Verbose Output**
+```typescript
+export const myScript = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    xConsole.log("Basic output");
+    
+    if (args.verbose) {
+      xConsole.debug("Detailed debug information");
+      xConsole.log("Additional verbose output");
+    }
+  },
+);
+```
+
+## 📚 Examples
+
+### **File Processing Script**
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./utils/create-scripts";
-import { createScript } from "./utils/create-scripts";
-import { $ } from "bun";
+import { validators } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
+import { readFileSync, writeFileSync } from "node:fs";
 
-const localSetupConfig = {
-  name: "Local Setup",
-  description: "Setup local development environment",
-  usage: "bun run local-setup [--clean]",
+const scriptConfig = {
+  name: "File Processor",
+  description: "Process files with custom logic",
+  usage: "bun run process-files --input file.txt --output result.txt",
   examples: [
-    "bun run local-setup",
-    "bun run local-setup --clean",
+    "bun run process-files --input data.txt --output processed.txt",
+    "bun run process-files --input data.txt --output processed.txt --verbose",
   ],
   options: [
     {
-      short: "-c",
-      long: "--clean",
-      description: "Clean existing setup",
+      short: "-i",
+      long: "--input",
+      description: "Input file path",
+      required: true,
+      validator: validators.fileExists,
+    },
+    {
+      short: "-o",
+      long: "--output",
+      description: "Output file path",
+      required: true,
+    },
+    {
+      short: "-v",
+      long: "--verbose",
+      description: "Enable verbose output",
       required: false,
+      defaultValue: false,
       validator: validators.boolean,
     },
   ],
 } as const;
 
-export const localSetup = createScript(
-  localSetupConfig,
+export const processFiles = createScript(
+  scriptConfig,
   async function main(args, xConsole) {
-    xConsole.log("🚀 Setting up local environment...");
+    xConsole.info("📁 Processing file...");
     
-    if (args.clean) {
-      xConsole.log("🧹 Cleaning existing setup...");
-      await $`rm -rf node_modules`;
-      await $`rm -rf dist`;
+    try {
+      const content = readFileSync(args.input, "utf-8");
+      xConsole.log(`Read ${content.length} characters`);
+      
+      // Process content
+      const processed = content.toUpperCase();
+      
+      writeFileSync(args.output, processed);
+      xConsole.log(colorify.green(`✅ File processed and saved to ${args.output}`));
+      
+      if (args.verbose) {
+        xConsole.debug(`Input: ${args.input}`);
+        xConsole.debug(`Output: ${args.output}`);
+        xConsole.debug(`Processed content length: ${processed.length}`);
+      }
+    } catch (error) {
+      xConsole.error(colorify.red(`❌ Error processing file: ${error.message}`));
+      process.exit(1);
     }
-    
-    // Install dependencies
-    xConsole.log("📦 Installing dependencies...");
-    await $`bun install`;
-    
-    // Setup git hooks
-    xConsole.log("🔧 Setting up git hooks...");
-    await $`bun run husky install`;
-    
-    xConsole.log("✅ Local setup completed!");
   },
 );
 
 if (import.meta.main) {
-  localSetup();
+  processFiles();
 }
 ```
 
-### Common Patterns
-
-#### File Processing
-
+### **Directory Analysis Script**
 ```typescript
-async function processFile(args: { input: string; output: string }, xConsole) {
-  xConsole.log(`📁 Processing: ${args.input}`);
-  
-  const file = Bun.file(args.input);
-  const content = await file.text();
-  
-  // Process content
-  const processed = content.toUpperCase();
-  
-  // Write output
-  await Bun.write(args.output, processed);
-  xConsole.log("✅ Processing completed!");
-}
-```
+#!/usr/bin/env bun
 
-#### Build Script
+import { validators } from "./scripting-utils/create-scripts";
+import { createScript } from "./scripting-utils/create-scripts";
+import { colorify } from "./scripting-utils/colorify";
+import { getAllDirectories } from "./scripting-utils/get-all-directories";
 
-```typescript
-async function buildProject(args: { target: string; clean?: boolean }, xConsole) {
-  xConsole.log(`🏗️ Building target: ${args.target}`);
-  
-  if (args.clean) {
-    xConsole.log("🧹 Cleaning build artifacts...");
-    await $`bun run clean`;
-  }
-  
-  await $`bun run build`;
-  xConsole.log("✅ Build completed!");
+const scriptConfig = {
+  name: "Directory Analyzer",
+  description: "Analyze project directory structure",
+  usage: "bun run analyze-dirs [options]",
+  examples: [
+    "bun run analyze-dirs",
+    "bun run analyze-dirs --verbose",
+  ],
+  options: [
+    {
+      short: "-v",
+      long: "--verbose",
+      description: "Enable verbose output",
+      required: false,
+      defaultValue: false,
+      validator: validators.boolean,
+    },
+  ],
+} as const;
+
+export const analyzeDirs = createScript(
+  scriptConfig,
+  async function main(args, xConsole) {
+    xConsole.info("🔍 Analyzing project directories...");
+    
+    try {
+      const directories = await getAllDirectories();
+      
+      xConsole.log(colorify.blue(`Found ${directories.length} directories:`));
+      
+      for (const dir of directories) {
+        xConsole.log(`  📁 ${dir}`);
+        
+        if (args.verbose) {
+          // Additional analysis for verbose mode
+          xConsole.debug(`    Path: ${dir}`);
+        }
+      }
+      
+      xConsole.log(colorify.green("✅ Directory analysis complete!"));
+    } catch (error) {
+      xConsole.error(colorify.red(`❌ Error analyzing directories: ${error.message}`));
+      process.exit(1);
+    }
+  },
+);
+
+if (import.meta.main) {
+  analyzeDirs();
 }
 ```
 
 ## 📖 API Reference
 
-### createScript
-
+### **createScript Function**
 ```typescript
 function createScript<T extends ScriptConfig>(
   config: T,
-  scriptFunction: (args: InferArgs<T>, xConsole: typeof console) => Promise<void>,
-  options?: {
-    exitOnError?: boolean;
-    showStack?: boolean;
-  }
-): (passedArgs?: InferArgs<T>) => Promise<void>
+  mainFunction: (args: InferArgs<T>, console: XConsole) => Promise<void>
+): () => Promise<void>
 ```
 
-### validators
-
-```typescript
-const validators = {
-  fileExists: (value: string) => boolean | string,
-  nonEmpty: (value: string) => boolean | string,
-  boolean: () => (value: string) => boolean | string,
-  enum: (values: readonly string[]) => (value: string) => boolean | string,
-  custom: (validator: (value: string) => boolean | string) => (value: string) => boolean | string,
-}
-```
-
-### Types
-
+### **ScriptConfig Interface**
 ```typescript
 interface ScriptConfig {
   name: string;
   description: string;
   usage: string;
-  examples: readonly string[];
-  options: readonly ArgOption[];
+  examples: string[];
+  options: Option[];
 }
+```
 
-interface ArgOption {
+### **Option Interface**
+```typescript
+interface Option {
   short: string;
   long: string;
   description: string;
-  required?: boolean;
-  defaultValue?: string | boolean | number;
-  validator?: (value: string) => boolean | string;
+  required: boolean;
+  defaultValue?: any;
+  validator?: (value: any) => boolean | string;
 }
-
-type InferArgs<T extends ScriptConfig> = // Inferred argument types
 ```
 
-## 🎉 Conclusion
+### **XConsole Interface**
+```typescript
+interface XConsole {
+  log(message: string): void;
+  info(message: string): void;
+  warn(message: string): void;
+  error(message: string): void;
+  debug(message: string): void;
+}
+```
 
-This modular script system provides consistency, type safety, and maintainability with minimal boilerplate. Start writing your scripts with confidence using this proven architecture! 🚀
+### **Colorify Interface**
+```typescript
+interface Colorify {
+  red(text: string): string;
+  green(text: string): string;
+  yellow(text: string): string;
+  blue(text: string): string;
+  cyan(text: string): string;
+  gray(text: string): string;
+  reset: string;
+  supportsColor(): boolean;
+  disable(): void;
+  enable(): void;
+}
+```
 
-### Next Steps
+---
 
-1. **Explore existing scripts** in the `scripts/` directory
-2. **Use the example template** in `scripts/example-script.ts`
-3. **Follow the patterns** established in `ci-*` and `local-*` scripts
-
-For more information, see:
-- [Development Flows](./3_DEV_FLOWS.md) - Development workflow
-- [Quality Checklist](./0_QUALITY_CHECKLIST.md) - Code quality standards 
+**Ready to build powerful, type-safe scripts?** Start with the examples above and explore the utility functions in `scripts/scripting-utils/` for more advanced features! 

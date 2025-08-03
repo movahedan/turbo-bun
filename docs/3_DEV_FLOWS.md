@@ -13,6 +13,7 @@ This document covers the essential commands and workflows for day-to-day develop
 - [Build Commands](#-build-commands)
 - [DevContainer Management](#-devcontainer-management)
 - [Contribution Workflow](#-contribution-workflow)
+- [Version Management](#-version-management)
 
 ## 🚀 Quick Start
 
@@ -49,16 +50,11 @@ bun run test --affected      # Test only packages affected by changes
 
 ### **Test Options**
 ```bash
-# Watch mode for development
-bun run test:watch           # Run tests in watch mode
-turbo run test --filter=@repo/ui --watch  # Watch specific package
-
 # Coverage and reporting
 bun run test:coverage        # Run tests with coverage
 bun run test:coverage --affected  # Coverage for affected packages only
 
 # Parallel testing
-bun run test:parallel        # Run tests in parallel
 turbo run test --parallel    # Turbo parallel testing
 ```
 
@@ -98,345 +94,301 @@ bun run dev:up ui            # Start UI package with Storybook only
 
 #### **Development Options**
 ```bash
-# Start with specific options
-bun run dev --parallel        # Start all apps in parallel
-turbo run dev --filter=@repo/* --parallel # Start all packages in parallel
+# Health monitoring
+bun run dev:health           # Check DevContainer health status
+bun run dev:logs             # View DevContainer logs
+bun run dev:logs admin       # View specific service logs
 
-# DevContainer options
-bun run dev:up                # It's in parallel by default
-bun run dev:up  # Start all services
+# Container management
+bun run dev:restart          # Restart all services
+bun run dev:down             # Stop all services
+bun run dev:cleanup          # Clean up containers and volumes
 ```
 
 ### **Package Development**
 
-#### **Local Mode (Host Machine)**
+#### **UI Package with Storybook**
 ```bash
-# Work on specific packages locally
-turbo run dev --filter=@repo/ui         # Start UI package development with Storybook
-turbo run dev --filter=@repo/utils      # Start utils package development
-turbo run dev --filter=@repo/utils     # Start utils package development
+# Start Storybook development server
+turbo run dev --filter=@repo/ui        # Start UI package dev
+bun run build:storybook                # Build Storybook for production
 
-# Build packages for development
-turbo run build --filter=@repo/ui       # Build UI package
-turbo run build --filter=@repo/utils    # Build utils package
+# Storybook commands
+cd packages/ui
+bun run dev:storybook                  # Start Storybook dev server
+bun run start                          # Serve built Storybook
 ```
 
-#### **DevContainer Mode (Containerized)**
+#### **Utility Package Development**
 ```bash
-# We don't have a DevContainer mode for package development, do it on host level
-# Unless the package is a docker container, which would follow app development flow
-```
-
-### **Development Tools**
-
-#### **Local Mode (Host Machine)**
-```bash
-# Local health checks
-bun run check:quick          # Quick verification of changes
-```
-
-#### **DevContainer Mode (Containerized)**
-```bash
-# Health checks
-bun run dev:check             # Check DevContainer health
-bun run dev:health            # Check service health status with formatted output
-
-# Service monitoring
-bun run dev:logs              # View service logs
-bun run dev:logs -f           # Follow logs in real-time
+# Work on utility packages
+turbo run dev --filter=@repo/utils     # Start utils package dev
+turbo run build --filter=@repo/utils   # Build utils package
 ```
 
 ## 🔍 Code Quality
 
-### **Code Quality Checks**
-
-#### **Local Mode and DevContainer Mode (Host Machine and Containerized)**
+### **Quality Checks**
 ```bash
-# Run all quality checks locally
-bun run check                 # Check code quality (linting, formatting)
-bun run check:fix             # Fix code quality issues automatically
-bun run check:types           # Run TypeScript type checking
+# Quick quality check
+bun run check:quick          # Run all quality checks on affected packages
 
-# Quick quality check for affected files
-bun run check:quick           # Quick verification (lint, type, test, build)
+# Individual quality checks
+bun run check                # Biome linting and formatting
+bun run check:fix            # Auto-fix Biome issues
+bun run check:types          # TypeScript type checking
+bun run check:staged         # Check staged files for issues
+```
+
+### **Staged File Validation**
+```bash
+# Check staged files for common issues
+bun run check:staged         # Validate staged files
+
+# Common validations:
+# - No manual version changes in package.json
+# - No manual CHANGELOG.md entries
+# - No development files committed
+```
+
+### **Git Hooks**
+```bash
+# Pre-commit hooks (automatic)
+# - Staged file validation
+# - Code formatting
+# - Type checking
+
+# Pre-push hooks (automatic)
+# - Branch name validation
+# - Quality checks
+# - Tests
+# - Build verification
 ```
 
 ## 🏗️ Build Commands
 
-### **Build Applications**
-
-#### **Local Mode (Host Machine)**
+### **Build System**
 ```bash
-# Build all applications locally
-bun run build                # Build all packages and applications
+# Build all packages
+bun run build               # Build all packages and applications
 
-# Build specific applications locally
-turbo run build --filter=admin      # Build admin app
-turbo run build --filter=storefront # Build storefront app
-turbo run build --filter=api        # Build API
+# Build specific packages
+turbo run build --filter=@repo/ui        # Build UI package
+turbo run build --filter=@repo/utils     # Build utils package
+turbo run build --filter=admin           # Build admin app
 
 # Build affected packages only
 bun run build --affected     # Build only affected packages
 ```
 
-#### **DevContainer Mode (Containerized)**
+### **Storybook Build**
 ```bash
-# Build all applications in DevContainer
-bun run dev:build            # Build all DevContainer images
-
-# Build specific applications in DevContainer
-bun run dev:build admin      # Build admin service image
-bun run dev:build storefront # Build storefront service image
-bun run dev:build api        # Build API service image
+# Build Storybook for production
+bun run build:storybook      # Build all Storybook instances
+turbo run build:storybook --filter=@repo/ui  # Build UI Storybook
 ```
 
-### **Build Options**
-
-#### **Local Mode (Host Machine)**
+### **Start Production Builds**
 ```bash
-# Production builds
-NODE_ENV=production bun run build        # Production build
-NODE_ENV=production turbo run build      # Production build with Turbo
-
-# Development builds
-NODE_ENV=development bun run build       # Development build
-NODE_ENV=development turbo run build     # Development build with Turbo
-
-# Build with specific options
-turbo run build --filter=@repo/* --force # Force rebuild all packages
-turbo run build --filter=@repo/* --parallel # Parallel build
-```
-
-#### **DevContainer Mode (Containerized)**
-```bash
-# DevContainer build options
-bun run dev:build                        # Single docker image for the entire dev env
-```
-
-### **Build Utilities**
-
-#### **Local Mode (Host Machine)**
-```bash
-# Build analysis
-turbo run build --dry-run    # Show what would be built without building
-turbo run build --graph      # Show build dependency graph
-```
-
-#### **DevContainer Mode (Containerized)**
-```bash
-# DevContainer build utilities
-bun run dev:build --dry-run  # Show what would be built
-bun run dev:build --verbose  # Verbose build output
+# Start production builds
+bun run start               # Start all production builds
+turbo run start --filter=admin           # Start admin app
+turbo run start --filter=storefront      # Start storefront app
+turbo run start --filter=api             # Start API server
 ```
 
 ## 🐳 DevContainer Management
 
-### **Service Management**
+### **Container Health**
 ```bash
-# Start and stop services
-bun run dev:up               # Start all DevContainer services
-bun run dev:down             # Stop all DevContainer services
+# Health monitoring
+bun run dev:check            # Comprehensive DevContainer health check
+bun run dev:health           # Quick container status overview
 
-# Start specific services
+# Health check includes:
+# - Container status verification
+# - Port availability
+# - Service connectivity
+# - Volume mount verification
+```
+
+### **Container Operations**
+```bash
+# Container lifecycle
+bun run dev:setup            # Setup DevContainer environment
+bun run dev:up               # Start all containers
+bun run dev:down             # Stop all containers
+bun run dev:restart          # Restart all containers
+
+# Container maintenance
+bun run dev:cleanup          # Clean containers and volumes
+bun run dev:rm               # Remove containers completely
+bun run dev:build            # Rebuild containers
+```
+
+### **Service-Specific Operations**
+```bash
+# Individual service management
 bun run dev:up admin         # Start admin service only
 bun run dev:up storefront    # Start storefront service only
 bun run dev:up api           # Start API service only
+bun run dev:up ui            # Start UI service only
+
+# Service logs
+bun run dev:logs admin       # View admin service logs
+bun run dev:logs storefront  # View storefront service logs
+bun run dev:logs api         # View API service logs
 ```
 
-### **Service Monitoring**
+## 📝 Contribution Workflow
+
+### **Development Process**
 ```bash
-# Check service status
-bun run dev:health           # Check health of all services with formatted output
-bun run dev:health admin     # Check health of specific service
+# 1. Setup development environment
+bun run local:setup          # Setup local environment
+bun run dev:setup            # Setup DevContainer (optional)
 
-# View service logs
-bun run dev:logs             # View logs from all services
-bun run dev:logs admin       # View logs from specific service
-bun run dev:logs -f admin    # Follow logs in real-time
-```
+# 2. Create feature branch
+git checkout -b feature/your-feature
 
-### **Service Building**
-```bash
-# Build services
-bun run dev:build            # Build all DevContainer images
-bun run dev:build admin      # Build specific service image (Actually it's the same image for all)
-bun run dev:build --no-cache # Build without cache
-```
-
-### **Service Restart**
-```bash
-# Restart services
-bun run dev:restart          # Restart all DevContainer services
-bun run dev:restart admin    # Restart specific service
-```
-
-## 🤝 Contribution Workflow
-
-### **Pre-commit Checks**
-```bash
-# Run all checks before committing
-bun run check:quick          # Quick verification (lint, type, test, build)
-
-# Individual checks
-bun run check                # Code quality check
-bun run check:types          # Type checking
+# 3. Make changes and test
+# ... make your changes ...
+bun run check:quick          # Verify changes
 bun run test --affected      # Test affected packages
+
+# 4. Commit with conventional commits
+git add .
+git commit -m "feat(scope): description of changes"
+
+# 5. Push and create PR
+git push origin feature/your-feature
 ```
 
-### **Version Management**
+### **Conventional Commits**
 ```bash
-# Create a changeset for versioning
-bun run changeset            # Create new changeset
+# Commit format: type(scope): description
+git commit -m "feat(admin): add user management interface"
+git commit -m "fix(ui): resolve button styling issue"
+git commit -m "docs(readme): update installation instructions"
+git commit -m "refactor(utils): optimize string processing"
 
-# Version the root monorepo
-bun run version-root         # Version with quality checks
-bun run version              # Version only
-
-# Check changeset status
-bunx changeset status        # View pending changesets
-
-# Custom version management
-bun run version:init         # Initialize release branch
-bun run version:add --patch  # Generate changelog for patch
-bun run version:add --minor  # Generate changelog for minor
-bun run version:add --major  # Generate changelog for major
-bun run version:commit       # Commit version bump
-bun run version:push         # Push release branch
+# Available scopes (auto-generated):
+# - root, admin, storefront, api, @repo/ui, @repo/utils, @repo/typescript-config, @repo/test-preset
 ```
 
-### **Branch Management**
+### **Quality Gates**
 ```bash
-# Check branch naming
-bun run ci:branchname        # Validate branch name (runs automatically on push)
+# Pre-commit (automatic)
+# - Code formatting (Biome)
+# - Type checking
+# - Staged file validation
 
-# Create feature branch
-git checkout -b feature/your-feature-name
-git checkout -b bugfix/your-bugfix-name
-git checkout -b hotfix/your-hotfix-name
+# Pre-push (automatic)
+# - Branch name validation
+# - Quality checks
+# - Test execution
+# - Build verification
 ```
 
-### **Commit Guidelines**
+## 🔄 Version Management
 
-#### **Conventional Commits**
-Use VS Code's command palette for conventional commits:
-1. **Open Command Palette**: `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
-2. **Type**: "Conventional Commits: Create Commit"
-3. **Select commit type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
-4. **Enter scope**: `repo`, `admin`, `storefront`, `api`, `ui`
-5. **Write description**: Clear, concise description of changes
-
-#### **Manual Commits**
+### **Automated Versioning**
 ```bash
-# Commit with conventional format
-git commit -m "feat(admin): add user authentication"
+# Add changeset for versioning
+bun run version:add          # Interactive changeset creation
 
-# Commit with body
-git commit -m "feat(api): implement user endpoints
+# Commit version changes
+bun run version:commit       # Apply version changes and create release
 
-- Add GET /api/users endpoint
-- Add POST /api/users endpoint
-- Add user validation middleware"
-
-# Commit with breaking change
-git commit -m "feat(ui): redesign component API
-
-BREAKING CHANGE: Component props have been restructured"
+# Version workflow includes:
+# - Dynamic scope detection
+# - Automated changelog generation
+# - Package version updates
+# - Git tag creation
 ```
 
-### **Pull Request Process**
-1. **Create feature branch**: `git checkout -b feature/your-feature`
-2. **Make changes**: Implement your feature or fix
-3. **Run checks**: `bun run check:quick`
-4. **Commit changes**: Use conventional commit format
-5. **Push branch**: `git push origin feature/your-feature`
-6. **Create PR**: Submit pull request with clear description
-7. **Ensure CI passes**: All checks must pass before merge
-
-### **Code Review Checklist**
-- [ ] Code follows project conventions
-- [ ] Tests are included and passing
-- [ ] Documentation is updated
-- [ ] No breaking changes (or properly documented)
-- [ ] Performance impact is considered
-- [ ] Security implications are reviewed
-
-## 🎯 Turbo Commands
-
-### **Filtered Operations**
+### **Version Scripts**
 ```bash
-# Work with specific packages
-turbo run dev --filter=@repo/ui          # Start UI package
-turbo run build --filter=@repo/utils     # Build utils package
-turbo run test --filter=@repo/utils     # Test utils package
-turbo run check:types --filter=@repo/*   # Type check all packages
+# Version management scripts
+bun run scripts/version-commit.ts  # Manual version commit
+bun run scripts/ci-staged.ts       # Staged file validation
+bun run scripts/ci-check.ts        # CI environment validation
 ```
 
-### **Affected Operations**
+## 🚨 Troubleshooting
+
+### **Common Issues**
+
+#### **DevContainer Issues**
 ```bash
-# Work only with affected packages
-turbo run build --affected               # Build affected packages
-turbo run test --affected                # Test affected packages
-turbo run check:types --affected         # Type check affected packages
-turbo run dev --affected                 # Start affected packages
+# Container won't start
+bun run dev:cleanup          # Clean up containers
+bun run dev:build            # Rebuild containers
+bun run dev:check            # Check container health
+
+# Port conflicts
+bun run dev:health           # Check port usage
+# Manually change ports in docker-compose.dev.yml
 ```
 
-### **Parallel Operations**
+#### **Build Issues**
 ```bash
-# Run operations in parallel
-turbo run build --parallel               # Parallel build
-turbo run test --parallel                # Parallel testing
-turbo run check:types --parallel         # Parallel type checking
+# Build failures
+bun run check:types          # Check for type errors
+bun run check:fix            # Fix formatting issues
+bun run test                 # Run tests to identify issues
+
+# Cache issues
+turbo run build --clearCache # Clear build cache
+bun run test --clearCache    # Clear test cache
 ```
 
-## 🔒 Lockfile Configuration
-
-### **JSON Lockfile Format**
-This project uses JSON lockfiles (`bun.lock`) instead of binary lockfiles (`bun.lockb`) for better compatibility with tools like Turbo and Docker builds.
-
-#### **Configuration**
-```toml
-# bunfig.toml
-[install]
-saveTextLockfile = true  # Always generate JSON lockfiles
-```
-
-#### **Why JSON Lockfiles?**
-- **Turbo Compatibility**: Turbo can parse JSON lockfiles for `turbo prune` operations
-- **Docker Builds**: Docker builds work reliably with JSON format
-- **Git Diffing**: JSON lockfiles are human-readable and diffable
-- **CI/CD Pipelines**: Better compatibility with various CI/CD tools
-
-#### **Lockfile Management**
+#### **Test Issues**
 ```bash
-# Install dependencies (generates bun.lock)
-bun install
-
-# Update dependencies
-bun update
-
-# Force regenerate lockfile
-rm bun.lock && bun install
-
-# Check lockfile format
-file bun.lock  # Should show "JSON text"
+# Test failures
+bun run test --affected      # Run tests on affected packages
+bun run test --clearCache    # Clear test cache
+turbo run test --filter=@repo/test-preset  # Test test preset package
 ```
 
-#### **Docker Build Integration**
-The JSON lockfile format ensures that `turbo prune` commands in Docker builds work correctly:
-```dockerfile
-# Dockerfile
-COPY ./package.json ./bun.lock ./
-RUN turbo prune --scope=api --docker
+### **Debug Commands**
+```bash
+# Debug development environment
+bun run dev:check            # Comprehensive health check
+bun run check:quick          # Quick quality verification
+bun run test                 # Full test suite
+
+# Debug specific areas
+bun run check:types          # TypeScript issues
+bun run check:staged         # Staged file issues
+bun run dev:health           # Container issues
 ```
 
-## 📚 Related Documentation
+## 📊 Performance Optimization
 
-- [Installation Guide](./1_INSTALLATION_GUIDE.md) - Setup and cleanup procedures
-- [Setup Flows](./2_SETUP_FLOWS.md) - Advanced setup configuration
-- [Cursor Rules](./.cursor/rules/) - Development conventions and coding standards
-- [Quality Checklist](./0_QUALITY_CHECKLIST.md) - Testing and validation procedures
-- [Changesets Versioning](./8_CHANGESETS_VERSIONING.md) - Version management and changelog generation
+### **Development Performance**
+```bash
+# Fast development workflow
+bun run check:quick          # Quick quality check (~30s)
+bun run test --affected      # Test only affected packages (~20s)
+bun run build --affected     # Build only affected packages (~30s)
+
+# Parallel operations
+turbo run test --parallel    # Parallel test execution
+turbo run build --parallel   # Parallel build execution
+```
+
+### **Caching Strategy**
+```bash
+# Turbo caching
+turbo run build              # Uses Turbo cache for faster builds
+turbo run test               # Uses Turbo cache for faster tests
+
+# Cache management
+turbo run build --clearCache # Clear build cache
+turbo run test --clearCache  # Clear test cache
+```
 
 ---
 
-**💡 Pro Tip**: Use `turbo run --help` to see all available Turbo commands and options for your specific workspace. 
+**Ready to start developing?** Follow this workflow for efficient, quality-focused development in the Turboobun monorepo! 🚀 

@@ -24,7 +24,7 @@ The project implements a layered setup architecture:
 │  🔧 Local Development Layer (Required)                      │
 │  ├── Dependencies (bun install)                             │
 │  ├── Code Quality (biome, typescript)                       │
-│  ├── Testing (jest, turbo)                                  │
+│  ├── Testing (bun test, turbo)                              │
 │  └── Build System (turbo, vite)                             │
 ├─────────────────────────────────────────────────────────────┤
 │  🐳 DevContainer Layer (Optional)                           │
@@ -192,32 +192,182 @@ bugfix/login validation                  # ❌ Invalid (space)
 hotfix/security_patch                    # ❌ Invalid (underscore)
 ```
 
+### **Staged File Validation**
+
+#### **`bun run check:staged` - Pre-commit Validation**
+```bash
+# Automatic validation of staged files
+bun run check:staged                    # Check for common issues
+
+# Validations include:
+# - No manual version changes in package.json
+# - No manual CHANGELOG.md entries
+# - No development files committed
+# - Proper file structure compliance
+```
+
+#### **Validation Patterns**
+```bash
+# Valid staged files
+package.json                            # ✅ Auto-generated versions only
+CHANGELOG.md                           # ✅ Auto-generated entries only
+src/components/Button.tsx              # ✅ Source code files
+
+# Invalid staged files
+package.json with manual version        # ❌ Should be auto-generated
+CHANGELOG.md with manual entries       # ❌ Should be auto-generated
+.env files                             # ❌ Should not be committed
+```
+
 ## 🛠️ Troubleshooting
 
 ### **Setup Debugging**
 ```bash
+# Verbose setup with debugging
 bun run local:setup --verbose --debug
 bun run dev:setup --verbose --debug
+
+# Health checks
+bun run dev:check                      # Comprehensive health check
+bun run dev:health                     # Quick container status
+bun run check:quick                    # Quality verification
 ```
 
-### **Recovery Procedures**
+### **Common Issues and Solutions**
 
-#### **Complete Reset**
+#### **DevContainer Issues**
 ```bash
-# Nuclear option - complete reset
-bun run local:cleanup --force
-bun run dev:rm --force
-rm -rf node_modules package-lock.json
-bun run local:setup --fresh
+# Container won't start
+bun run dev:cleanup                    # Clean up containers
+bun run dev:build                      # Rebuild containers
+bun run dev:check                      # Check container health
+
+# Port conflicts
+bun run dev:health                     # Check port usage
+# Manually change ports in docker-compose.dev.yml
 ```
 
-## 📚 Related Documentation
+#### **Dependency Issues**
+```bash
+# Clear dependency cache
+rm -rf node_modules
+rm bun.lock
+bun install
 
-- [Installation Guide](./1_INSTALLATION_GUIDE.md) - Basic installation steps
-- [Development Workflow](./3_DEV_FLOWS.md) - Daily development commands
-- [Quality Checklist](./0_QUALITY_CHECKLIST.md) - Testing procedures
-- [Docker Setup](./5_DOCKER.md) - Docker configuration
+# Update dependencies
+bun update
+
+# Check for conflicts
+bun run check:types                    # TypeScript issues
+bun run check                          # Biome issues
+```
+
+#### **Build Issues**
+```bash
+# Clear build cache
+turbo run build --clearCache
+turbo run test --clearCache
+
+# Force rebuild
+bun run build --force
+bun run test --force
+```
+
+### **Performance Optimization**
+
+#### **Development Performance**
+```bash
+# Fast development workflow
+bun run check:quick                    # Quick quality check (~30s)
+bun run test --affected                # Test only affected packages (~20s)
+bun run build --affected               # Build only affected packages (~30s)
+
+# Parallel operations
+turbo run test --parallel              # Parallel test execution
+turbo run build --parallel             # Parallel build execution
+```
+
+#### **Caching Strategy**
+```bash
+# Turbo caching
+turbo run build                        # Uses Turbo cache for faster builds
+turbo run test                         # Uses Turbo cache for faster tests
+
+# Cache management
+turbo run build --clearCache           # Clear build cache
+turbo run test --clearCache            # Clear test cache
+```
+
+### **Environment-Specific Issues**
+
+#### **macOS Issues**
+```bash
+# Docker Desktop issues
+docker system prune -a                 # Clean Docker system
+docker volume prune                    # Clean volumes
+
+# Permission issues
+sudo chown -R $(whoami) .             # Fix file permissions
+```
+
+#### **Linux Issues**
+```bash
+# Docker permissions
+sudo usermod -aG docker $USER         # Add user to docker group
+newgrp docker                         # Apply group changes
+
+# File watching
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p                        # Apply changes
+```
+
+#### **Windows Issues**
+```bash
+# WSL2 issues
+wsl --shutdown                         # Restart WSL
+wsl --update                          # Update WSL
+
+# Docker Desktop issues
+# Restart Docker Desktop
+# Check WSL2 integration in Docker Desktop settings
+```
+
+## 📊 Monitoring and Health Checks
+
+### **Health Check Commands**
+```bash
+# Comprehensive health check
+bun run dev:check                      # Full DevContainer health check
+
+# Quick status check
+bun run dev:health                     # Container status overview
+
+# Quality verification
+bun run check:quick                    # Quick quality check
+bun run check:staged                   # Staged file validation
+```
+
+### **Health Check Components**
+- **Container Status**: Verify all containers are running
+- **Port Availability**: Check if ports are accessible
+- **Service Connectivity**: Test inter-service communication
+- **Volume Mounts**: Verify file system mounts
+- **Environment Variables**: Check configuration
+- **Dependencies**: Verify package installations
+
+### **Logging and Debugging**
+```bash
+# View service logs
+bun run dev:logs                       # All service logs
+bun run dev:logs admin                 # Admin service logs
+bun run dev:logs storefront            # Storefront service logs
+bun run dev:logs api                   # API service logs
+
+# Follow logs in real-time
+bun run dev:logs -f                    # Follow all logs
+bun run dev:logs -f admin              # Follow admin logs
+```
 
 ---
 
-**💡 Pro Tip**: Use `bun run local:setup --help` and `bun run dev:setup --help` to see all available options for each command. 
+**Ready to set up your development environment?** Follow this guide for a robust, scalable development setup! 🚀 

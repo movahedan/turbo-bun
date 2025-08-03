@@ -1,0 +1,315 @@
+---
+alwaysApply: false
+---
+
+# Commit and Documentation Workflow
+
+## 🎯 Complete Interactive Workflow Process
+
+When handling commits and changes, follow this comprehensive **interactive workflow** that guides through the entire process:
+
+### 1. 📋 Pre-Commit Analysis
+
+**ALWAYS start by reading the staged and changed diffs:**
+
+```bash
+# Check staged changes
+git diff --cached
+
+# Check unstaged changes  
+git diff
+
+# Check all changes (staged + unstaged)
+git diff HEAD
+```
+
+**Analyze the changes to understand:**
+- What files were modified
+- What functionality was added/changed/fixed
+- Impact on existing features
+- Breaking changes or new dependencies
+
+**Ask the developer:**
+> "I can see the following changes in your working directory:
+> - [List specific files and changes]
+> - [List any new dependencies or breaking changes]
+> 
+> Should I proceed with committing these changes?"
+
+### 2. 📝 Commit Message Creation
+
+**Follow the conventional commits format as defined in [conventional-commits.mdc](./conventional-commits.mdc):**
+
+- Use lowercase for type, scope, and subject
+- Keep subject concise but descriptive (max 72 chars)
+- Follow the exact type categories from the conventional commits rule
+- Reference existing patterns from the repository for consistency
+
+**Ask the developer for commit details:**
+> "Based on the changes I see, I suggest this commit message:
+> ```
+> type(scope): descriptive subject
+> ```
+> 
+> Would you like me to use this, or would you prefer a different message?"
+
+**Examples of good commit messages:**
+```bash
+git commit -m "feat(ui): add new button component"
+git commit -m "fix(api): resolve authentication bug"
+git commit -m "docs(repo): update installation guide"
+git commit -m "refactor(storefront): improve performance"
+```
+
+### 3. 📚 Documentation Review
+
+**ALWAYS check for documentation updates needed:**
+
+```bash
+# Find all docs files
+find docs/ -name "*.md" -type f
+
+# Search for related documentation
+grep -r "keyword" docs/
+```
+
+**For each change, identify:**
+- Related documentation files in `docs/`
+- API documentation that needs updates
+- README files that might need changes
+- Setup/installation guides affected
+- Development workflow documentation
+
+**Present findings to the developer:**
+> "I found these documentation files that might need updates based on your changes:
+> - `docs/feature-guide.md` (mentions the API you modified)
+> - `docs/setup.md` (references the config you changed)
+> - `docs/3_DEV_FLOWS.md` (workflow affected by your changes)
+> 
+> Would you like me to update the documentation to reflect these changes?"
+
+**If yes, proceed with documentation updates:**
+> "I'll update the documentation now. This may take a moment..."
+
+### 4. 🔄 Documentation Updates
+
+**If documentation updates are requested:**
+
+- Update relevant documentation files
+- Add examples for new features
+- Update API references
+- Include migration steps for breaking changes
+- Update version information if needed
+- Cross-reference related documentation
+
+**After updating docs, commit them separately:**
+```bash
+git add docs/
+git commit -m "docs(repo): update documentation for new feature"
+```
+
+**Confirm with the developer:**
+> "Documentation has been updated and committed. The following files were modified:
+> - [List of updated documentation files]
+> 
+> Should I proceed with committing the main changes?"
+
+### 5. 💾 Commit Changes
+
+**Commit with proper conventional commit message:**
+
+```bash
+git add .
+git commit -m "type(scope): descriptive subject"
+```
+
+**Confirm the commit:**
+> "Changes have been committed successfully with message:
+> ```
+> type(scope): descriptive subject
+> ```
+> 
+> Would you like me to push these changes to the remote repository?"
+
+### 6. 🚀 Push Changes
+
+**After committing, ask the developer:**
+> "Changes have been committed successfully. Would you like me to push the changes to the remote repository?"
+
+**If yes, push the changes:**
+```bash
+git push origin main
+# or
+git push origin feature-branch
+```
+
+**Confirm the push:**
+> "Changes have been pushed successfully to [branch name]."
+
+### 7. 🔗 Pull Request Creation
+
+**After pushing, ask about pull request:**
+> "Changes have been pushed successfully. Would you like me to create a pull request on GitHub?"
+
+**If yes, create pull request using GitHub CLI:**
+
+**Interactive mode (recommended):**
+```bash
+gh pr create
+```
+
+**Or with specific flags:**
+```bash
+# Basic PR with title and body
+gh pr create --title "Scope: A short title containing the most important keynotes" --body "Adds new reusable button component with variants"
+
+# Auto-fill from commit messages
+gh pr create --fill
+
+# Add reviewers
+gh pr create --reviewer username1,username2
+
+# Add labels
+gh pr create --label "enhancement" --label "ui"
+
+# Create as draft
+gh pr create --draft
+
+# Specify base branch
+gh pr create --base develop
+
+# Use template
+gh pr create --template "pull_request_template.md"
+```
+
+**Common PR creation patterns:**
+```bash
+# Feature PR
+gh pr create --title "Scope: A short title containing the most important keynotes" --body "Summary Report" --label "enhancement"
+
+# Bug fix PR  
+gh pr create --title "fix(scope): A short title containing the most important keynotes" --body "Fixes issue #123" --label "bug"
+
+# Documentation PR
+gh pr create --title "docs(repo): A short title containing the most important keynotes" --body "Summary Report" --label "documentation"
+```
+
+## 📝 PR Description Guidelines
+
+**ALWAYS create concise PR descriptions (max 2000 characters):**
+
+### ✅ **Good PR Description Structure:**
+```
+## 🎯 Overview
+Brief description of what this PR accomplishes (2-3 sentences max)
+
+## ✨ Key Changes
+- Bullet points of main changes (3-5 items max)
+- Focus on user-facing improvements
+- Avoid technical implementation details
+
+## 🔧 Technical Notes
+- Any important technical considerations (optional)
+- Breaking changes or migrations needed
+- Performance impacts (if significant)
+
+## 🧪 Testing
+- Brief testing summary
+- Coverage maintained/improved
+- Any new tests added
+
+## 📋 Files Changed
+- New files: X
+- Modified files: Y  
+- Deleted files: Z
+
+## 🎯 Next Steps
+- What reviewers should focus on
+- Any follow-up actions needed
+```
+
+### ❌ **Avoid in PR Descriptions:**
+- Detailed technical implementation
+- Step-by-step process descriptions
+- Extensive file-by-file breakdowns
+- Internal workflow details
+- Verbose explanations of obvious changes
+
+**Provide the GitHub PR link:**
+> "Pull request created successfully! You can view it here: [PR Link]"
+
+### 8. 📊 Summary Report
+
+**After completing the workflow, provide a comprehensive summary:**
+
+```
+## 📋 Commit Summary
+
+**Changes Committed:**
+- [List of key changes made]
+
+**Documentation Updated:**
+- [List of docs files updated, if any]
+
+**Files Modified:**
+- [List of main files changed]
+
+**Commit Message Used:**
+- [Exact commit message]
+
+**Pull Request Created:**
+- [PR link if created]
+
+**Next Steps:**
+- [Link to PR if created]
+- [Any follow-up actions needed]
+- [Reminders about review process]
+```
+
+**Ask for confirmation:**
+> "The complete workflow has been finished. Is there anything else you'd like me to help you with?"
+
+## 🚨 Critical Rules
+
+1. **ALWAYS read diffs before committing**
+2. **ALWAYS check for documentation updates**
+3. **ALWAYS use lowercase in commit messages**
+4. **ALWAYS ask before pushing**
+5. **ALWAYS ask before creating PR**
+6. **ALWAYS provide PR link if created**
+7. **ALWAYS guide through the complete process interactively**
+8. **ALWAYS provide a comprehensive summary at the end**
+
+## 📝 Interactive Workflow Checklist
+
+- [ ] Read staged and unstaged diffs
+- [ ] Analyze changes and impact
+- [ ] Ask developer about proceeding
+- [ ] Create appropriate commit message
+- [ ] Ask developer about commit message
+- [ ] Check for documentation updates needed
+- [ ] Ask developer about doc updates
+- [ ] Update documentation if requested
+- [ ] Commit documentation changes if made
+- [ ] Commit main changes with proper message
+- [ ] Ask about pushing changes
+- [ ] Push if approved
+- [ ] Ask about creating pull request
+- [ ] Create PR if approved
+- [ ] Provide PR link
+- [ ] Give comprehensive summary report
+- [ ] Ask if anything else is needed
+
+## 🎯 Best Practices
+
+- **Be thorough** in analyzing changes
+- **Be descriptive** in commit messages
+- **Be proactive** about documentation
+- **Be communicative** with the developer
+- **Be helpful** by providing clear next steps
+- **Be accurate** in reporting what was done
+- **Be interactive** throughout the entire process
+- **Be comprehensive** in the final summary
+
+alwaysApply: false
+---
