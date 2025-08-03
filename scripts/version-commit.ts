@@ -41,7 +41,11 @@ async function readChangesets(): Promise<VersionPackages[]> {
 	const files = await readdir(".changeset");
 	const changesets = files.filter((file) => file.endsWith(".md") && file !== "README.md");
 
-	return changesets.map((filename) => parseChangeset(filename).packages);
+	const results = await Promise.all(
+		changesets.map(async (filename) => (await parseChangeset(filename)).packages),
+	);
+
+	return results;
 }
 async function createChangeset(packages: VersionPackages, rootVersionTag: string): Promise<string> {
 	const changesetContent = Object.entries(packages).reduce((accumulator, current, index, array) => {

@@ -17,7 +17,6 @@
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
 		"check:types": "turbo run check:types",
-		"check:types:force": "turbo run check:types --force",
 		"check:quick": "bun run check:fix && turbo run check:types --affected && bun run test --affected && bun run build --affected",
 		"test": "bun test",
 		"test:coverage": "bun test --coverage-reporter=lcov",
@@ -49,7 +48,6 @@
 		"prod:health": "bun run prod:compose ps --format table",
 		"//version": "////////////////////////////////////////////////////////////////////////////////////////////////",
 		"version:add": "bunx @changesets/cli add",
-		"version:add:auto": "bun run scripts/version-add-auto.ts",
 		"version:commit": "bun run scripts/version-commit.ts"
 	},
 	"devDependencies": {

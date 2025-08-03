@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-
 type VersionType = "patch" | "minor" | "major";
 export type VersionPackages = Record<string, VersionType>;
 
@@ -8,12 +6,12 @@ interface ChangesetEntry {
 	summary: string;
 }
 
-export const parseChangeset = (filename: string): ChangesetEntry => {
+export const parseChangeset = async (filename: string): Promise<ChangesetEntry> => {
 	const packages: VersionPackages = {};
 	let summary = "";
 	let inSummary = false;
 
-	const lines = readFileSync(filename, "utf8").split("\n").filter(Boolean);
+	const lines = (await Bun.file(filename).text()).split("\n").filter(Boolean);
 	lines.forEach((line) => {
 		if (line.startsWith('"') && line.includes('":')) {
 			// Package line

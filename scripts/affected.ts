@@ -90,7 +90,7 @@ async function getAffectedServices(mode: ServiceMode): Promise<AffectedService[]
 	const keys = await getAffectedPackages();
 	const devServices = await parseCompose("dev");
 	const prodServices = await parseCompose("prod");
-	const allDirectories = getAllDirectories(process.cwd());
+	const allDirectories = await getAllDirectories(process.cwd());
 
 	const affectedServices: AffectedService[] = [];
 

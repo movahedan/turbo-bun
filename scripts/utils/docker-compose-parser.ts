@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 
-import { existsSync } from "node:fs";
 import { $ } from "bun";
 // waiting for https://github.com/oven-sh/bun/issues/1003
 import { parse as pYaml } from "yaml";
@@ -76,7 +75,7 @@ interface DockerCompose {
 
 async function parse(composePath: string): Promise<ServiceInfo[]> {
 	try {
-		if (!existsSync(composePath)) {
+		if (!(await Bun.file(composePath).exists())) {
 			throw new Error(`Docker compose file not found: ${composePath}`);
 		}
 

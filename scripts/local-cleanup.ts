@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 
-import fs from "node:fs";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
@@ -20,20 +19,20 @@ This includes DevContainer cleanup. To stop the VS Code DevContainer itself, run
 const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> => {
 	vConsole.log(chalk.blue("🧹 Starting comprehensive cleanup..."));
 
-	function removeFile(filePath: string) {
-		if (fs.existsSync(filePath)) {
-			fs.rmSync(filePath, { recursive: true, force: true });
+	async function removeFile(filePath: string) {
+		if (await Bun.file(filePath).exists()) {
+			await Bun.file(filePath).delete();
 			vConsole.log(chalk.gray(`  Removed: ${filePath}`));
 		}
 	}
 	async function stepArtifacts() {
 		vConsole.log(chalk.yellow("🗂️ Cleaning development artifacts..."));
-		const directories = getAllDirectories(process.cwd());
+		const directories = await getAllDirectories(process.cwd());
 		for (const directory of directories) {
 			const dirPath = path.resolve(process.cwd(), directory.path);
 
 			for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
-				removeFile(path.join(dirPath, ARTIFACT));
+				await removeFile(path.join(dirPath, ARTIFACT));
 			}
 		}
 	}

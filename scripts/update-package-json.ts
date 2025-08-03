@@ -27,10 +27,7 @@ export const updatePackageJson = createScript(
 	async function run(args, vConsole) {
 		vConsole.log(chalk.blue("🧹 Starting package.json update..."));
 
-		vConsole.log(chalk.blue("🔍 Finding package.json..."));
 		const packageJsonPath = path.join(process.cwd(), "package.json");
-		vConsole.log(chalk.blue(`🔍 Found package.json at ${packageJsonPath}`));
-
 		const packageDir = path.dirname(packageJsonPath);
 		const srcDir = args.src ? path.join(packageDir, "src") : packageDir;
 		const files = await readdir(srcDir, {

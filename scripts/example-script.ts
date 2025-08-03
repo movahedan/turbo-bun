@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { createScript, validators } from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
 
 const exampleScriptConfig = {
 	name: "Example Script",
@@ -10,6 +10,13 @@ const exampleScriptConfig = {
 		"bun run example-script --file data.json --output result.json --verbose --dry-run --quite --help",
 	],
 	options: [
+		{
+			short: "-b",
+			long: "--build",
+			description: "Build mode",
+			required: false,
+			validator: validators.boolean,
+		},
 		{
 			short: "-f",
 			long: "--file",
@@ -25,7 +32,7 @@ const exampleScriptConfig = {
 			validator: validators.nonEmpty,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const exampleScript = createScript(exampleScriptConfig, async function main(args, xConsole) {
 	xConsole.info("📁 Processing file:", args.file);

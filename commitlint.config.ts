@@ -7,7 +7,7 @@ import { getAllDirectories } from "./scripts/utils/get-all-directories";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname);
-const directories = getAllDirectories(projectRoot);
+const directories = await getAllDirectories(projectRoot);
 const validScopes = directories.map((dir) => dir.name);
 
 const config: UserConfig = {
