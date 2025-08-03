@@ -5,6 +5,78 @@ import { getAffectedPackages } from "./affected";
 import { parseChangeset, type VersionPackages } from "./utils/changeset-parser";
 import { createScript } from "./utils/create-scripts";
 
+const VERSION_TAG_PREFIX = "v";
+
+// Versioning -------------------------------------------------------------------------------------
+async function getLatestVersionTag(): Promise<string | undefined> {
+	const tags =
+		await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
+			.nothrow()
+			.text();
+	const tagList = tags?.split("\n").filter(Boolean) ?? [];
+
+	return tagList[0];
+}
+async function getLastVersionTagSha(): Promise<string> {
+	try {
+		const latestTag = await getLatestVersionTag();
+		if (!latestTag) throw new Error("No version tags found");
+		const commitSha = await $`git rev-list -n 1 ${latestTag}`.text();
+		return commitSha.trim();
+	} catch (_error) {
+		const initialCommit = await $`git rev-list --max-parents=0 HEAD`.text();
+		return initialCommit.trim();
+	}
+}
+async function tagVersion(version: string): Promise<string> {
+	const tagName = `${VERSION_TAG_PREFIX}${version}`;
+	const existingTag = await $`git tag --list "${tagName}"`.nothrow().text();
+	if (existingTag.trim()) {
+		throw new Error(`Tag ${tagName} already exists`);
+	}
+	await $`git tag -a ${tagName} -m "Release version ${version} (auto-generated)"`;
+	return tagName;
+}
+
+// Changesets -------------------------------------------------------------------------------------
+async function readChangesets(): Promise<VersionPackages[]> {
+	const files = await readdir(".changeset");
+	const changesets = files.filter(
+		(file) => file.endsWith(".md") && file !== "README.md",
+	);
+
+	return changesets.map((filename) => parseChangeset(filename).packages);
+}
+async function createChangeset(
+	packages: VersionPackages,
+	rootVersionTag: string,
+): Promise<string> {
+	const changesetContent = Object.entries(packages).reduce(
+		(accumulator, current, index, array) => {
+			console.log({ current });
+			const isFirst = index === 0;
+			const firstLineSegment = isFirst ? "---\n" : "";
+			const VERSION_TAG_PREFIX = "v";
+			const summary = `Automated version bump for ${current[0]} and other affected packages on root version tag: ${VERSION_TAG_PREFIX}${rootVersionTag}.`;
+
+			const isLast = index === array.length - 1;
+			const lastLineSegment = isLast ? `---\n\n${summary}` : "";
+
+			const [packageName, versionType] = current;
+			const newPackageSegment = `"${packageName}": ${versionType}\n`;
+
+			return `${accumulator}${firstLineSegment}${newPackageSegment}${lastLineSegment}`;
+		},
+		"",
+	);
+
+	const timestamp = Date.now();
+	const filename = `auto-${timestamp}.md`;
+	await Bun.write(`.changeset/${filename}`, changesetContent);
+	return filename;
+}
+
+// Version Commit ---------------------------------------------------------------------------------
 export const versionCommit = createScript(
 	{
 		name: "Version Commit",
@@ -34,6 +106,7 @@ export const versionCommit = createScript(
 	) {
 		xConsole.info("🚀 Analyzing deployment packages for production...");
 
+		// Configure Git authentication ----------------------------------------------------------------
 		xConsole.log("🔍 Configuring Git authentication...");
 		if (dryRun) xConsole.log("-> 🔍 Dry run, skipping git config");
 		else if (!process.env.GITHUB_ACTIONS)
@@ -44,17 +117,23 @@ export const versionCommit = createScript(
 			xConsole.log("-> ⚠️ GITHUB_TOKEN not found");
 		else {
 			xConsole.log("-> 🔐 Configuring Git authentication...");
-			const maskedUrl = await configureGitAuthentication(
-				process.env.GITHUB_REPOSITORY,
-				process.env.GITHUB_TOKEN,
+			await $`git config user.name "github-actions[bot]"`.text();
+			await $`git config user.email "github-actions[bot]@users.noreply.github.com"`.text();
+			await $`git remote set-url origin https://x-access-token:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`.text();
+
+			const actualRemoteUrl = await $`git remote get-url origin`.text(); // Verify the remote URL
+			const maskedUrl = actualRemoteUrl.replace(
+				/https:\/\/x-access-token:[^@]+@/,
+				"***@",
 			);
 			xConsole.log(
 				`-> 🔗 Git authentication configured, remote URL: ${maskedUrl}`,
 			);
 		}
 
+		// Get affected packages ----------------------------------------------------------------------
 		const lastVersionTagSha = await getLastVersionTagSha();
-		xConsole.info(
+		xConsole.log(
 			`🔍 Analyzing affected packages by last version tag SHA: ${lastVersionTagSha}`,
 		);
 		const affectedPackages = await getAffectedPackages(lastVersionTagSha);
@@ -80,12 +159,14 @@ export const versionCommit = createScript(
 			{} as VersionPackages,
 		);
 
+		// Version bump -------------------------------------------------------------------------------
 		const packageJson = await Bun.file("package.json").json();
 		const [currentMajor, currentMinor, currentPatch] = packageJson.version
 			.split(".")
 			.map(Number);
 		const newRootVersion = `${currentMajor}.${currentMinor}.${currentPatch + 1}`;
 		packageJson.version = newRootVersion;
+
 		await Bun.write("package.json", JSON.stringify(packageJson, null, 2));
 		await $`bun biome check --write --no-errors-on-unmatched package.json`.text();
 		await $`git add package.json`.text();
@@ -93,7 +174,7 @@ export const versionCommit = createScript(
 		if (Object.keys(packagesToAdd).length === 0) {
 			xConsole.log("-> ✅ All changed packages already have changesets");
 		} else {
-			const filename = createChangeset(packagesToAdd, newRootVersion);
+			const filename = await createChangeset(packagesToAdd, newRootVersion);
 			xConsole.log(
 				`-> ✅ Created ./changeset/${filename} for: ${Object.keys(packagesToAdd)}`,
 			);
@@ -104,6 +185,7 @@ export const versionCommit = createScript(
 		);
 		await $`bunx @changesets/cli version`.text();
 
+		// Tag version ---------------------------------------------------------------------------------
 		const tagName = await tagVersion(newRootVersion);
 		xConsole.log(`🏷️ Created version tag: ${tagName}`);
 		if (!dryRun) {
@@ -123,6 +205,7 @@ export const versionCommit = createScript(
 			);
 		}
 
+		// Attach affected packages to github output --------------------------------------------------
 		if (outputId) {
 			xConsole.log(
 				`📱 Attaching affected packages to github output ${outputId}`,
@@ -150,91 +233,4 @@ export const versionCommit = createScript(
 
 if (import.meta.main) {
 	versionCommit();
-}
-
-// Git Authentication -----------------------------------------------------------------------------
-async function configureGitAuthentication(
-	repo: string,
-	token: string,
-): Promise<string> {
-	await $`git config user.name "github-actions[bot]"`.text();
-	await $`git config user.email "github-actions[bot]@users.noreply.github.com"`.text();
-	await $`git remote set-url origin https://x-access-token:${token}@github.com/${repo}.git`.text();
-
-	const actualRemoteUrl = await $`git remote get-url origin`.text(); // Verify the remote URL
-	const maskedUrl = actualRemoteUrl.replace(
-		/https:\/\/x-access-token:[^@]+@/,
-		"***@",
-	);
-
-	return maskedUrl;
-}
-
-// Versioning -------------------------------------------------------------------------------------
-const VERSION_TAG_PREFIX = "v";
-async function getLatestVersionTag(): Promise<string | undefined> {
-	const tags =
-		await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
-			.nothrow()
-			.text();
-	const tagList = tags?.split("\n").filter(Boolean) ?? [];
-
-	return tagList[0];
-}
-async function getLastVersionTagSha(): Promise<string> {
-	try {
-		const latestTag = await getLatestVersionTag();
-		if (!latestTag) throw new Error("No version tags found");
-		const commitSha = await $`git rev-list -n 1 ${latestTag}`.text();
-		return commitSha.trim();
-	} catch {
-		const initialCommit = await $`git rev-list --max-parents=0 HEAD`.text();
-		return initialCommit.trim();
-	}
-}
-
-async function tagVersion(version: string): Promise<string> {
-	const tagName = `${VERSION_TAG_PREFIX}${version}`;
-	const existingTag = await $`git tag --list "${tagName}"`.nothrow().text();
-	if (existingTag.trim()) {
-		throw new Error(`Tag ${tagName} already exists`);
-	}
-	await $`git tag -a ${tagName} -m "Release version ${version} (auto-generated)"`;
-	return tagName;
-}
-
-// Changesets -------------------------------------------------------------------------------------
-async function readChangesets(): Promise<VersionPackages[]> {
-	const files = await readdir(".changeset");
-	const changesets = files.filter(
-		(file) => file.endsWith(".md") && file !== "README.md",
-	);
-
-	return changesets.map((filename) => parseChangeset(filename).packages);
-}
-async function createChangeset(
-	packages: VersionPackages,
-	rootVersionTag: string,
-): Promise<string> {
-	const changesetContent = Object.entries(packages).reduce(
-		(accumulator, current, index, array) => {
-			const isFirst = index === 0;
-			const firstLineSegment = isFirst ? "---\n" : "";
-			const summary = `Automated version bump for ${current[0]} and other affected packages on root version tag: ${VERSION_TAG_PREFIX}${rootVersionTag}.`;
-
-			const isLast = index === array.length - 1;
-			const lastLineSegment = isLast ? `---\n\n${summary}` : "";
-
-			const [packageName, versionType] = current;
-			const newPackageSegment = `"${packageName}": ${versionType}\n`;
-
-			return `${accumulator}${firstLineSegment}${newPackageSegment}${lastLineSegment}`;
-		},
-		"",
-	);
-
-	const timestamp = Date.now();
-	const filename = `auto-${timestamp}.md`;
-	await Bun.write(`.changeset/${filename}`, changesetContent);
-	return filename;
 }

@@ -74,7 +74,7 @@ export async function getAffectedPackages(baseSha?: string): Promise<string[]> {
 	const effectiveBaseSha = baseSha || (await getBaseSha());
 
 	const affectedPackages =
-		await $`turbo run build --filter="...[${effectiveBaseSha}]" --dry-run=json`
+		await $`bunx turbo run build --filter="...[${effectiveBaseSha}]" --dry-run=json`
 			.quiet()
 			.json();
 
