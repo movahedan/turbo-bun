@@ -12,11 +12,12 @@ export async function getBaseSha(): Promise<string> {
 	}
 
 	const currentSha = await $`git rev-parse HEAD`.text();
-	return await $`git rev-parse ${currentSha.trim()}^1`.text();
+	const parentSha = await $`git rev-parse ${currentSha.trim()}^1`.text();
+	return parentSha.trim();
 }
 
 export async function getAffectedPackages(baseSha?: string): Promise<string[]> {
-	const effectiveBaseSha = baseSha || (await getBaseSha());
+	const effectiveBaseSha = (baseSha || (await getBaseSha())).trim();
 
 	const affectedPackages =
 		await $`bunx turbo run build --filter="...[${effectiveBaseSha}]" --dry-run=json`.quiet().json();

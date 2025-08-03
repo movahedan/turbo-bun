@@ -11,7 +11,11 @@ async function getLatestVersionTag(): Promise<string | undefined> {
 	const tags = await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
 		.nothrow()
 		.text();
-	const tagList = tags?.split("\n").filter(Boolean) ?? [];
+	const tagList =
+		tags
+			?.split("\n")
+			.filter(Boolean)
+			.map((tag) => tag.trim()) ?? [];
 
 	return tagList[0];
 }
@@ -19,8 +23,30 @@ async function getLastVersionTagSha(): Promise<string> {
 	try {
 		const latestTag = await getLatestVersionTag();
 		if (!latestTag) throw new Error("No version tags found");
-		const commitSha = await $`git rev-list -n 1 ${latestTag}`.text();
-		return commitSha.trim();
+		// Ensure the tag is properly trimmed and quoted to handle any whitespace issues
+		const trimmedTag = latestTag.trim();
+		const latestTagSha = await $`git rev-list -n 1 "${trimmedTag}"`.text();
+		const currentSha = await $`git rev-parse HEAD`.text();
+
+		// If we're at the same commit as the latest version tag, use the previous version tag
+		if (latestTagSha.trim() === currentSha.trim()) {
+			const tags = await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
+				.nothrow()
+				.text();
+			const tagList =
+				tags
+					?.split("\n")
+					.filter(Boolean)
+					.map((tag) => tag.trim()) ?? [];
+
+			if (tagList.length > 1) {
+				const previousTag = tagList[1]; // Get the second most recent tag
+				const previousTagSha = await $`git rev-list -n 1 "${previousTag}"`.text();
+				return previousTagSha.trim();
+			}
+		}
+
+		return latestTagSha.trim();
 	} catch (_error) {
 		const initialCommit = await $`git rev-list --max-parents=0 HEAD`.text();
 		return initialCommit.trim();
@@ -115,12 +141,29 @@ export const versionCommit = createScript(
 		}
 
 		// Get affected packages ----------------------------------------------------------------------
-		const lastVersionTagSha = await getLastVersionTagSha();
-		xConsole.log(`🔍 Analyzing affected packages by last version tag SHA: ${lastVersionTagSha}`);
-		const affectedPackages = await getAffectedPackages(lastVersionTagSha);
-		if (affectedPackages.length === 0) {
-			xConsole.log("-> ⚠️ No affected packages detected");
-			return;
+		const currentSha = await $`git rev-parse HEAD`.text();
+		const latestTag = await getLatestVersionTag();
+		const latestTagSha = latestTag ? await $`git rev-list -n 1 "${latestTag.trim()}"`.text() : null;
+
+		let affectedPackages: string[];
+
+		// Exception: If current SHA equals version tag SHA, use --affected flag
+		if (latestTagSha && latestTagSha.trim() === currentSha.trim()) {
+			xConsole.log("🔍 Current SHA equals version tag SHA, using Turborepo's --affected flag");
+			affectedPackages = await getAffectedPackages();
+			if (affectedPackages.length === 0) {
+				xConsole.log("-> ⚠️ No affected packages detected");
+				return;
+			}
+		} else {
+			// Use normal version tag comparison
+			const lastVersionTagSha = await getLastVersionTagSha();
+			xConsole.log(`🔍 Analyzing affected packages by last version tag SHA: ${lastVersionTagSha}`);
+			affectedPackages = await getAffectedPackages(lastVersionTagSha);
+			if (affectedPackages.length === 0) {
+				xConsole.log("-> ⚠️ No affected packages detected");
+				return;
+			}
 		}
 		xConsole.log(`-> 📦 Found ${affectedPackages.length} affected packages: ${affectedPackages}`);
 
