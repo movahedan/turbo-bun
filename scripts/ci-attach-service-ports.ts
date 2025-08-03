@@ -1,10 +1,6 @@
 #!/usr/bin/env bun
 
-import {
-	createScript,
-	type ScriptConfig,
-	validators,
-} from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
 import { parseCompose } from "./utils/docker-compose-parser";
 
 const ciAttachServicePortsConfig = {

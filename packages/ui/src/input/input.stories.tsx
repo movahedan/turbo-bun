@@ -97,9 +97,7 @@ export const WithError: Story = {
 				placeholder="Enter your email"
 				className="border-red-500 focus:border-red-500"
 			/>
-			<p className="text-sm text-red-500">
-				Please enter a valid email address.
-			</p>
+			<p className="text-sm text-red-500">Please enter a valid email address.</p>
 		</div>
 	),
 };

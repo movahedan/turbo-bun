@@ -3,16 +3,11 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { $ } from "bun";
 import chalk from "chalk";
-import {
-	createScript,
-	type ScriptConfig,
-	validators,
-} from "./utils/create-scripts";
+import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
 
 const updatePackageJsonConfig = {
 	name: "update-package-json",
-	description:
-		"Update the package.json exports attributes based on the files in the package",
+	description: "Update the package.json exports attributes based on the files in the package",
 	usage: "bun run update-package-json [options]",
 	examples: ["bun run update-package-json"],
 	options: [
@@ -53,9 +48,7 @@ export const updatePackageJson = createScript(
 
 			for (const file of files) {
 				const shouldSkip =
-					!file.isDirectory() &&
-					!file.name.endsWith(".ts") &&
-					!file.name.endsWith(".tsx");
+					!file.isDirectory() && !file.name.endsWith(".ts") && !file.name.endsWith(".tsx");
 				if (shouldSkip) continue;
 
 				if (file.name === "index.ts") {

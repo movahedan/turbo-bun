@@ -8,22 +8,14 @@ const meta: Meta<typeof Button> = {
 		layout: "centered",
 		docs: {
 			description: {
-				component:
-					"A versatile button component with multiple variants and sizes.",
+				component: "A versatile button component with multiple variants and sizes.",
 			},
 		},
 	},
 	argTypes: {
 		variant: {
 			control: { type: "select" },
-			options: [
-				"default",
-				"destructive",
-				"outline",
-				"secondary",
-				"ghost",
-				"link",
-			],
+			options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
 			description: "The visual style variant of the button",
 		},
 		size: {

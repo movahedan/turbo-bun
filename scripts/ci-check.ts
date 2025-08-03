@@ -4,8 +4,7 @@ import { createScript, validators } from "./utils/create-scripts";
 
 const ciCheckConfig = {
 	name: "GitHub Actions Local Testing",
-	description:
-		"Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
+	description: "Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
 	usage: "bun run ci:check -e <event> -w <workflow> [-v | --verbose]",
 	examples: [
 		"bun run ci:check -v --verbose -e pull_request -w .github/workflows/Check.yml",
@@ -66,8 +65,7 @@ async function cleanupActContainers() {
 
 		try {
 			// Check if any act containers exist before trying to stop them
-			const runningContainers =
-				await $`docker ps -q --filter "label=com.act.container"`.text();
+			const runningContainers = await $`docker ps -q --filter "label=com.act.container"`.text();
 			if (runningContainers.trim()) {
 				await $`docker ps -q --filter "label=com.act.container" | xargs -r docker stop`;
 				console.log("✅ Stopped running act containers");
@@ -78,23 +76,18 @@ async function cleanupActContainers() {
 
 		try {
 			// Remove all act containers (including stopped ones)
-			const allContainers =
-				await $`docker ps -aq --filter "label=com.act.container"`.text();
+			const allContainers = await $`docker ps -aq --filter "label=com.act.container"`.text();
 			if (allContainers.trim()) {
 				await $`docker ps -aq --filter "label=com.act.container" | xargs -r docker rm`;
 				console.log("✅ Removed act containers");
 			}
 		} catch (error) {
-			console.warn(
-				"⚠️  Warning: act containers may not have been cleaned up:",
-				error,
-			);
+			console.warn("⚠️  Warning: act containers may not have been cleaned up:", error);
 		}
 
 		try {
 			// Remove act networks
-			const networks =
-				await $`docker network ls -q --filter "label=com.act.network"`.text();
+			const networks = await $`docker network ls -q --filter "label=com.act.network"`.text();
 			if (networks.trim()) {
 				await $`docker network ls -q --filter "label=com.act.network" | xargs -r docker network rm`;
 				console.log("✅ Removed act networks");
@@ -105,9 +98,6 @@ async function cleanupActContainers() {
 
 		console.log("✅ Act containers cleaned up successfully!");
 	} catch (error) {
-		console.warn(
-			"⚠️  Warning: Some containers may not have been cleaned up:",
-			error,
-		);
+		console.warn("⚠️  Warning: Some containers may not have been cleaned up:", error);
 	}
 }

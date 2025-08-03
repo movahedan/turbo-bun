@@ -5,9 +5,7 @@ import { Link } from "./link";
 describe("Link", () => {
 	it("renders without crashing", () => {
 		render(<Link href="https://turborepo.com">Turborepo Docs</Link>);
-		expect(
-			screen.getByRole("link", { name: "Turborepo Docs" }),
-		).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Turborepo Docs" })).toBeInTheDocument();
 	});
 
 	it("renders with required href and children", () => {
@@ -74,10 +72,7 @@ describe("Link", () => {
 		expect(screen.getByRole("link")).toHaveAttribute("href", "/relative");
 
 		rerender(<Link href="mailto:test@example.com">Email</Link>);
-		expect(screen.getByRole("link")).toHaveAttribute(
-			"href",
-			"mailto:test@example.com",
-		);
+		expect(screen.getByRole("link")).toHaveAttribute("href", "mailto:test@example.com");
 
 		rerender(<Link href="tel:+1234567890">Phone</Link>);
 		expect(screen.getByRole("link")).toHaveAttribute("href", "tel:+1234567890");

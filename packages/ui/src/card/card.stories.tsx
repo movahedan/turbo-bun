@@ -1,12 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "./card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
 
 const meta: Meta<typeof Card> = {
 	title: "Components/Card",
@@ -15,8 +8,7 @@ const meta: Meta<typeof Card> = {
 		layout: "centered",
 		docs: {
 			description: {
-				component:
-					"A flexible card component for displaying content in a structured layout.",
+				component: "A flexible card component for displaying content in a structured layout.",
 			},
 		},
 	},
@@ -116,10 +108,7 @@ export const ComplexLayout: Story = {
 				<button type="button" className="px-4 py-2 border rounded">
 					Cancel
 				</button>
-				<button
-					type="button"
-					className="px-4 py-2 bg-blue-500 text-white rounded"
-				>
+				<button type="button" className="px-4 py-2 bg-blue-500 text-white rounded">
 					Deploy
 				</button>
 			</CardFooter>

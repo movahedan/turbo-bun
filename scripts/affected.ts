@@ -57,9 +57,7 @@ export async function getBaseSha(): Promise<string> {
 
 		baseSha = firstParent.trim();
 	} else {
-		console.log(
-			"📋 Previous commit is a regular commit, using it as base SHA.",
-		);
+		console.log("📋 Previous commit is a regular commit, using it as base SHA.");
 		// For regular commits, use the previous commit as base
 		const previousCommit = await $`git rev-parse ${currentSha.trim()}^1`.text();
 		baseSha = previousCommit.trim();
@@ -74,9 +72,7 @@ export async function getAffectedPackages(baseSha?: string): Promise<string[]> {
 	const effectiveBaseSha = baseSha || (await getBaseSha());
 
 	const affectedPackages =
-		await $`bunx turbo run build --filter="...[${effectiveBaseSha}]" --dry-run=json`
-			.quiet()
-			.json();
+		await $`bunx turbo run build --filter="...[${effectiveBaseSha}]" --dry-run=json`.quiet().json();
 
 	// Remove root package
 	return affectedPackages.packages.slice(1);
@@ -90,9 +86,7 @@ export interface AffectedService {
 	port?: number;
 }
 
-async function getAffectedServices(
-	mode: ServiceMode,
-): Promise<AffectedService[]> {
+async function getAffectedServices(mode: ServiceMode): Promise<AffectedService[]> {
 	const keys = await getAffectedPackages();
 	const devServices = await parseCompose("dev");
 	const prodServices = await parseCompose("prod");
@@ -122,14 +116,10 @@ async function getAffectedServices(
 	if (mode === "prod" || mode === "all") {
 		for (const service of prodServices.exposedServices()) {
 			const isPackage = allDirectories.find(
-				(d) =>
-					d.path.includes("packages") &&
-					d.path.includes(service.name.replace(/^prod-/, "")),
+				(d) => d.path.includes("packages") && d.path.includes(service.name.replace(/^prod-/, "")),
 			);
 
-			const serviceKey = isPackage
-				? `@repo/${service.name.replace(/^prod-/, "")}`
-				: service.name;
+			const serviceKey = isPackage ? `@repo/${service.name.replace(/^prod-/, "")}` : service.name;
 			if (keys.some((k: string) => k === serviceKey.replace(/^prod-/, ""))) {
 				affectedServices.push({
 					name: service.name,
@@ -177,9 +167,7 @@ export async function getAffectedServicesWithDependencies(
 		const result: AffectedService[] = [];
 		for (const serviceName of allServicesWithDeps) {
 			// Find in dev services
-			const devService = devServices
-				.exposedServices()
-				.find((s) => s.name === serviceName);
+			const devService = devServices.exposedServices().find((s) => s.name === serviceName);
 			if (devService) {
 				result.push({
 					name: devService.name,
@@ -189,9 +177,7 @@ export async function getAffectedServicesWithDependencies(
 			}
 
 			// Find in prod services
-			const prodService = prodServices
-				.exposedServices()
-				.find((s) => s.name === serviceName);
+			const prodService = prodServices.exposedServices().find((s) => s.name === serviceName);
 			if (prodService) {
 				result.push({
 					name: prodService.name,
@@ -203,9 +189,7 @@ export async function getAffectedServicesWithDependencies(
 
 		return result;
 	} catch (error) {
-		throw new Error(
-			`Failed to get affected services with dependencies: ${error}`,
-		);
+		throw new Error(`Failed to get affected services with dependencies: ${error}`);
 	}
 }
 

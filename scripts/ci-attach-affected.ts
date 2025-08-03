@@ -1,13 +1,6 @@
 #!/usr/bin/env bun
-import {
-	getAffectedPackages,
-	getAffectedServicesWithDependencies,
-} from "./affected";
-import {
-	createScript,
-	type ScriptConfig,
-	validators,
-} from "./utils/create-scripts";
+import { getAffectedPackages, getAffectedServicesWithDependencies } from "./affected";
+import { createScript, type ScriptConfig, validators } from "./utils/create-scripts";
 
 const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",
@@ -49,9 +42,7 @@ export const ciAttachAffected = createScript(
 				? await getAffectedServicesWithDependencies("prod").then((services) =>
 						services.map((s) => s.name),
 					)
-				: await getAffectedPackages().then((packages) =>
-						packages.map((p) => `--filter=${p}`),
-					);
+				: await getAffectedPackages().then((packages) => packages.map((p) => `--filter=${p}`));
 
 		const affectedServicesNames = affectedList.join(" ");
 

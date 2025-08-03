@@ -7,9 +7,7 @@ let checkInterval: NodeJS.Timeout;
 
 async function main() {
 	console.log(chalk.cyan("🚀 Starting UI development environment..."));
-	console.log(
-		chalk.yellow("📁 Watching src/ for changes and running prebuild"),
-	);
+	console.log(chalk.yellow("📁 Watching src/ for changes and running prebuild"));
 	console.log(chalk.blue("📚 Starting Storybook\n"));
 
 	console.log(chalk.green("🔄 Running initial prebuild..."));

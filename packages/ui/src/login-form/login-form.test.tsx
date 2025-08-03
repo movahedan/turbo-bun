@@ -31,9 +31,7 @@ describe("LoginForm", () => {
 		render(<LoginForm onSubmit={mockOnSubmit} />);
 
 		expect(screen.getByText("Welcome back")).toBeInTheDocument();
-		expect(
-			screen.getByText("Enter your credentials to access your account"),
-		).toBeInTheDocument();
+		expect(screen.getByText("Enter your credentials to access your account")).toBeInTheDocument();
 		expect(screen.getByLabelText("Email")).toBeInTheDocument();
 		expect(screen.getByLabelText("Password")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Sign In" })).toBeInTheDocument();
@@ -51,9 +49,7 @@ describe("LoginForm", () => {
 
 		expect(screen.getByText("Custom Title")).toBeInTheDocument();
 		expect(screen.getByText("Custom Description")).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: "Custom Submit" }),
-		).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Custom Submit" })).toBeInTheDocument();
 	});
 
 	it("shows validation errors for empty fields", async () => {
@@ -97,9 +93,7 @@ describe("LoginForm", () => {
 		fireEvent.click(submitButton);
 
 		await waitFor(() => {
-			expect(
-				screen.getByText("Password must be at least 6 characters"),
-			).toBeInTheDocument();
+			expect(screen.getByText("Password must be at least 6 characters")).toBeInTheDocument();
 		});
 
 		expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -152,9 +146,7 @@ describe("LoginForm", () => {
 
 		fireEvent.click(toggleButton);
 		expect(passwordInput.type).toBe("text");
-		expect(
-			screen.getByRole("button", { name: "Hide password" }),
-		).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Hide password" })).toBeInTheDocument();
 
 		fireEvent.click(screen.getByRole("button", { name: "Hide password" }));
 		expect(passwordInput.type).toBe("password");
@@ -163,9 +155,7 @@ describe("LoginForm", () => {
 	it("hides password toggle when showPasswordToggle is false", () => {
 		render(<LoginForm onSubmit={mockOnSubmit} showPasswordToggle={false} />);
 
-		expect(
-			screen.queryByRole("button", { name: /password/i }),
-		).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /password/i })).not.toBeInTheDocument();
 	});
 
 	it("shows loading state", () => {

@@ -38,24 +38,18 @@ export const parseCompose = async (mode: "dev" | "prod") => {
 	return {
 		exposedServices: () => services.filter((s) => s.port !== undefined),
 		serviceHealth: () => {
-			return $`docker compose -f ${composePaths[mode]} --profile all ps`.then(
-				({ stdout }) => parseDockerPsOutput(stdout.toString()),
+			return $`docker compose -f ${composePaths[mode]} --profile all ps`.then(({ stdout }) =>
+				parseDockerPsOutput(stdout.toString()),
 			);
 		},
 		serviceUrls: (baseUrl = "http://localhost") => {
 			return Object.fromEntries(
 				services
 					.filter((service) => service.port !== undefined)
-					.map((service) => [
-						service.name,
-						service.port ? `${baseUrl}:${service.port}` : "",
-					]),
+					.map((service) => [service.name, service.port ? `${baseUrl}:${service.port}` : ""]),
 			);
 		},
-		servicePorts: () =>
-			Object.fromEntries(
-				services.map((s) => [s.name, s.port?.toString() ?? ""]),
-			),
+		servicePorts: () => Object.fromEntries(services.map((s) => [s.name, s.port?.toString() ?? ""])),
 		dependentServices: (serviceName: string) =>
 			services.filter((service) => service.dependencies?.includes(serviceName)),
 	};
@@ -114,9 +108,7 @@ async function parse(composePath: string): Promise<ServiceInfo[]> {
 					serviceInfo.port = serviceInfo.hostPort; // Use host port as default
 				} else {
 					// Unsupported format - log warning but don't fail
-					console.warn(
-						`Unsupported port format for service ${serviceName}: ${portMapping}`,
-					);
+					console.warn(`Unsupported port format for service ${serviceName}: ${portMapping}`);
 				}
 			}
 
@@ -154,9 +146,7 @@ function parseDockerPsOutput(output: string): ServiceHealth[] {
 		}
 
 		// Extract port information using a regex pattern
-		const portMatch = line.match(
-			/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/,
-		);
+		const portMatch = line.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+->\d+)/);
 		const port = portMatch ? portMatch[1] : undefined;
 
 		services.push({

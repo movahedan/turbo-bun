@@ -27,9 +27,7 @@ const devRm = createScript(devRmConfig, async (_, vConsole): Promise<void> => {
 			),
 		);
 		vConsole.info(
-			chalk.yellow(
-				"💡 Please exit the DevContainer and run this command from your host terminal.",
-			),
+			chalk.yellow("💡 Please exit the DevContainer and run this command from your host terminal."),
 		);
 		process.exit(1);
 	}
@@ -54,17 +52,9 @@ const devRm = createScript(devRmConfig, async (_, vConsole): Promise<void> => {
 	vConsole.log(chalk.green("✅ DevContainer removal completed successfully!"));
 	vConsole.log(chalk.cyan("\n💡 To start fresh, run:"));
 	vConsole.log(chalk.cyan("  - bun run local:setup # For local development"));
-	vConsole.log(
-		chalk.cyan("  - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) "),
-	);
-	vConsole.log(
-		chalk.cyan(
-			"  -Type 'Dev Containers: Reopen in Container' and select the command",
-		),
-	);
-	vConsole.log(
-		chalk.cyan("  - bun run dev:setup # For DevContainer development"),
-	);
+	vConsole.log(chalk.cyan("  - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS) "));
+	vConsole.log(chalk.cyan("  -Type 'Dev Containers: Reopen in Container' and select the command"));
+	vConsole.log(chalk.cyan("  - bun run dev:setup # For DevContainer development"));
 });
 
 if (import.meta.main) {

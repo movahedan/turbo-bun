@@ -4,10 +4,7 @@ import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
 import chalk from "chalk";
 import { createScript, validators } from "./utils/create-scripts";
-import {
-	parseCompose,
-	type ServiceHealth,
-} from "./utils/docker-compose-parser";
+import { parseCompose, type ServiceHealth } from "./utils/docker-compose-parser";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",
@@ -25,41 +22,28 @@ const devCheckConfig = {
 	],
 } as const;
 
-const devCheck = createScript(
-	devCheckConfig,
-	async function main(args, xConsole) {
-		xConsole.log(chalk.blue("🧪 Starting DevContainer Health Check..."));
+const devCheck = createScript(devCheckConfig, async function main(args, xConsole) {
+	xConsole.log(chalk.blue("🧪 Starting DevContainer Health Check..."));
 
-		await $`bun run dev:up --build`;
-		const parsedCompose = await parseCompose("dev");
-		await monitorServiceHealth(
-			parsedCompose.serviceHealth,
-			parsedCompose.exposedServices,
-			xConsole,
-		);
+	await $`bun run dev:up --build`;
+	const parsedCompose = await parseCompose("dev");
+	await monitorServiceHealth(parsedCompose.serviceHealth, parsedCompose.exposedServices, xConsole);
 
-		xConsole.log(chalk.blue("\n📊 Services are available at:"));
-		const devUrls = parsedCompose.serviceUrls();
-		for (const [name, url] of Object.entries(devUrls)) {
-			xConsole.log(chalk.cyan(`   • ${name}: ${url}`));
-		}
+	xConsole.log(chalk.blue("\n📊 Services are available at:"));
+	const devUrls = parsedCompose.serviceUrls();
+	for (const [name, url] of Object.entries(devUrls)) {
+		xConsole.log(chalk.cyan(`   • ${name}: ${url}`));
+	}
 
-		xConsole.log(
-			chalk.green("✅ DevContainer health check completed successfully!"),
-		);
+	xConsole.log(chalk.green("✅ DevContainer health check completed successfully!"));
 
-		if (args.shutdown) {
-			xConsole.log(chalk.yellow("🧹 Cleaning up services..."));
-			await $`bun run dev:down`;
-		} else {
-			xConsole.log(
-				chalk.yellow(
-					"💡 Use 'bun run dev:check --shutdown' to stop services when done",
-				),
-			);
-		}
-	},
-);
+	if (args.shutdown) {
+		xConsole.log(chalk.yellow("🧹 Cleaning up services..."));
+		await $`bun run dev:down`;
+	} else {
+		xConsole.log(chalk.yellow("💡 Use 'bun run dev:check --shutdown' to stop services when done"));
+	}
+});
 
 if (import.meta.main) {
 	devCheck();

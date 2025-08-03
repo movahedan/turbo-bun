@@ -1,13 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { render, screen } from "@testing-library/react";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "./card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
 
 describe("Card Components", () => {
 	it("renders Card component", () => {
@@ -59,21 +52,14 @@ describe("Card Components", () => {
 	});
 
 	it("renders CardDescription component", () => {
-		render(
-			<CardDescription data-testid="card-description">
-				Card description
-			</CardDescription>,
-		);
+		render(<CardDescription data-testid="card-description">Card description</CardDescription>);
 		expect(screen.getByTestId("card-description")).toBeInTheDocument();
 		expect(screen.getByText("Card description")).toBeInTheDocument();
 	});
 
 	it("renders CardDescription with custom className", () => {
 		render(
-			<CardDescription
-				className="custom-description"
-				data-testid="card-description"
-			>
+			<CardDescription className="custom-description" data-testid="card-description">
 				Card description
 			</CardDescription>,
 		);
@@ -131,12 +117,8 @@ describe("Card Components", () => {
 
 		expect(screen.getByTestId("complete-card")).toBeInTheDocument();
 		expect(screen.getByText("Complete Card")).toBeInTheDocument();
-		expect(
-			screen.getByText("This is a complete card example"),
-		).toBeInTheDocument();
-		expect(
-			screen.getByText("This is the main content of the card."),
-		).toBeInTheDocument();
+		expect(screen.getByText("This is a complete card example")).toBeInTheDocument();
+		expect(screen.getByText("This is the main content of the card.")).toBeInTheDocument();
 		expect(screen.getByText("Action")).toBeInTheDocument();
 	});
 

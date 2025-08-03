@@ -16,10 +16,7 @@ export function LoginPage() {
 			await new Promise((resolve, reject) => {
 				setTimeout(() => {
 					// Mock authentication logic
-					if (
-						data.email === "admin@example.com" &&
-						data.password === "password123"
-					) {
+					if (data.email === "admin@example.com" && data.password === "password123") {
 						resolve({ success: true });
 					} else {
 						reject(new Error("Invalid credentials"));
@@ -50,9 +47,7 @@ export function LoginPage() {
 			<div className="max-w-md w-full space-y-8">
 				<div className="text-center">
 					<h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-					<p className="mt-2 text-sm text-gray-600">
-						Sign in to access your admin panel
-					</p>
+					<p className="mt-2 text-sm text-gray-600">Sign in to access your admin panel</p>
 				</div>
 
 				<LoginForm
@@ -66,9 +61,7 @@ export function LoginPage() {
 				/>
 
 				<div className="text-center">
-					<p className="text-xs text-gray-500">
-						Demo credentials: admin@example.com / password123
-					</p>
+					<p className="text-xs text-gray-500">Demo credentials: admin@example.com / password123</p>
 				</div>
 			</div>
 		</div>

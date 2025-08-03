@@ -27,16 +27,13 @@ const exampleScriptConfig = {
 	],
 } as const;
 
-export const exampleScript = createScript(
-	exampleScriptConfig,
-	async function main(args, xConsole) {
-		xConsole.info("📁 Processing file:", args.file);
-		xConsole.log("💾 Output will be saved to:", args.output);
-		xConsole.warn("🔍 Verbose mode enabled");
-		// Your script logic here...
-		xConsole.log("✅ Example script completed successfully!");
-	},
-);
+export const exampleScript = createScript(exampleScriptConfig, async function main(args, xConsole) {
+	xConsole.info("📁 Processing file:", args.file);
+	xConsole.log("💾 Output will be saved to:", args.output);
+	xConsole.warn("🔍 Verbose mode enabled");
+	// Your script logic here...
+	xConsole.log("✅ Example script completed successfully!");
+});
 
 if (import.meta.main) {
 	exampleScript();

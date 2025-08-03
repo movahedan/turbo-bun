@@ -32,49 +32,44 @@ const setupLocalConfig = {
 	],
 } as const;
 
-const setupLocal = createScript(
-	setupLocalConfig,
-	async function main(args, xConsole) {
-		xConsole.log(chalk.blue("🚀 Starting local development setup..."));
+const setupLocal = createScript(setupLocalConfig, async function main(args, xConsole) {
+	xConsole.log(chalk.blue("🚀 Starting local development setup..."));
 
-		// Step 1: Install dependencies
-		xConsole.log(chalk.blue("📦 Installing dependencies..."));
-		await $`bun install`;
+	// Step 1: Install dependencies
+	xConsole.log(chalk.blue("📦 Installing dependencies..."));
+	await $`bun install`;
 
-		// Step 2: Run code quality checks
-		xConsole.log(chalk.blue("🔍 Running code quality checks..."));
-		await $`bun run check:fix`;
+	// Step 2: Run code quality checks
+	xConsole.log(chalk.blue("🔍 Running code quality checks..."));
+	await $`bun run check:fix`;
 
-		// Step 3: Type checking
-		xConsole.log(chalk.blue("🔍 Running type checks..."));
-		await $`bun run check:types`;
+	// Step 3: Type checking
+	xConsole.log(chalk.blue("🔍 Running type checks..."));
+	await $`bun run check:types`;
 
-		// Step 4: Run tests (unless skipped)
-		if (!args["skip-tests"]) {
-			xConsole.log(chalk.blue("🧪 Running tests..."));
-			await $`bun run test`;
-		}
+	// Step 4: Run tests (unless skipped)
+	if (!args["skip-tests"]) {
+		xConsole.log(chalk.blue("🧪 Running tests..."));
+		await $`bun run test`;
+	}
 
-		// Step 5: Build all packages
-		xConsole.log(chalk.blue("🏗️ Building all packages..."));
-		await $`bun run build`;
+	// Step 5: Build all packages
+	xConsole.log(chalk.blue("🏗️ Building all packages..."));
+	await $`bun run build`;
 
-		// Step 6: Sync VS Code configuration (unless skipped)
-		if (!args["skip-vscode"]) {
-			xConsole.log(chalk.blue("🎯 Syncing VS Code configuration..."));
-			await $`bun run local:vscode`;
-		}
+	// Step 6: Sync VS Code configuration (unless skipped)
+	if (!args["skip-vscode"]) {
+		xConsole.log(chalk.blue("🎯 Syncing VS Code configuration..."));
+		await $`bun run local:vscode`;
+	}
 
-		xConsole.log(chalk.green("✅ Local setup completed successfully!"));
+	xConsole.log(chalk.green("✅ Local setup completed successfully!"));
 
-		xConsole.log(chalk.cyan("\n💡 Useful commands:"));
-		xConsole.log(chalk.cyan(" - bun run check:quick # Quick verification"));
-		xConsole.log(
-			chalk.cyan(" - bun run dev:setup # Setup DevContainer environment"),
-		);
-		xConsole.log(chalk.cyan(" - bun run local:cleanup # Clean everything"));
-	},
-);
+	xConsole.log(chalk.cyan("\n💡 Useful commands:"));
+	xConsole.log(chalk.cyan(" - bun run check:quick # Quick verification"));
+	xConsole.log(chalk.cyan(" - bun run dev:setup # Setup DevContainer environment"));
+	xConsole.log(chalk.cyan(" - bun run local:cleanup # Clean everything"));
+});
 
 if (import.meta.main) {
 	setupLocal();

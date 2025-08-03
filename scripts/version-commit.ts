@@ -5,14 +5,12 @@ import { getAffectedPackages } from "./affected";
 import { parseChangeset, type VersionPackages } from "./utils/changeset-parser";
 import { createScript } from "./utils/create-scripts";
 
-const VERSION_TAG_PREFIX = "v";
-
 // Versioning -------------------------------------------------------------------------------------
+const VERSION_TAG_PREFIX = "v";
 async function getLatestVersionTag(): Promise<string | undefined> {
-	const tags =
-		await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
-			.nothrow()
-			.text();
+	const tags = await $`git tag --list "${VERSION_TAG_PREFIX}*" --sort=-version:refname`
+		.nothrow()
+		.text();
 	const tagList = tags?.split("\n").filter(Boolean) ?? [];
 
 	return tagList[0];
@@ -41,34 +39,26 @@ async function tagVersion(version: string): Promise<string> {
 // Changesets -------------------------------------------------------------------------------------
 async function readChangesets(): Promise<VersionPackages[]> {
 	const files = await readdir(".changeset");
-	const changesets = files.filter(
-		(file) => file.endsWith(".md") && file !== "README.md",
-	);
+	const changesets = files.filter((file) => file.endsWith(".md") && file !== "README.md");
 
 	return changesets.map((filename) => parseChangeset(filename).packages);
 }
-async function createChangeset(
-	packages: VersionPackages,
-	rootVersionTag: string,
-): Promise<string> {
-	const changesetContent = Object.entries(packages).reduce(
-		(accumulator, current, index, array) => {
-			console.log({ current });
-			const isFirst = index === 0;
-			const firstLineSegment = isFirst ? "---\n" : "";
-			const VERSION_TAG_PREFIX = "v";
-			const summary = `Automated version bump for ${current[0]} and other affected packages on root version tag: ${VERSION_TAG_PREFIX}${rootVersionTag}.`;
+async function createChangeset(packages: VersionPackages, rootVersionTag: string): Promise<string> {
+	const changesetContent = Object.entries(packages).reduce((accumulator, current, index, array) => {
+		console.log({ current });
+		const isFirst = index === 0;
+		const firstLineSegment = isFirst ? "---\n" : "";
+		const versionTag = `${VERSION_TAG_PREFIX}${rootVersionTag}`;
+		const summary = `Automated version bump for ${current[0]} and other affected packages on root version tag: ${versionTag}.`;
 
-			const isLast = index === array.length - 1;
-			const lastLineSegment = isLast ? `---\n\n${summary}` : "";
+		const isLast = index === array.length - 1;
+		const lastLineSegment = isLast ? `---\n\n${summary}` : "";
 
-			const [packageName, versionType] = current;
-			const newPackageSegment = `"${packageName}": ${versionType}\n`;
+		const [packageName, versionType] = current;
+		const newPackageSegment = `"${packageName}": ${versionType}\n`;
 
-			return `${accumulator}${firstLineSegment}${newPackageSegment}${lastLineSegment}`;
-		},
-		"",
-	);
+		return `${accumulator}${firstLineSegment}${newPackageSegment}${lastLineSegment}`;
+	}, "");
 
 	const timestamp = Date.now();
 	const filename = `auto-${timestamp}.md`;
@@ -100,21 +90,15 @@ export const versionCommit = createScript(
 			},
 		],
 	} as const,
-	async function main(
-		{ "dry-run": dryRun, "attach-to-output-id": outputId },
-		xConsole,
-	) {
+	async function main({ "dry-run": dryRun, "attach-to-output-id": outputId }, xConsole) {
 		xConsole.info("🚀 Analyzing deployment packages for production...");
 
 		// Configure Git authentication ----------------------------------------------------------------
 		xConsole.log("🔍 Configuring Git authentication...");
 		if (dryRun) xConsole.log("-> 🔍 Dry run, skipping git config");
-		else if (!process.env.GITHUB_ACTIONS)
-			xConsole.log("-> 🔍 Running locally, skip git config");
-		else if (!process.env.GITHUB_REPOSITORY)
-			xConsole.log("-> ⚠️ GITHUB_REPOSITORY not found");
-		else if (!process.env.GITHUB_TOKEN)
-			xConsole.log("-> ⚠️ GITHUB_TOKEN not found");
+		else if (!process.env.GITHUB_ACTIONS) xConsole.log("-> 🔍 Running locally, skip git config");
+		else if (!process.env.GITHUB_REPOSITORY) xConsole.log("-> ⚠️ GITHUB_REPOSITORY not found");
+		else if (!process.env.GITHUB_TOKEN) xConsole.log("-> ⚠️ GITHUB_TOKEN not found");
 		else {
 			xConsole.log("-> 🔐 Configuring Git authentication...");
 			await $`git config user.name "github-actions[bot]"`.text();
@@ -122,48 +106,34 @@ export const versionCommit = createScript(
 			await $`git remote set-url origin https://x-access-token:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`.text();
 
 			const actualRemoteUrl = await $`git remote get-url origin`.text(); // Verify the remote URL
-			const maskedUrl = actualRemoteUrl.replace(
-				/https:\/\/x-access-token:[^@]+@/,
-				"***@",
-			);
-			xConsole.log(
-				`-> 🔗 Git authentication configured, remote URL: ${maskedUrl}`,
-			);
+			const maskedUrl = actualRemoteUrl.replace(/https:\/\/x-access-token:[^@]+@/, "***@");
+			xConsole.log(`-> 🔗 Git authentication configured, remote URL: ${maskedUrl}`);
 		}
 
 		// Get affected packages ----------------------------------------------------------------------
 		const lastVersionTagSha = await getLastVersionTagSha();
-		xConsole.log(
-			`🔍 Analyzing affected packages by last version tag SHA: ${lastVersionTagSha}`,
-		);
+		xConsole.log(`🔍 Analyzing affected packages by last version tag SHA: ${lastVersionTagSha}`);
 		const affectedPackages = await getAffectedPackages(lastVersionTagSha);
 		if (affectedPackages.length === 0) {
 			xConsole.log("-> ⚠️ No affected packages detected");
 			return;
 		}
-		xConsole.log(
-			`-> 📦 Found ${affectedPackages.length} affected packages: ${affectedPackages}`,
-		);
+		xConsole.log(`-> 📦 Found ${affectedPackages.length} affected packages: ${affectedPackages}`);
 
 		xConsole.log("🔍 Reading existing changesets...");
 		const changesets = await readChangesets();
 		xConsole.log(`-> 📋 Found ${changesets.length} existing changesets`);
 
 		xConsole.log("🤖 Automatic version bump for affected packages...");
-		const packagesToAdd: VersionPackages = affectedPackages.reduce(
-			(acc, pkg) => {
-				const hasChangeset = changesets.some((packages) => packages[pkg]);
-				if (!hasChangeset) acc[pkg] = "patch";
-				return acc;
-			},
-			{} as VersionPackages,
-		);
+		const packagesToAdd: VersionPackages = affectedPackages.reduce((acc, pkg) => {
+			const hasChangeset = changesets.some((packages) => packages[pkg]);
+			if (!hasChangeset) acc[pkg] = "patch";
+			return acc;
+		}, {} as VersionPackages);
 
 		// Version bump -------------------------------------------------------------------------------
 		const packageJson = await Bun.file("package.json").json();
-		const [currentMajor, currentMinor, currentPatch] = packageJson.version
-			.split(".")
-			.map(Number);
+		const [currentMajor, currentMinor, currentPatch] = packageJson.version.split(".").map(Number);
 		const newRootVersion = `${currentMajor}.${currentMinor}.${currentPatch + 1}`;
 		packageJson.version = newRootVersion;
 
@@ -175,14 +145,10 @@ export const versionCommit = createScript(
 			xConsole.log("-> ✅ All changed packages already have changesets");
 		} else {
 			const filename = await createChangeset(packagesToAdd, newRootVersion);
-			xConsole.log(
-				`-> ✅ Created ./changeset/${filename} for: ${Object.keys(packagesToAdd)}`,
-			);
+			xConsole.log(`-> ✅ Created ./changeset/${filename} for: ${Object.keys(packagesToAdd)}`);
 		}
 
-		xConsole.log(
-			"📝 Generating and committing changesets (.changeset/config.json)...",
-		);
+		xConsole.log("📝 Generating and committing changesets (.changeset/config.json)...");
 		await $`bunx @changesets/cli version`.text();
 
 		// Tag version ---------------------------------------------------------------------------------
@@ -195,27 +161,21 @@ export const versionCommit = createScript(
 
 		xConsole.log("🔍 Checking for commits to push...");
 		const aheadCount = await $`git rev-list --count origin/main..HEAD`.text();
-		if (Number.parseInt(aheadCount.trim()) === 0)
-			xConsole.log("-> ⚠️ No commits to push");
+		if (Number.parseInt(aheadCount.trim()) === 0) xConsole.log("-> ⚠️ No commits to push");
 		else if (dryRun) xConsole.log("-> 🔍 Dry run, skipping push");
 		else {
 			await $`git push origin main`.text();
-			xConsole.log(
-				"-> 🚀 Successfully pushed version changes to main branch...",
-			);
+			xConsole.log("-> 🚀 Successfully pushed version changes to main branch...");
 		}
 
 		// Attach affected packages to github output --------------------------------------------------
 		if (outputId) {
-			xConsole.log(
-				`📱 Attaching affected packages to github output ${outputId}`,
-			);
+			xConsole.log(`📱 Attaching affected packages to github output ${outputId}`);
 			const affectedPackagesString = JSON.stringify(affectedPackages);
 			const output = `${outputId}<<EOF\n${JSON.stringify(affectedPackages)}\nEOF\n`;
 
 			if (dryRun) xConsole.log("-> 🔍 Dry run, skipping attachment");
-			else if (!process.env.GITHUB_OUTPUT)
-				xConsole.log("-> ⚠️ GITHUB_OUTPUT not found");
+			else if (!process.env.GITHUB_OUTPUT) xConsole.log("-> ⚠️ GITHUB_OUTPUT not found");
 			else await Bun.write(process.env.GITHUB_OUTPUT, output);
 
 			xConsole.log(`\n-> 📱 Attached: ${outputId}=${affectedPackagesString}\n`);

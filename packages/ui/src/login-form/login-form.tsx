@@ -2,13 +2,7 @@ import { cn } from "@repo/utils/cn";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import * as React from "react";
 import { Button } from "../button/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "../card/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../card/card";
 import { Input } from "../input/input";
 import { Label } from "../label/label";
 
@@ -54,13 +48,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 		password: "",
 	});
 	const [showPassword, setShowPassword] = React.useState(false);
-	const [validationErrors, setValidationErrors] = React.useState<
-		Partial<LoginFormData>
-	>({});
+	const [validationErrors, setValidationErrors] = React.useState<Partial<LoginFormData>>({});
 
 	const handleInputChange =
-		(field: keyof LoginFormData) =>
-		(e: React.ChangeEvent<HTMLInputElement>) => {
+		(field: keyof LoginFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
 			const value = e.target.value;
 			setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -136,9 +127,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 							value={formData.email}
 							onChange={handleInputChange("email")}
 							disabled={loading}
-							aria-describedby={
-								validationErrors.email ? "email-error" : undefined
-							}
+							aria-describedby={validationErrors.email ? "email-error" : undefined}
 							aria-invalid={!!validationErrors.email}
 						/>
 						{validationErrors.email && (
@@ -159,9 +148,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 								value={formData.password}
 								onChange={handleInputChange("password")}
 								disabled={loading}
-								aria-describedby={
-									validationErrors.password ? "password-error" : undefined
-								}
+								aria-describedby={validationErrors.password ? "password-error" : undefined}
 								aria-invalid={!!validationErrors.password}
 							/>
 							{showPasswordToggle && (
@@ -174,11 +161,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 									disabled={loading}
 									aria-label={showPassword ? "Hide password" : "Show password"}
 								>
-									{showPassword ? (
-										<EyeOff className="h-4 w-4" />
-									) : (
-										<Eye className="h-4 w-4" />
-									)}
+									{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 								</Button>
 							)}
 						</div>

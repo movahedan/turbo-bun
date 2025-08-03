@@ -32,14 +32,10 @@ export const syncVscodeConfigScript = createScript(
 		xConsole.log(`📋 Generated scopes: ${scopes.join(", ")}`);
 
 		const {
-			customizations: {
-				vscode: { extensions: recommendations = [], settings = {} } = {},
-			} = {},
+			customizations: { vscode: { extensions: recommendations = [], settings = {} } = {} } = {},
 		} = JSON.parse(
 			stripComments(
-				await Bun.file(
-					join(import.meta.dir, "..", ".devcontainer", "devcontainer.json"),
-				).text(),
+				await Bun.file(join(import.meta.dir, "..", ".devcontainer", "devcontainer.json")).text(),
 			),
 		);
 
@@ -61,26 +57,14 @@ export const syncVscodeConfigScript = createScript(
 		}
 
 		// Update devcontainer.json with new scopes
-		const devcontainerPath = join(
-			import.meta.dir,
-			"..",
-			".devcontainer",
-			"devcontainer.json",
-		);
-		const devcontainerContent = JSON.parse(
-			stripComments(await Bun.file(devcontainerPath).text()),
-		);
+		const devcontainerPath = join(import.meta.dir, "..", ".devcontainer", "devcontainer.json");
+		const devcontainerContent = JSON.parse(stripComments(await Bun.file(devcontainerPath).text()));
 
 		// Update the scopes in devcontainer.json
-		devcontainerContent.customizations.vscode.settings[
-			"conventionalCommits.scopes"
-		] = scopes;
+		devcontainerContent.customizations.vscode.settings["conventionalCommits.scopes"] = scopes;
 
 		// Write back the updated devcontainer.json
-		writeFileSync(
-			devcontainerPath,
-			JSON.stringify(devcontainerContent, null, 2),
-		);
+		writeFileSync(devcontainerPath, JSON.stringify(devcontainerContent, null, 2));
 		await $`bun run biome check --write ${devcontainerPath}`;
 		xConsole.log(`✅ Updated ${devcontainerPath} with new scopes!`);
 
