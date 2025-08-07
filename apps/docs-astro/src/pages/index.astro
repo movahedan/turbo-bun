@@ -1,0 +1,209 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title='Project Documentation'>
+  <div class='bg-white'>
+    <!-- Hero section -->
+    <div class='relative isolate px-6 pt-14 lg:px-8'>
+      <div class='mx-auto max-w-2xl py-32 sm:py-48 lg:py-56'>
+        <div class='text-center'>
+          <h1
+            class='text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl'
+          >
+            📚 Project Documentation
+          </h1>
+          <p class='mt-6 text-lg leading-8 text-gray-600'>
+            Comprehensive documentation for development workflows, setup guides,
+            and best practices. Everything you need to know about this project
+            in one place.
+          </p>
+          <div class='mt-10 flex items-center justify-center gap-x-6'>
+            <a
+              href='/docs/1_INSTALLATION_GUIDE'
+              class='rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+            >
+              Get Started
+            </a>
+            <a
+              href='/docs/3_DEV_FLOWS'
+              class='text-sm font-semibold leading-6 text-gray-900'
+            >
+              Development Flows <span aria-hidden='true'>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick links section -->
+    <div class='bg-gray-50 py-24 sm:py-32'>
+      <div class='mx-auto max-w-7xl px-6 lg:px-8'>
+        <div class='mx-auto max-w-2xl lg:max-w-none'>
+          <h2
+            class='text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl'
+          >
+            Quick Navigation
+          </h2>
+          <div
+            class='mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3'
+          >
+            <!-- Installation Guide -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-indigo-50 p-3 text-indigo-700 ring-4 ring-white'
+                >
+                  📦
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a
+                    href='/docs/1_INSTALLATION_GUIDE'
+                    class='focus:outline-none'
+                  >
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    Installation Guide
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Complete setup instructions for getting the project running on
+                  your local machine.
+                </p>
+              </div>
+            </div>
+
+            <!-- Development Flows -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-green-50 p-3 text-green-700 ring-4 ring-white'
+                >
+                  🔄
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a href='/docs/3_DEV_FLOWS' class='focus:outline-none'>
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    Development Flows
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Essential development workflows and commands for daily
+                  development tasks.
+                </p>
+              </div>
+            </div>
+
+            <!-- Docker -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-blue-50 p-3 text-blue-700 ring-4 ring-white'
+                >
+                  🐳
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a href='/docs/5_DOCKER' class='focus:outline-none'>
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    Docker & DevContainer
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Containerized development environment setup and configuration.
+                </p>
+              </div>
+            </div>
+
+            <!-- Quality Checklist -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-yellow-50 p-3 text-yellow-700 ring-4 ring-white'
+                >
+                  ✅
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a
+                    href='/docs/0_QUALITY_CHECKLIST'
+                    class='focus:outline-none'
+                  >
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    Quality Checklist
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Standards and requirements for maintaining code quality and
+                  consistency.
+                </p>
+              </div>
+            </div>
+
+            <!-- Testing -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-purple-50 p-3 text-purple-700 ring-4 ring-white'
+                >
+                  🧪
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a href='/docs/TESTING' class='focus:outline-none'>
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    Testing
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Testing strategies, tools, and best practices for the project.
+                </p>
+              </div>
+            </div>
+
+            <!-- AI Prompt -->
+            <div
+              class='group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            >
+              <div>
+                <span
+                  class='inline-flex rounded-lg bg-pink-50 p-3 text-pink-700 ring-4 ring-white'
+                >
+                  🤖
+                </span>
+              </div>
+              <div class='mt-8'>
+                <h3 class='text-lg font-medium'>
+                  <a href='/docs/AI_Prompt' class='focus:outline-none'>
+                    <span class='absolute inset-0' aria-hidden='true'></span>
+                    AI Development Assistant
+                  </a>
+                </h3>
+                <p class='mt-2 text-sm text-gray-500'>
+                  Guidelines for AI-assisted development and documentation
+                  standards.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

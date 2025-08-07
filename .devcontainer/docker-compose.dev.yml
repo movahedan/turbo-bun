@@ -168,3 +168,25 @@ services:
     profiles: ["ui", "all"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://ui:3004"]
+
+  docs-astro:
+    extends:
+      service: apps
+    expose:
+      - "3005"
+    ports:
+      - "3005:3005"
+    env_file:
+      - path: ../.env
+        required: true
+    environment:
+      PORT: "3005"
+      HOST: "0.0.0.0"
+    command: bun run dev --filter=docs-astro -- --host 0.0.0.0 --port 3005
+    profiles: ["docs-astro", "all"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://docs-astro:3005"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s

@@ -1,0 +1,106 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	// Define all the documentation pages
+	const docs = [
+		'0_QUALITY_CHECKLIST',
+		'1_INSTALLATION_GUIDE',
+		'2_SETUP_FLOWS',
+		'3_DEV_FLOWS',
+		'4_SCRIPTING',
+		'5_DOCKER',
+		'6_RENOVATE',
+		'7_AUTO_VERSIONING',
+		'TESTING',
+		'AI_Prompt',
+	];
+
+	return docs.map((doc) => ({
+		params: { slug: doc },
+		props: { doc },
+	}));
+}
+
+const doc = Astro.props.doc;
+
+// For now, we'll show a placeholder since we can't read files at build time
+// In a real implementation, you'd use Astro's content collections
+let content = '';
+
+let title = doc;
+
+// Placeholder content for each documentation page
+const docContent: Record<string, { title: string; content: string }> = {
+	'0_QUALITY_CHECKLIST': {
+		title: '✅ Quality Checklist',
+		content:
+			'<h1>Quality Checklist</h1><p>This page contains the quality checklist for the project.</p>',
+	},
+	'1_INSTALLATION_GUIDE': {
+		title: '📦 Installation Guide',
+		content:
+			'<h1>Installation Guide</h1><p>This page contains the installation guide for the project.</p>',
+	},
+	'2_SETUP_FLOWS': {
+		title: '⚙️ Setup Flows',
+		content:
+			'<h1>Setup Flows</h1><p>This page contains the setup flows for the project.</p>',
+	},
+	'3_DEV_FLOWS': {
+		title: '🔄 Development Flows',
+		content:
+			'<h1>Development Flows</h1><p>This page contains the development flows for the project.</p>',
+	},
+	'4_SCRIPTING': {
+		title: '📝 Scripting',
+		content:
+			'<h1>Scripting</h1><p>This page contains scripting information for the project.</p>',
+	},
+	'5_DOCKER': {
+		title: '🐳 Docker',
+		content:
+			'<h1>Docker</h1><p>This page contains Docker information for the project.</p>',
+	},
+	'6_RENOVATE': {
+		title: '🔄 Renovate',
+		content:
+			'<h1>Renovate</h1><p>This page contains Renovate information for the project.</p>',
+	},
+	'7_AUTO_VERSIONING': {
+		title: '🏷️ Auto Versioning',
+		content:
+			'<h1>Auto Versioning</h1><p>This page contains auto versioning information for the project.</p>',
+	},
+	TESTING: {
+		title: '🧪 Testing',
+		content:
+			'<h1>Testing</h1><p>This page contains testing information for the project.</p>',
+	},
+	AI_Prompt: {
+		title: '🤖 AI Prompt',
+		content:
+			'<h1>AI Prompt</h1><p>This page contains AI prompt information for the project.</p>',
+	},
+};
+
+const docInfo = docContent[doc] || {
+	title: doc,
+	content: `<h1>${doc}</h1><p>Documentation page for ${doc}.</p>`,
+};
+
+title = docInfo.title;
+content = docInfo.content;
+---
+
+<Layout title={title}>
+	<div class='bg-white shadow-sm border-b border-gray-200'>
+		<div class='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+			<div class='prose prose-lg max-w-none'>
+				<div set:html={content} />
+			</div>
+		</div>
+	</div>
+</Layout>

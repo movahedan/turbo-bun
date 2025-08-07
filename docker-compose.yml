@@ -6,8 +6,9 @@ services:
       context: .
       dockerfile: apps/admin/Dockerfile
     ports:
-      - "5001:80"
+      - "5001:5001"
     environment:
+      - PORT=5001
       - VITE_API_URL=http://api:5003
     depends_on:
       - api
@@ -57,6 +58,23 @@ services:
     environment:
       - PORT=80
       - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  docs-astro:
+    build:
+      context: .
+      dockerfile: apps/docs-astro/Dockerfile
+    ports:
+      - "5007:5007"
+    environment:
+      - PORT=5007
+      - NODE_ENV=production
+      - ASTRO_SITE_PATH=localhost:5007
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
