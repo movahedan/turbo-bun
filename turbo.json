@@ -41,7 +41,7 @@
 				"**/*.spec.jsx"
 			],
 			"outputs": ["coverage/**"],
-			"dependsOn": ["^build", "@repo/test-preset#build"],
+			"dependsOn": ["^build"],
 			"cache": true,
 			"persistent": false
 		}

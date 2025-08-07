@@ -18,6 +18,7 @@ if [ -S /var/run/docker.sock ]; then
     # Set socket permissions for non-root access
     sudo chmod 666 /var/run/docker.sock
     # Add user to docker group
+    sudo groupadd docker
     sudo usermod -aG docker vscode-user
     echo "Docker permissions configured for Linux/macOS"
 else
