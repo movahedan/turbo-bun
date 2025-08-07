@@ -65,7 +65,7 @@
 		"typescript": "5.9.2",
 		"react": "19.1.1",
 		"react-dom": "19.1.1",
-		"vite": "7.0.6"
+		"vite": "7.1.0"
 	},
 	"description": "A monorepo for Turbo and Bun",
 	"author": "Soheil Movahedan",
