@@ -37,7 +37,8 @@ RUN mkdir -p /var/cache/nginx && \
     chown -R nginx:nginx /run/nginx.pid && \
     chmod -R 755 /run/nginx.pid
 
-COPY --from=build --chown=nginx:nginx /app/apps/admin/nginx.conf /etc/nginx/conf.d/default.conf
+# https://github.com/docker-library/docs/tree/master/nginx#using-environment-variables-in-nginx-configuration-new-in-119
+COPY --from=build --chown=nginx:nginx /app/apps/admin/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build --chown=nginx:nginx /app/apps/admin/dist/ /usr/share/nginx/html
 
 USER nginx
