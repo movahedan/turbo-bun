@@ -40,9 +40,6 @@ services:
       - HOST=0.0.0.0
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://api:5003
-    env_file:
-      - path: .env
-        required: true
     depends_on:
       - api
     healthcheck:
@@ -64,9 +61,6 @@ services:
       - PORT=5003
       - HOST=0.0.0.0
       - NODE_ENV=production
-    env_file:
-      - path: .env
-        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -86,9 +80,6 @@ services:
       - PORT=5006
       - HOST=0.0.0.0
       - NODE_ENV=production
-    env_file:
-      - path: .env
-        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -109,9 +100,6 @@ services:
       - HOST=0.0.0.0
       - NODE_ENV=production
       - ASTRO_SITE_PATH=localhost:5007
-    env_file:
-      - path: .env
-        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
