@@ -28,17 +28,15 @@ COPY --from=installer /app/ .
 RUN bun run build --filter=admin
 
 FROM nginx:alpine AS runner
-WORKDIR /app
-RUN mkdir -p /var/cache/nginx && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chmod -R 755 /var/cache/nginx && \
-    mkdir -p /run && \
-    touch /run/nginx.pid && \
-    chown -R nginx:nginx /run/nginx.pid && \
-    chmod -R 755 /run/nginx.pid
-
-COPY --from=build --chown=nginx:nginx /app/apps/admin/nginx.conf /etc/nginx/conf.d/default.conf
+ENV NGINX_ENVSUBST_TEMPLATE_DIR=/etc/nginx/templates
+ENV NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+COPY --from=build --chown=nginx:nginx --chmod=644 /app/apps/admin/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build --chown=nginx:nginx /app/apps/admin/dist/ /usr/share/nginx/html
+RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d /run && \
+    chmod -R 755 /var/cache/nginx /var/log/nginx /etc/nginx/conf.d /run && \
+    chmod -R 755 /etc/nginx/templates && \
+    find /usr/share/nginx/html -type d -exec chmod 755 {} \; && \
+    find /usr/share/nginx/html -type f -exec chmod 444 {} \;
 
 USER nginx
 CMD ["nginx", "-g", "daemon off;"]

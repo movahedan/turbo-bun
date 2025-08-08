@@ -1,11 +1,8 @@
 #!/usr/bin/env bun
 
-import path from "node:path";
 import { $ } from "bun";
 import { colorify } from "./scripting-utils/colorify";
-import type { ScriptConfig } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
-import { getAllDirectories } from "./scripting-utils/get-all-directories";
+import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",
@@ -16,64 +13,11 @@ This includes DevContainer cleanup. To stop the VS Code DevContainer itself, run
 	options: [],
 } as const satisfies ScriptConfig;
 
-const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> => {
-	vConsole.log(colorify.blue("🧹 Starting comprehensive cleanup..."));
-
-	async function removeFile(filePath: string) {
-		if (await Bun.file(filePath).exists()) {
-			await Bun.file(filePath).delete();
-			vConsole.log(colorify.gray(`  Removed: ${filePath}`));
-		}
-	}
-	async function stepArtifacts() {
-		vConsole.log(colorify.yellow("🗂️ Cleaning development artifacts..."));
-		const directories = await getAllDirectories();
-		for (const directory of directories) {
-			for (const ARTIFACT of DEVELOPMENT_ARTIFACT) {
-				await removeFile(path.join(directory, ARTIFACT));
-			}
-		}
-	}
-	await stepArtifacts();
-
-	async function stepLogs() {
-		vConsole.log(colorify.yellow("📝 Cleaning logs and temp files..."));
-		await $`find . -name "*.log" -type f -delete`;
-		await $`find . -name "logs" -type d -exec rm -rf {} + 2>/dev/null || true`;
-		await $`find . -name "*.tmp" -type f -delete`;
-		await $`find . -name "*.temp" -type f -delete`;
-		await $`find . -name ".DS_Store" -type f -delete`;
-		await $`find . -name "Thumbs.db" -type f -delete`;
-	}
-	await stepLogs();
-
-	async function stepNodeModules() {
-		vConsole.log(colorify.yellow("📦 Cleaning node_modules in directories..."));
-		await $`find . -type d -name "node_modules" -exec rm -rf {} +`.nothrow();
-	}
-	await stepNodeModules();
-
-	async function stepVSCode() {
-		vConsole.log(colorify.yellow("🎯 Cleaning VS Code configuration..."));
-		await $`rm -rf .vscode`;
-	}
-	await stepVSCode();
-
-	vConsole.log(colorify.green("✅ Cleanup completed successfully!"));
-	vConsole.log(colorify.cyan("\n💡 To start fresh, run:"));
-	vConsole.log(colorify.cyan("  - bun run local:setup # For local development"));
-	vConsole.log(colorify.cyan("  - bun run dev:setup # For DevContainer development"));
-});
-
-if (import.meta.main) {
-	cleanup();
-}
-
-const DEVELOPMENT_ARTIFACT = [
-	".bun",
+const directories = [
 	"dist",
 	"build",
-	".tsbuildinfo",
+	"dist",
+	"dist-storybook",
 	".turbo",
 	".next",
 	".output",
@@ -84,7 +28,45 @@ const DEVELOPMENT_ARTIFACT = [
 	".vite",
 	".swc",
 	".act",
-	".act-event.json",
 	".biomecache",
 	"bin",
 ];
+
+const files = [
+	".act-event.json",
+	"*.tsbuildinfo",
+	".log",
+	".tmp",
+	".temp",
+	".DS_Store",
+	"Thumbs.db",
+];
+
+const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> => {
+	vConsole.log(colorify.blue("🧹 Starting comprehensive cleanup..."));
+
+	vConsole.log(colorify.yellow("🗂️ Cleaning development artifacts..."));
+	for (const directory of directories) {
+		await $`rm -rf ${directory} **/${directory} **/${directory}/**`.quiet().nothrow();
+	}
+
+	vConsole.log(colorify.yellow("📝 Cleaning logs and temp files..."));
+	for (const file of files) {
+		await $`rm -rf ${file} **/${file}`.quiet().nothrow();
+	}
+
+	vConsole.log(colorify.yellow("📦 Cleaning node_modules in directories..."));
+	await $`rm -rf node_modules **/node_modules`.quiet().nothrow();
+
+	vConsole.log(colorify.yellow("🎯 Cleaning VS Code configuration..."));
+	await $`rm -rf .vscode`.quiet().nothrow();
+
+	vConsole.log(colorify.green("✅ Cleanup completed successfully!"));
+	vConsole.log(colorify.cyan("\n💡 To start fresh, run:"));
+	vConsole.log(colorify.cyan("  - bun run local:setup # For local development"));
+	vConsole.log(colorify.cyan("  - bun run dev:setup # For DevContainer development"));
+});
+
+if (import.meta.main) {
+	cleanup();
+}

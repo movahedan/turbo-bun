@@ -3,8 +3,8 @@
 	"dockerComposeFile": ["docker-compose.dev.yml"],
 	"service": "vscode-service",
 	"workspaceFolder": "/app",
-	"remoteUser": "vscode-user",
-	"containerUser": "vscode-user",
+	"remoteUser": "runner-user",
+	"containerUser": "runner-user",
 	"runServices": ["vscode-service"],
 	"networks": ["dev-network"],
 	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
@@ -49,7 +49,8 @@
 				"biomejs.biome",
 				"vivaxy.vscode-conventional-commits",
 				"ms-azuretools.vscode-docker",
-				"bierner.markdown-preview-github-styles"
+				"bierner.markdown-preview-github-styles",
+				"astro-build.astro-vscode"
 			],
 			"settings": {
 				"editor.formatOnSave": true,
@@ -85,10 +86,14 @@
 				"[javascriptreact]": {
 					"editor.defaultFormatter": "biomejs.biome"
 				},
+				"[astro]": {
+					"editor.defaultFormatter": "astro-build.astro-vscode"
+				},
 				"conventionalCommits.scopes": [
 					"root",
 					"admin",
 					"api",
+					"docs-astro",
 					"storefront",
 					"@repo/test-preset",
 					"@repo/typescript-config",

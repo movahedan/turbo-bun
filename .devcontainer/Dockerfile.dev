@@ -4,7 +4,8 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-COPY --chown=vscode-user:vscode-user . .
+RUN addgroup --system --gid 1001 runner-group && adduser --system --uid 1001 runner-user
+COPY --chown=runner-user:runner-group . .
 
 RUN --mount=type=cache,target=/root/.bun/install/cache \
     --mount=type=cache,target=/app/node_modules/.cache \

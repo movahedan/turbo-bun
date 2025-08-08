@@ -13,7 +13,6 @@ export function createScript<Config extends ScriptConfig, Return extends Promise
 	} = {},
 ): (passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>) => Return {
 	return (passedArgs) => {
-		// Parse command line args if no passed args
 		const cliArgs =
 			passedArgs ||
 			parseArgs({
@@ -22,7 +21,6 @@ export function createScript<Config extends ScriptConfig, Return extends Promise
 				options: [...defaultConfig.options, ...config.options],
 			});
 
-		// Merge with defaults to ensure all default values are present
 		const defaultArgs = {
 			verbose: true,
 			quiet: false,
@@ -125,19 +123,19 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		optionMap.set(option.long, option);
 	});
 
+	// Set default values for options that are not required
+	config.options.forEach((option) => {
+		const key = option.long.replace("--", "");
+		if (!option.required && !result[key]) {
+			result[key] = option.defaultValue as InferArgValue<typeof option>;
+		}
+	});
+
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
 		const nextArg = args[i + 1];
 		const isLastArg = !nextArg;
 		const nextArgIsOption = !!nextArg && nextArg.startsWith("-");
-
-		// Set default values for options that are not required
-		config.options.forEach((option) => {
-			const key = option.long.replace("--", "");
-			if (!option.required && !result[key]) {
-				result[key] = option.defaultValue as InferArgValue<typeof option>;
-			}
-		});
 
 		// Handle help
 		if (arg === "-h" || arg === "--help") {

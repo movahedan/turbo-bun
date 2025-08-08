@@ -75,7 +75,7 @@ jobs:
     name: 🔍 Validate
     runs-on: ubuntu-latest
     needs: get-affected
-    if: github.event.workflow_run.conclusion == 'success' && needs.get-affected.outputs.affected-packages != ''
+    if: needs.get-affected.outputs.affected-packages != ''
     env:
       TURBO_SCM_HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha || 'HEAD' }}
       TURBO_SCM_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
@@ -133,7 +133,7 @@ jobs:
     name: 🐳 Validate Docker Compose
     runs-on: ubuntu-latest
     needs: get-affected
-    if: github.event.workflow_run.conclusion == 'success' && needs.get-affected.outputs.affected-services != ''
+    if: needs.get-affected.outputs.affected-services != ''
     env:
      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
      TURBO_TEAM: ${{ vars.TURBO_TEAM }}

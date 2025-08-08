@@ -1,7 +1,7 @@
 ---
+description: Use only for committing and pushing git changes
 alwaysApply: false
 ---
-
 # Commit and Documentation Workflow
 
 ## 🎯 Complete Interactive Workflow Process

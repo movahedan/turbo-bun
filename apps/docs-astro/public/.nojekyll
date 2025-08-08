@@ -1,0 +1,2 @@
+# This file prevents GitHub Pages from using Jekyll processing
+# which can interfere with Astro's _astro/ directory 

@@ -1,16 +1,25 @@
 name: repo-prod
 
+networks:
+  prod-network:
+    driver: bridge
+
 services:
-  prod-admin:
+  admin:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
     ports:
-      - "5001:80"
+      - "5001:5001"
+    networks:
+      - prod-network
     environment:
+      - PORT=5001
+      - HOST=0.0.0.0
+      - NODE_ENV=production
       - VITE_API_URL=http://api:5003
     depends_on:
-      - prod-api
+      - api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -18,16 +27,21 @@ services:
       retries: 3
       start_period: 30s
 
-  prod-storefront:
+  storefront:
     build:
       context: .
       dockerfile: apps/storefront/Dockerfile
     ports:
-      - "5002:3000"
+      - "5002:5002"
+    networks:
+      - prod-network
     environment:
+      - PORT=5002
+      - HOST=0.0.0.0
+      - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://api:5003
     depends_on:
-      - prod-api
+      - api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -35,12 +49,18 @@ services:
       retries: 3
       start_period: 30s
 
-  prod-api:
+  api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "5003:5001"
+      - "5003:5003"
+    networks:
+      - prod-network
+    environment:
+      - PORT=5003
+      - HOST=0.0.0.0
+      - NODE_ENV=production
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -48,15 +68,38 @@ services:
       retries: 3
       start_period: 30s
 
-  prod-ui:
+  ui:
     build:
       context: .
       dockerfile: packages/ui/Dockerfile
     ports:
-      - "5006:80"
+      - "5006:5006"
+    networks:
+      - prod-network
     environment:
-      - PORT=80
+      - PORT=5006
+      - HOST=0.0.0.0
       - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  docs-astro:
+    build:
+      context: .
+      dockerfile: apps/docs-astro/Dockerfile
+    ports:
+      - "5007:5007"
+    networks:
+      - prod-network
+    environment:
+      - PORT=5007
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+      - ASTRO_SITE_PATH=localhost:5007
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s

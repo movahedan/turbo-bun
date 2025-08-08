@@ -1,0 +1,17 @@
+{
+	"root": false,
+	"extends": "//",
+	"files": {
+		"includes": ["src/**/*.ts", "src/**/*.tsx", "!**/*.astro"]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"correctness": {
+				"noUnusedImports": "off",
+				"noUnusedVariables": "off"
+			}
+		}
+	}
+}

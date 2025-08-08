@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.19-alpine AS base
+FROM oven/bun:1.2.15-alpine AS base
 RUN bun install -g turbo@2.5.5
 
 FROM base AS turbo
@@ -35,7 +35,7 @@ RUN chown -R runner-user:runner-group /app
 
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
-COPY --from=build --chown=runner-user:runner-group /app/packages/logger ./packages/logger
+COPY --from=build --chown=runner-user:runner-group /app/packages/utils ./packages/utils
 COPY --from=build --chown=runner-user:runner-group /app/apps/api ./apps/api
 
 USER runner-user
