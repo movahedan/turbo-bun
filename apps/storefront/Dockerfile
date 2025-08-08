@@ -37,7 +37,6 @@ ARG OWNER_MODE=765
 COPY --from=pruner --chown=runner-user:runner-group /app/out/json/ .
 COPY --from=installer --chown=runner-user:runner-group /app/node_modules ./node_modules
 COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/ui ./packages/ui
-COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/logger ./packages/logger
 COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/packages/utils ./packages/utils
 COPY --from=build --chown=runner-user:runner-group --chmod=${OWNER_MODE} /app/apps/storefront/.next ./apps/storefront/.next
 COPY --from=build --chown=runner-user:runner-group --chmod=${MODE} /app/apps/storefront/public ./apps/storefront/public

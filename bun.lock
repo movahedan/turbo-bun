@@ -65,6 +65,7 @@
         "marked": "^16.1.1",
       },
       "devDependencies": {
+        "@repo/typescript-config": "workspace:*",
         "@tailwindcss/vite": "4.1.11",
         "tailwindcss": "4.1.11",
       },

@@ -1,5 +1,9 @@
 name: repo-prod
 
+networks:
+  prod-network:
+    driver: bridge
+
 services:
   admin:
     build:
@@ -7,8 +11,12 @@ services:
       dockerfile: apps/admin/Dockerfile
     ports:
       - "5001:5001"
+    networks:
+      - prod-network
     environment:
       - PORT=5001
+      - HOST=0.0.0.0
+      - NODE_ENV=production
       - VITE_API_URL=http://api:5003
     depends_on:
       - api
@@ -24,9 +32,17 @@ services:
       context: .
       dockerfile: apps/storefront/Dockerfile
     ports:
-      - "5002:3000"
+      - "5002:5002"
+    networks:
+      - prod-network
     environment:
+      - PORT=5002
+      - HOST=0.0.0.0
+      - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://api:5003
+    env_file:
+      - path: .env
+        required: true
     depends_on:
       - api
     healthcheck:
@@ -41,7 +57,16 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
     ports:
-      - "5003:5001"
+      - "5003:5003"
+    networks:
+      - prod-network
+    environment:
+      - PORT=5003
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    env_file:
+      - path: .env
+        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -54,10 +79,16 @@ services:
       context: .
       dockerfile: packages/ui/Dockerfile
     ports:
-      - "5006:80"
+      - "5006:5006"
+    networks:
+      - prod-network
     environment:
-      - PORT=80
+      - PORT=5006
+      - HOST=0.0.0.0
       - NODE_ENV=production
+    env_file:
+      - path: .env
+        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
@@ -71,10 +102,16 @@ services:
       dockerfile: apps/docs-astro/Dockerfile
     ports:
       - "5007:5007"
+    networks:
+      - prod-network
     environment:
       - PORT=5007
+      - HOST=0.0.0.0
       - NODE_ENV=production
       - ASTRO_SITE_PATH=localhost:5007
+    env_file:
+      - path: .env
+        required: true
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
