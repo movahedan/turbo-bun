@@ -15,7 +15,7 @@ export async function getAllDirectories(baseDir?: DirectoryPath): Promise<Direct
 				.flatMap(({ name, path }) => {
 					const results: DirectoryPath[] = [];
 
-					const [, , category, , packagePath] = path.split("/");
+					const [, category, , packagePath] = path.replace(projectRoot ?? "", "").split("/");
 					if (category !== "node_modules" && packagePath === "package.json") {
 						const basePath = path.replace(/\/package\.json$/, "");
 						results.push(basePath);
@@ -54,11 +54,12 @@ export async function getAllDirectoryNames(): Promise<string[]> {
 				.replace("root/", "@repo/"),
 		)
 		.filter(Boolean);
-	return result
+	const sortedResult = result
 		.sort((a, b) => {
 			if (b.startsWith("root") && !a.startsWith("root")) return -1;
 			if (b.startsWith("@repo") && !a.startsWith("@repo")) return 1;
 			return b.toLowerCase().localeCompare(a.toLowerCase());
 		})
 		.reverse();
+	return sortedResult;
 }

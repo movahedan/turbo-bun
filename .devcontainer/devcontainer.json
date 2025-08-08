@@ -3,8 +3,8 @@
 	"dockerComposeFile": ["docker-compose.dev.yml"],
 	"service": "vscode-service",
 	"workspaceFolder": "/app",
-	"remoteUser": "vscode-user",
-	"containerUser": "vscode-user",
+	"remoteUser": "runner-user",
+	"containerUser": "runner-user",
 	"runServices": ["vscode-service"],
 	"networks": ["dev-network"],
 	"postCreateCommand": "bash .devcontainer/setup-docker.sh",
@@ -85,6 +85,9 @@
 				},
 				"[javascriptreact]": {
 					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[astro]": {
+					"editor.defaultFormatter": "astro-build.astro-vscode"
 				},
 				"conventionalCommits.scopes": [
 					"root",

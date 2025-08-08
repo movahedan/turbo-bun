@@ -1,17 +1,15 @@
 #!/bin/bash
 
-sudo chown -R vscode-user:vscode-user /app/node_modules
-sudo chmod -R 777 /app/node_modules
-sudo chown -R vscode-user:vscode-user /app/apps /app/packages /app/scripts
-sudo chown -R vscode-user:vscode-user /app/package.json /app/bun.lock /app/turbo.json /app/biome.json
-sudo chown -R vscode-user:vscode-user /app/commitlint.config.ts /app/lefthook.yml /app/.env /app/.npmrc
-sudo chown -R vscode-user:vscode-user /app/README.md /app/LICENSE /app/renovate.json
-sudo chown -R vscode-user:vscode-user /app/.devcontainer /app/.changeset /app/.cursor /app/.vscode /app/.turbo
-
-# Setup Docker permissions for cross-platform compatibility ---------------------
+# Setup Docker permissions for cross-platform compatibility ---------------------------------------
 # This script handles Docker socket permissions for Linux/macOS
 # Windows uses Docker Desktop and doesn't need socket permissions
-
+sudo chown -R runner-user:runner-user /app/node_modules
+sudo chmod -R 777 /app/node_modules
+sudo chown -R runner-user:runner-user /app/apps /app/packages /app/scripts
+sudo chown -R runner-user:runner-user /app/package.json /app/bun.lock /app/turbo.json /app/biome.json
+sudo chown -R runner-user:runner-user /app/commitlint.config.ts /app/lefthook.yml /app/.env /app/.npmrc
+sudo chown -R runner-user:runner-user /app/README.md /app/LICENSE /app/renovate.json
+sudo chown -R runner-user:runner-user /app/.devcontainer /app/.changeset /app/.cursor /app/.vscode /app/.turbo
 echo "Setting up Docker permissions..."
 # Check if Docker socket exists (Linux/macOS)
 if [ -S /var/run/docker.sock ]; then    
@@ -19,7 +17,7 @@ if [ -S /var/run/docker.sock ]; then
     sudo chmod 666 /var/run/docker.sock
     # Add user to docker group
     sudo groupadd docker
-    sudo usermod -aG docker vscode-user
+    sudo usermod -aG docker runner-user
     echo "Docker permissions configured for Linux/macOS"
 else
     echo "No Docker socket found, assuming Windows or Docker Desktop"
@@ -41,8 +39,7 @@ cat > .act/actrc << EOF
 --reuse
 EOF
 
-# Install dependencies
+# Install dependencies ----------------------------------------------------------------------------
 echo "Installing dependencies..."
 bun install
-
 echo "Setup complete!" 

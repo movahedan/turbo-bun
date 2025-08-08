@@ -1,7 +1,5 @@
-# VS Code Development Environment
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
-# Install essential development tools and Docker CLI
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -19,17 +17,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Bun
 RUN curl -fsSL https://bun.com/install | bash -s "bun-v1.2.15"
-# Add bun bin to PATH for the vscode-user
-RUN addgroup --system --gid 1001 vscode-user & adduser --system --uid 1001 --shell /bin/zsh vscode-user
-
-USER vscode-user
-ENV PATH="/home/vscode-user/.bun/bin:$PATH"
-RUN echo 'export PATH="$PATH"' >> /home/vscode-user/.zshrc
+RUN addgroup --system --gid 1001 runner-user & adduser --system --uid 1001 --shell /bin/zsh runner-user
+USER runner-user
+ENV PATH="/home/runner-user/.bun/bin:$PATH"
+RUN echo 'export PATH="$PATH"' >> /home/runner-user/.zshrc
+RUN git config --global --add safe.directory /app
 
 WORKDIR /app
-
-RUN git config --global --add safe.directory /app
 
 CMD ["sleep", "infinity"] 
