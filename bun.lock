@@ -58,11 +58,11 @@
       "name": "docs-astro",
       "version": "0.0.0",
       "dependencies": {
-        "@astrojs/tailwind": "^6.0.2",
-        "@tailwindcss/typography": "^0.5.16",
-        "astro": "^4.8.4",
-        "lucide-astro": "^0.536.0",
-        "marked": "^16.1.1",
+        "@astrojs/tailwind": "6.0.2",
+        "@tailwindcss/typography": "0.5.16",
+        "astro": "4.16.18",
+        "lucide-astro": "0.536.0",
+        "marked": "16.1.2",
       },
       "devDependencies": {
         "@repo/typescript-config": "workspace:*",
