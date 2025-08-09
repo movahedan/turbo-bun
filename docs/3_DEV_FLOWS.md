@@ -294,23 +294,35 @@ git commit -m "refactor(utils): optimize string processing"
 
 ### **Automated Versioning**
 ```bash
-# Add changeset for versioning
-bun run version:add          # Interactive changeset creation
+# Complete version management workflow (recommended)
+bun run scripts/version-commit.ts --dry-run # Preview version changes
+bun run scripts/version-commit.ts           # Apply version changes and create release
 
-# Commit version changes
-bun run version:commit       # Apply version changes and create release
+# Alternative: Use the main orchestrator
+bun run scripts/version.ts --dry-run        # Preview complete versioning
+bun run scripts/version.ts                  # Execute complete versioning
 
 # Version workflow includes:
-# - Dynamic scope detection
-# - Automated changelog generation
-# - Package version updates
-# - Git tag creation
+# - Dynamic scope detection from affected packages
+# - Automated changelog generation from git history
+# - Package version updates based on conventional commits
+# - Git tag creation and management
+# - GitHub Actions integration
 ```
 
-### **Version Scripts**
+### **Individual Version Scripts**
 ```bash
-# Version management scripts
-bun run scripts/version-commit.ts  # Manual version commit
+# Individual version management operations
+bun run scripts/version-bump.ts --auto         # Auto-detect and bump versions
+bun run scripts/version-changelog.ts --all     # Generate changelogs
+bun run scripts/version-tag.ts --push          # Create and push tags
+
+# Manual version operations
+bun run scripts/version-bump.ts --package admin --type minor
+bun run scripts/version-changelog.ts --from v1.0.0 --to HEAD
+bun run scripts/version-tag.ts --version 1.2.3
+
+# Validation scripts
 bun run scripts/ci-staged.ts       # Staged file validation
 bun run scripts/ci-check.ts        # CI environment validation
 ```
