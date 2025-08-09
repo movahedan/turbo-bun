@@ -4,8 +4,7 @@
 	"version": "0.0.2",
 	"workspaces": [
 		"apps/*",
-		"packages/*",
-		"scripts"
+		"packages/*"
 	],
 	"packageManager": "bun@1.2.19",
 	"scripts": {

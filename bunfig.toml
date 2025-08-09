@@ -51,6 +51,7 @@ coverageIgnoreSourcemaps = true
 coverageSkipTestFiles = true
 coveragePathIgnorePatterns = [
 	"**/packages/test-preset/**",
+	"**/scripts/**",
 	"**/node_modules/**",
 	"**/dist/**",
 	"**/build/**",

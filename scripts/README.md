@@ -31,9 +31,10 @@ This workspace contains all automation scripts and utilities for the repository,
 ### CI/CD
 - `ci-attach-affected.ts` - Attach affected packages to GitHub Actions output
 - `ci-attach-service-ports.ts` - Attach service port mappings for deployment
-- `ci-branchname.ts` - Validate branch names against conventions
 - `ci-check.ts` - Run GitHub Actions locally with `act`
-- `ci-staged.ts` - Check staged files for manual changes
+- `commit-check.ts` - Validate commit messages and branch names
+- `commit-staged-check.ts` - Check staged files for manual changes
+- `commit-interactive.ts` - Interactive commit creation with validation
 
 ### Development
 - `dev-check.ts` - Health check for DevContainer services
