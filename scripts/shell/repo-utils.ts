@@ -86,13 +86,13 @@ class WorkspaceUtils {
 		const packages: string[] = ["root"];
 
 		let apps: string[] = [];
-		const appsResult = await $`ls apps/`.nothrow();
+		const appsResult = await $`ls apps/`.nothrow().quiet();
 		if (appsResult.exitCode === 0) {
 			apps = appsResult.text().trim().split("\n").filter(Boolean);
 		}
 
 		let pkgs: string[] = [];
-		const packagesResult = await $`ls packages/`.nothrow();
+		const packagesResult = await $`ls packages/`.nothrow().quiet();
 		if (packagesResult.exitCode === 0) {
 			pkgs = packagesResult
 				.text()
