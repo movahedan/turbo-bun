@@ -1,0 +1,15 @@
+{
+	"name": "@repo/scripts",
+	"version": "0.0.0",
+	"description": "Repository automation scripts and utilities",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"check:types": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "workspace:*",
+		"type-fest": "^4.26.1",
+		"yaml": "^2.6.0"
+	}
+}

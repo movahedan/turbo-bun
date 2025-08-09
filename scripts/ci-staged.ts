@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { colorify } from "./shell/colorify";
+import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const issuePatterns = [
 	{
