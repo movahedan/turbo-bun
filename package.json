@@ -2,11 +2,6 @@
 	"root": true,
 	"name": "root",
 	"version": "0.0.2",
-	"config": {
-		"commitizen": {
-			"path": "cz-conventional-changelog"
-		}
-	},
 	"workspaces": [
 		"apps/*",
 		"packages/*",
@@ -14,7 +9,10 @@
 	],
 	"packageManager": "bun@1.2.19",
 	"scripts": {
-		"commit": "cz",
+		"commit": "bun run scripts/commit-interactive.ts",
+		"commit:interactive": "bun run scripts/commit-interactive.ts --interactive",
+		"commit:check": "bun run scripts/commit-check.ts",
+		"commit:staged-check": "bun run scripts/commit-staged-check.ts",
 		"//local": "//////////////////////////////////////////////////////////////////////// local //",
 		"postinstall": "bun run scripts/local-vscode.ts",
 		"local:setup": "bun run scripts/local-setup.ts",
@@ -25,7 +23,6 @@
 		"check:fix": "biome check . --write",
 		"check:types": "turbo run check:types",
 		"check:github": "bun run scripts/ci-check.ts",
-		"check:staged": "bun run scripts/ci-staged.ts",
 		"check:quick": "bun run check:fix && turbo run check:types --affected && bun run test --affected && bun run build --affected",
 		"test": "bun test",
 		"test:coverage": "bun test --coverage-reporter=lcov",
@@ -60,12 +57,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
-		"@commitlint/cli": "19.8.1",
-		"@commitlint/config-conventional": "19.8.1",
 		"bun-types": "1.2.19",
-		"commitizen": "4.3.1",
-		"commitlint-plugin-function-rules": "4.0.2",
-		"cz-conventional-changelog": "3.3.0",
 		"lefthook": "1.12.2",
 		"turbo": "2.5.5",
 		"typescript": "5.8.3",
