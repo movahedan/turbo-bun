@@ -3,9 +3,9 @@
 pre-commit:
   parallel: true
   commands:
-    staged:
+    staged-check:
       glob: "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,html,css,md,mdx,yaml,yml}"
-      run: bun run check:staged && bun biome check --write --no-errors-on-unmatched {staged_files}
+      run: bun run commit:staged-check && bun biome check --write --no-errors-on-unmatched {staged_files}
       stage_fixed: true
     types:
       glob: "*.{ts,tsx}"
@@ -13,16 +13,16 @@ pre-commit:
 
 commit-msg:
   commands:
-    commitlint:
-      run: bunx --bun commitlint --edit {1}
+    commit-check:
+      run: bun run commit:check --commit-msg-file {1}
 
 pre-push:
   parallel: true
   commands:
-    branch-name:
-      run: bun scripts/ci-branchname.ts
-    staged:
-      run: bun run check:staged
+    commit-validation:
+      run: bun run commit:check --branch-only
+    staged-validation:
+      run: bun run commit:staged-check
     check:
       run: bun check
     test:

@@ -143,6 +143,13 @@ git push origin main
 git push origin feature-branch
 ```
 
+**For version management commits, consider using the automated versioning:**
+```bash
+# If this is a version-related change, suggest using:
+bun run scripts/version-commit.ts --dry-run  # Preview version changes
+bun run scripts/version-commit.ts            # Execute complete versioning flow
+```
+
 **Confirm the push:**
 > "Changes have been pushed successfully to [branch name]."
 

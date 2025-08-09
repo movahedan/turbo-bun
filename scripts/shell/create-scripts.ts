@@ -11,15 +11,15 @@ export function createScript<Config extends ScriptConfig, Return extends Promise
 		exitOnError?: boolean;
 		showStack?: boolean;
 	} = {},
-): (passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>) => Return {
-	return (passedArgs) => {
+): (passedArgs?: InferArgs<typeof defaultConfig> & InferArgs<Config>) => Promise<Return> {
+	return async (passedArgs) => {
 		const cliArgs =
 			passedArgs ||
-			parseArgs({
+			(await parseArgs({
 				...defaultConfig,
 				...config,
 				options: [...defaultConfig.options, ...config.options],
-			});
+			}));
 
 		const defaultArgs = {
 			verbose: true,
@@ -43,6 +43,9 @@ export function createScript<Config extends ScriptConfig, Return extends Promise
 			log: (...props: Parameters<typeof console.log>) => {
 				if (!("verbose" in args) || args.verbose) console.log(...props);
 			},
+			table: (...props: Parameters<typeof console.table>) => {
+				if (!("verbose" in args) || args.verbose) console.table(...props);
+			},
 		});
 
 		try {
@@ -65,7 +68,7 @@ export interface ArgOption {
 	required?: boolean;
 	defaultValue?: string | boolean | number;
 	multiple?: boolean; // Allow multiple values for this option
-	validator?: (value: string) => boolean | string;
+	validator?: (value: string) => boolean | string | Promise<boolean | string>;
 	examples?: string[];
 }
 
@@ -107,12 +110,15 @@ type OptionalOptions<T extends ScriptConfigOptions> = {
  * Type utility to infer argument types from ScriptConfig
  * Combines required and optional options
  */
-export type InferArgs<T extends ScriptConfigOptions> = RequiredOptions<T> & OptionalOptions<T>;
+export type InferArgs<T extends ScriptConfigOptions> = RequiredOptions<T> &
+	OptionalOptions<T> &
+	RequiredOptions<typeof defaultConfig> &
+	OptionalOptions<typeof defaultConfig>;
 
 /**
  * Parse command line arguments based on script configuration
  */
-export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
+export async function parseArgs<T extends ScriptConfig>(config: T): Promise<InferArgs<T>> {
 	const args = process.argv.slice(2);
 	const result: ParsedArgs = {};
 	const optionMap = new Map<string, ArgOption>();
@@ -180,7 +186,7 @@ export function parseArgs<T extends ScriptConfig>(config: T): InferArgs<T> {
 		}
 
 		// Validate the value
-		const validation = option.validator?.(nextArg) ?? true;
+		const validation = (await option.validator?.(nextArg)) ?? true;
 		if (typeof validation === "string") {
 			throw new Error(`❌ Error: ${validation}`);
 		}

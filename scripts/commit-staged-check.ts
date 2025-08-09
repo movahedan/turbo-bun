@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
+
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { colorify } from "./shell/colorify";
+import { createScript, validators } from "./shell/create-scripts";
 
 const issuePatterns = [
 	{
@@ -20,7 +21,7 @@ const issuePatterns = [
 	{
 		filePattern: [/package.json/],
 		contentPattern: [
-			/"version": "[^"]+"/, // Manual version changes
+			/^[+-]\s*"version":\s*"[^"]+"/, // Manual version changes (only actual diff lines with +/-)
 		],
 		ignore: {
 			mode: "create",
@@ -63,49 +64,74 @@ async function checkGitStatus(): Promise<{ stagedFiles: string[] }> {
 	};
 }
 
-export const checkStagedFiles = createScript(
-	{
-		name: "Check Staged Files",
-		description: "Check for manual changes to staged files",
-		usage: "bun run check:staged",
-		examples: ["bun run check:staged"],
-		options: [
-			{
-				short: "-s",
-				long: "--staged-only",
-				description: "Only check staged files",
-				required: false,
-				defaultValue: false,
-				validator: validators.boolean,
-			},
-		],
-	} as const satisfies ScriptConfig,
-	async function main(_, xConsole) {
-		xConsole.info("🔍 Checking for issues in staged files...");
+const scriptConfig = {
+	name: "Commit Staged Check",
+	description: "Validate staged files to prevent manual changes to auto-generated files",
+	usage: "bun run commit-staged-check [options]",
+	examples: [
+		"bun run commit-staged-check",
+		"bun run commit-staged-check --verbose",
+		"bun run commit-staged-check --staged-only",
+	],
+	options: [
+		{
+			short: "-s",
+			long: "--staged-only",
+			description: "Only check staged files",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+	],
+} as const;
+
+export const commitStagedCheck = createScript(scriptConfig, async (_args, xConsole) => {
+	try {
+		xConsole.log(colorify.blue("🔍 Checking staged files for policy violations..."));
 
 		const { stagedFiles } = await checkGitStatus();
 
 		if (!stagedFiles.length) {
-			xConsole.info("✅ No staged changes");
+			xConsole.log(colorify.green("✅ No staged changes"));
 			return;
 		}
+
+		xConsole.log(
+			colorify.gray(`Found ${stagedFiles.length} staged files: ${stagedFiles.join(", ")}`),
+		);
 
 		const allIssues = await Promise.all(
 			stagedFiles.map(async (file) => await findIssues(file, issuePatterns)),
 		).then((issues) => issues.flat());
 
 		if (allIssues.length === 0) {
-			xConsole.info("✅ No custom issues found in staged files");
+			xConsole.log(colorify.green("✅ No policy violations found in staged files"));
 			return;
 		}
 
+		xConsole.error(colorify.red("❌ Policy violations found:"));
 		for (const issue of allIssues) {
-			xConsole.error(colorify.red(`❌ ${issue}`));
+			xConsole.error(colorify.red(`  • ${issue}`));
 		}
+
+		xConsole.error(colorify.yellow("\n💡 To fix these issues:"));
+		xConsole.error(
+			colorify.yellow("  • Use 'bun run version:commit' for version and changelog updates"),
+		);
+		xConsole.error(colorify.yellow("  • Avoid committing development files manually"));
+		xConsole.error(
+			colorify.yellow("  • Let automation handle package.json and CHANGELOG.md updates"),
+		);
+
 		process.exit(1);
-	},
-);
+	} catch (error) {
+		xConsole.error(
+			colorify.red(`❌ Error: ${error instanceof Error ? error.message : String(error)}`),
+		);
+		process.exit(1);
+	}
+});
 
 if (import.meta.main) {
-	checkStagedFiles();
+	commitStagedCheck();
 }
