@@ -1,15 +1,22 @@
 {
 	"root": true,
-	"name": "turbo-bun",
+	"name": "root",
 	"version": "0.0.2",
+	"config": {
+		"commitizen": {
+			"path": "cz-conventional-changelog"
+		}
+	},
 	"workspaces": [
 		"apps/*",
-		"packages/*"
+		"packages/*",
+		"scripts"
 	],
 	"packageManager": "bun@1.2.19",
 	"scripts": {
+		"commit": "cz",
 		"//local": "//////////////////////////////////////////////////////////////////////// local //",
-		"postinstall": "bun run scripts/local-vscode.ts --verbose false",
+		"postinstall": "bun run scripts/local-vscode.ts",
 		"local:setup": "bun run scripts/local-setup.ts",
 		"local:vscode": "bun run scripts/local-vscode.ts",
 		"local:cleanup": "bun run scripts/local-cleanup.ts",
@@ -45,15 +52,20 @@
 		"prod:build": "bun run prod:compose build",
 		"prod:health": "bun run prod:compose ps --format table",
 		"//deploy": "////////////////////////////////////////////////////////////////////// deploy //",
-		"version:add": "bunx @changesets/cli add",
-		"version:commit": "bun run scripts/version-commit.ts"
+		"version:changelog": "bun run scripts/version-changelog.ts",
+		"version:bump": "bun run scripts/version-bump.ts",
+		"version:commit": "bun run scripts/version-commit.ts",
+		"version:tag": "bun run scripts/version-tag.ts",
+		"version:flow": "bun run scripts/version-flow.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
-		"@changesets/cli": "2.29.5",
 		"@commitlint/cli": "19.8.1",
 		"@commitlint/config-conventional": "19.8.1",
 		"bun-types": "1.2.19",
+		"commitizen": "4.3.1",
+		"commitlint-plugin-function-rules": "4.0.2",
+		"cz-conventional-changelog": "3.3.0",
 		"lefthook": "1.12.2",
 		"turbo": "2.5.5",
 		"typescript": "5.8.3",
