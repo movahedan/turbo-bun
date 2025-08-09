@@ -1,4 +1,5 @@
 import { $ } from "bun";
+import { parseCommitType } from "./commit-utils";
 import type { ChangelogEntry, CommitInfo, PRCategory } from "./version-utils";
 
 export interface ChangelogConfig {
@@ -205,7 +206,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 		const commitsByType = new Map<string, CommitInfo[]>();
 
 		for (const prCommit of prCommits) {
-			const type = this.parseCommitType(prCommit.message);
+			const type = parseCommitType(prCommit.message);
 			if (!commitsByType.has(type)) {
 				commitsByType.set(type, []);
 			}
@@ -307,12 +308,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 	private generateFooter(): string {
 		return "\n---\n\n*This changelog was automatically generated using our custom versioning script* ⚡\n";
-	}
-
-	private parseCommitType(message: string): string {
-		const conventionalCommitRegex = /^(\w+)(?:\([^)]+\))?: (.+)$/;
-		const match = message.match(conventionalCommitRegex);
-		return match ? match[1] : "other";
 	}
 
 	private isDependencyCommit(entry: ChangelogEntry): boolean {

@@ -1,5 +1,6 @@
 import { $ } from "bun";
 import { ChangelogGenerator } from "./changelog-generator";
+import { type ParsedCommit, parseCommit } from "./commit-utils";
 import { repoUtils } from "./repo-utils";
 
 export interface CommitInfo {
@@ -13,13 +14,6 @@ export interface CommitInfo {
 	readonly prCommits?: CommitInfo[];
 	readonly prCategory?: PRCategory;
 	readonly prStats?: PRStats;
-}
-
-export interface ParsedCommit {
-	readonly type: string;
-	readonly scope?: string;
-	readonly description: string;
-	readonly breaking: boolean;
 }
 
 export interface ChangelogEntry extends ParsedCommit {
@@ -103,7 +97,7 @@ export class VersionUtils {
 		};
 
 		for (const commit of prCommits) {
-			const parsed = this.parseCommit(commit.message);
+			const parsed = parseCommit(commit.message);
 
 			switch (parsed.type) {
 				case "feat":
@@ -358,31 +352,6 @@ export class VersionUtils {
 		}
 	}
 
-	private parseCommit(message: string): ParsedCommit {
-		const conventionalCommitRegex = /^(\w+!?)(?:\(([^)]+)\))?: (.+)$/;
-		const match = message.match(conventionalCommitRegex);
-
-		if (!match) {
-			return {
-				type: "other",
-				description: message,
-				breaking: false,
-			};
-		}
-
-		const [, rawType, scope, description] = match;
-		const breaking =
-			message.includes("BREAKING CHANGE:") || message.includes("!:") || rawType.endsWith("!");
-		const type = rawType.endsWith("!") ? rawType.slice(0, -1) : rawType;
-
-		return {
-			type,
-			scope,
-			description,
-			breaking,
-		};
-	}
-
 	getNextVersion(currentVersion: string, bumpType: VersionBumpType): string {
 		const [major, minor, patch] = currentVersion.split(".").map(Number);
 
@@ -420,7 +389,7 @@ export class VersionUtils {
 		let hasFixes = false;
 
 		for (const commit of commits) {
-			const parsed = this.parseCommit(commit.message);
+			const parsed = parseCommit(commit.message);
 
 			if (parsed.breaking) {
 				hasBreaking = true;
@@ -438,7 +407,7 @@ export class VersionUtils {
 	}
 
 	parseCommitToChangelogEntry(commit: CommitInfo): ChangelogEntry {
-		const parsed = this.parseCommit(commit.message);
+		const parsed = parseCommit(commit.message);
 		return {
 			...parsed,
 			hash: commit.hash.substring(0, 7),
