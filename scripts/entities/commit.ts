@@ -15,7 +15,7 @@ export class EntityCommit {
 	constructor() {}
 
 	static parseByMessage(message: string): CommitMessageData {
-		const conventionalCommitRegex = /^(\w+)(?:\(([^)]+)\))?(!)?:\s*(.+)\s*$/;
+		const conventionalCommitRegex = /^(\w+)(?:\(([^)]+)\))?(!)?:\s*([^\r\n]+?)\s*$/;
 		const match = message.match(conventionalCommitRegex);
 		const isMerge = message.startsWith("Merge pull request") || message.startsWith("Merge branch");
 		if (!match) {

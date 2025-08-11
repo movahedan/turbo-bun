@@ -80,24 +80,6 @@ export interface PRStats {
 	readonly linesDeleted?: number;
 }
 
-const imperativeWords = [
-	"add",
-	"update",
-	"remove",
-	"change",
-	"improve",
-	"create",
-	"delete",
-	"modify",
-	"implement",
-	"enhance",
-	"optimize",
-	"streamline",
-	"synchronize",
-	"sync",
-	"attach",
-];
-
 type Section = keyof CommitMessageData;
 type CommitRules = Record<
 	Section,
@@ -246,8 +228,6 @@ export const commitRules = {
 			if (desc.endsWith(".")) return "description | should not end with a period";
 			if (validTypes.map((t) => t.type).includes(firstWord as CommitType))
 				return `description | should not start with a type: "${firstWord}". You're either duplicating the type or should use a different type.`;
-			if (!imperativeWords.includes(firstWord))
-				return `description | should start with an imperative verb like:\n  => ${imperativeWords.join(", ")}`;
 			return true;
 		},
 	},
