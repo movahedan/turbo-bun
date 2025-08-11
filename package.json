@@ -8,10 +8,9 @@
 	],
 	"packageManager": "bun@1.2.19",
 	"scripts": {
-		"commit": "bun run scripts/commit-interactive.ts",
-		"commit:interactive": "bun run scripts/commit-interactive.ts --interactive",
+		"commit": "bun run scripts/commit.ts",
 		"commit:check": "bun run scripts/commit-check.ts",
-		"commit:staged-check": "bun run scripts/commit-staged-check.ts",
+		"ci:act": "bun run scripts/ci-act.ts",
 		"//local": "//////////////////////////////////////////////////////////////////////// local //",
 		"postinstall": "bun run scripts/local-vscode.ts",
 		"local:setup": "bun run scripts/local-setup.ts",
@@ -47,12 +46,10 @@
 		"prod:down": "bun run prod:compose down",
 		"prod:build": "bun run prod:compose build",
 		"prod:health": "bun run prod:compose ps --format table",
-		"//deploy": "////////////////////////////////////////////////////////////////////// deploy //",
-		"version:changelog": "bun run scripts/version-changelog.ts",
-		"version:bump": "bun run scripts/version-bump.ts",
-		"version:commit": "bun run scripts/version-commit.ts",
-		"version:tag": "bun run scripts/version-tag.ts",
-		"version:flow": "bun run scripts/version-flow.ts"
+		"//version": "//////////////////////////////////////////////////////////////////// version //",
+		"version:prepare": "bun run scripts/version-prepare.ts",
+		"version:apply": "bun run scripts/version-apply.ts",
+		"version:ci": "bun run scripts/version-ci.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.1.2",
