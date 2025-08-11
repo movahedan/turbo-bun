@@ -10,6 +10,6 @@
 	},
 	"peerDependencies": {
 		"typescript": "5.8.3",
-		"bun-types": "1.2.19"
+		"bun-types": "1.2.20"
 	}
 }

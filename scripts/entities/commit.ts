@@ -17,6 +17,7 @@ export class EntityCommit {
 	static parseByMessage(message: string): CommitMessageData {
 		const conventionalCommitRegex = /^(\w+)(?:\(([^)]+)\))?(!)?:\s*(.+)\s*$/;
 		const match = message.match(conventionalCommitRegex);
+		const isMerge = message.startsWith("Merge pull request") || message.startsWith("Merge branch");
 		if (!match) {
 			return {
 				type: "other",
@@ -24,7 +25,7 @@ export class EntityCommit {
 				scopes: [],
 				bodyLines: [],
 				isBreaking: false,
-				isMerge: false,
+				isMerge,
 				isDependency: false,
 			};
 		}
@@ -32,7 +33,6 @@ export class EntityCommit {
 		const [, type, scope, isBreaking, description] = match || [];
 		const scopes = scope?.split(",") || [];
 		const isBreakingBoolean = isBreaking === "!";
-		const isMerge = message.startsWith("Merge pull request") || message.startsWith("Merge branch");
 
 		const lines = message.split("\n");
 		const bodyLines = lines.length > 1 ? lines.slice(1).filter((line) => line.trim()) : [];
@@ -74,7 +74,9 @@ export class EntityCommit {
 	static async validateCommitMessage(message: string): Promise<string[]> {
 		if (!message.trim()) return ["type | commit message cannot be empty"];
 		const match = EntityCommit.parseByMessage(message);
-		if (!match) return ["type | message does not follow conventional commit format"];
+		if (match.isMerge) return [];
+		if (match.type === "other")
+			return ["type | message does not follow conventional commit format"];
 
 		const errors: string[] = [];
 		for (const [key, value] of Object.entries(match)) {
