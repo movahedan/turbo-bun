@@ -95,6 +95,7 @@ const imperativeWords = [
 	"streamline",
 	"synchronize",
 	"sync",
+	"attach",
 ];
 
 type Section = keyof CommitMessageData;
