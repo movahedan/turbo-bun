@@ -22,17 +22,16 @@ This workspace contains all automation scripts and utilities for the repository,
 ## 🚀 Scripts
 
 ### Version Management
-- `version.ts` - Complete version flow orchestrator (main entry point)
-- `version-bump.ts` - Bump package versions based on commit analysis
-- `version-changelog.ts` - Generate changelogs from git commits
-- `version-commit.ts` - Commit version changes with proper formatting
-- `version-tag.ts` - Create and manage git tags for releases
+- `version-ci.ts` - Main CI orchestrator with git authentication (main entry point)
+- `version-prepare.ts` - Version bumping and changelog generation
+- `version-apply.ts` - Commit, tag, and push operations
 
 ### CI/CD
+- `ci-act.ts` - Run GitHub Actions locally with `act`
 - `ci-attach-affected.ts` - Attach affected packages to GitHub Actions output
 - `ci-attach-service-ports.ts` - Attach service port mappings for deployment
-- `ci-check.ts` - Run GitHub Actions locally with `act`
-- `commit-check.ts` - Validate commit messages and branch names
+- `commit.ts` - Unified commit interface with interactive fallback
+- `commit-check.ts` - Comprehensive commit validation with step-based checking
 - `commit-staged-check.ts` - Check staged files for manual changes
 - `commit-interactive.ts` - Interactive commit creation with validation
 
@@ -109,26 +108,24 @@ bun test shell/version-utils.test.ts
 - Consistent error handling and help generation
 - Type-safe argument inference
 
-#### `shell/repo-utils.ts`
-- Package.json management (`PackageJsonUtils`)
-- Workspace operations (`WorkspaceUtils`)
-- Affected package detection (`AffectedUtils`)
-- Git tag operations (`TagsUtils`)
-- Docker Compose parsing (`ComposeUtils`)
+#### `entities/` - Core Entity System
+- **EntityCommit** - Commit parsing, validation, and analysis
+- **EntityChangelog** - Changelog generation and merging
+- **EntityPackageJson** - Package.json operations and version management
+- **EntityWorkspace** - Workspace package discovery and validation
+- **EntityCompose** - Docker Compose parsing and service health
+- **EntityAffected** - Affected package detection with dependencies
+- **EntityTag** - Git tag operations and management
+- **ChangelogManager** - Stateful changelog orchestration
 
-#### `shell/version-utils.ts`
-- Git commit analysis and parsing
-- Semantic version management
-- Changelog content merging and sorting
-- PR categorization and statistics
-- Conventional commit parsing
+#### `shell/create-scripts.ts`
+- CLI argument parsing and validation
+- Consistent error handling and help generation
+- Type-safe argument inference
 
-#### `shell/changelog-generator.ts`
-- Markdown changelog generation with Keep a Changelog format
-- Badge and link formatting for PRs and commits
-- Collapsible section creation for better organization
-- Author information handling with email integration
-- PR categorization and commit type analysis
+#### `shell/interactive-cli.ts`
+- Interactive prompt system for user input
+- Selection, confirmation, and text input handling
 
 ### Design Principles
 

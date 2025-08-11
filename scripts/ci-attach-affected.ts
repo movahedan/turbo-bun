@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
+import { EntityAffected } from "./entities";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
-import { repoUtils } from "./shell/repo-utils";
 
 const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",
@@ -39,8 +39,8 @@ export const ciAttachAffected = createScript(
 
 		const affectedList =
 			mode === "docker"
-				? await repoUtils.affected().services()
-				: await repoUtils.affected().packages();
+				? await EntityAffected.getAffectedServices()
+				: await EntityAffected.getAffectedPackages();
 
 		const affectedServicesNames = affectedList.join(" ");
 

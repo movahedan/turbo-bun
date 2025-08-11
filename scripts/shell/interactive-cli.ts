@@ -43,6 +43,7 @@ interface KeyHandlers {
 
 export class InteractiveCLI {
 	private isRawMode = false;
+	private currentError: string | null = null;
 
 	constructor() {
 		this.enableRawMode();
@@ -128,9 +129,45 @@ export class InteractiveCLI {
 		}
 	}
 
-	private clearScreen() {
+	renderError(error: string | undefined | null): void {
+		this.currentError = error || null;
+	}
+
+	clearError(): void {
+		this.currentError = null;
+	}
+
+	refreshDisplay(): void {
+		// Clear the screen and redraw if there are errors
+		if (this.currentError) {
+			this.clearScreen();
+			this.showCursor();
+		}
+	}
+
+	clearScreen(): void {
 		process.stdout.write("\u001b[2J\u001b[0;0H");
 	}
+
+	private renderErrorSection(): void {
+		if (this.currentError) {
+			console.log(colorify.red("\n  ❌ Error:"));
+			console.log(colorify.red(`  ${this.currentError}`));
+		}
+	}
+
+	// async waitForErrorAcknowledgment(): Promise<void> {
+	// 	if (!this.currentError) return;
+
+	// 	return new Promise((resolve) => {
+	// 		const onKeyPress = (data: Buffer) => {
+	// 			process.stdin.removeListener("data", onKeyPress);
+	// 			resolve();
+	// 		};
+
+	// 		process.stdin.on("data", onKeyPress);
+	// 	});
+	// }
 
 	private hideCursor() {
 		process.stdout.write("\u001b[?25l");
@@ -176,6 +213,8 @@ export class InteractiveCLI {
 					console.log(`${prefix}${text}`);
 				}
 			}
+
+			this.renderErrorSection();
 
 			const instructions = allowMultiple
 				? "\n  ↑/↓ Navigate • Space Toggle • Enter Continue • Ctrl+C Exit"
@@ -249,7 +288,15 @@ export class InteractiveCLI {
 		if (placeholder) {
 			console.log(colorify.gray(`  ${placeholder}`));
 		}
-		process.stdout.write(colorify.green("\n  ❯ "));
+
+		// Show error if exists, but don't let it interfere with input
+		if (this.currentError) {
+			console.log(colorify.red("\n  ❌ Error:"));
+			console.log(colorify.red(`  ${this.currentError}`));
+			console.log(""); // Add spacing
+		}
+
+		process.stdout.write(colorify.green("  ❯ "));
 
 		let input = "";
 
@@ -316,6 +363,8 @@ export class InteractiveCLI {
 			console.log(`${yesPrefix}${yesText}`);
 			console.log(`${noPrefix}${noText}`);
 			console.log(colorify.gray("\n  ↑/↓ Navigate • Enter Select • Ctrl+C Exit"));
+
+			this.renderErrorSection();
 		};
 
 		return new Promise((resolve) => {

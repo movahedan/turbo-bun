@@ -2,7 +2,7 @@
 import { $ } from "bun";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
-const ciCheckConfig = {
+const ciActConfig = {
 	name: "GitHub Actions Local Testing",
 	description: "Uses catthehacker/ubuntu:act-latest image which has unzip available for Bun setup",
 	usage: "bun run ci:check -e <event> -w <workflow> [-v | --verbose]",
@@ -36,7 +36,7 @@ const ciCheckConfig = {
 	],
 } as const satisfies ScriptConfig;
 
-export const ciCheck = createScript(ciCheckConfig, async function main(args) {
+export const ciAct = createScript(ciActConfig, async function main(args) {
 	console.log(`📋 on: ${args.event} at: ${args.workflow} \n`);
 
 	try {
@@ -55,7 +55,7 @@ export const ciCheck = createScript(ciCheckConfig, async function main(args) {
 });
 
 if (import.meta.main) {
-	ciCheck();
+	ciAct();
 }
 
 // Cleanup function to stop and remove act containers
