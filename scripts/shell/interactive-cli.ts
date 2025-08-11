@@ -9,16 +9,20 @@ export interface CLIConfig {
 export interface SelectConfig extends CLIConfig {
 	allowMultiple?: boolean;
 	allowEmpty?: boolean;
+	onLeft?: () => void;
+	quickActions?: QuickAction[];
 }
 
 export interface PromptConfig extends CLIConfig {
-	placeholder?: string;
 	allowEmpty?: boolean;
+	onLeft?: () => void;
+	quickActions?: QuickAction[];
 }
 
 export interface ConfirmConfig extends CLIConfig {
 	defaultValue?: boolean;
 	message?: string; // For showing additional content above confirmation
+	quickActions?: QuickAction[];
 }
 
 interface KeyPress {
@@ -39,12 +43,24 @@ interface KeyHandlers {
 	onCtrlC?: () => void;
 	onChar?: (char: string) => void;
 	onKey?: (key: KeyPress) => void;
+	onQuickAction?: (action: QuickAction) => void;
+}
+
+export interface QuickAction {
+	key: string;
+	label: string;
+	description: string;
+	shortcut?: string;
+	action: () => void;
 }
 
 export class InteractiveCLI {
 	private isRawMode = false;
+	private currentError: string | null = null;
+	private xConsole: typeof console;
 
-	constructor() {
+	constructor(xConsole: typeof console = console) {
+		this.xConsole = xConsole;
 		this.enableRawMode();
 	}
 
@@ -69,7 +85,11 @@ export class InteractiveCLI {
 			key.name = "up";
 		} else if (data === "\u001b[B") {
 			key.name = "down";
-		} else if (data === " ") {
+		} else if (data === "\u001b[D") {
+			key.name = "left";
+		} else if (data === "\u001b[C") {
+			key.name = "right";
+		} else if (data === " " || data === "\u0020") {
 			key.name = "space";
 		} else if (data === "\u007f" || data === "\u0008") {
 			key.name = "backspace";
@@ -88,9 +108,16 @@ export class InteractiveCLI {
 
 	handleKey(data: Buffer, handlers: KeyHandlers): void {
 		const key = this.getKey(data);
+		this.xConsole.log(`Key detected: ${key.name}, sequence: ${JSON.stringify(key.sequence)}`); // Debug
 
 		if (key.ctrl && key.name === "c" && handlers.onCtrlC) {
 			handlers.onCtrlC();
+			return;
+		}
+
+		// Handle quick action shortcuts first
+		if (key.name && key.name.length === 1 && handlers.onQuickAction) {
+			// This will be handled by the calling function with the quickActions array
 			return;
 		}
 
@@ -102,6 +129,7 @@ export class InteractiveCLI {
 				handlers.onDown?.();
 				break;
 			case "left":
+				this.xConsole.log("Left arrow key handler called"); // Debug
 				handlers.onLeft?.();
 				break;
 			case "right":
@@ -111,7 +139,12 @@ export class InteractiveCLI {
 				handlers.onReturn?.();
 				break;
 			case "space":
-				handlers.onSpace?.();
+				if (handlers.onSpace) {
+					handlers.onSpace();
+				} else {
+					// If no space handler, treat space as a regular character
+					handlers.onChar?.(" ");
+				}
 				break;
 			case "backspace":
 				handlers.onBackspace?.();
@@ -128,9 +161,45 @@ export class InteractiveCLI {
 		}
 	}
 
-	private clearScreen() {
+	renderError(error: string | undefined | null): void {
+		this.currentError = error || null;
+	}
+
+	clearError(): void {
+		this.currentError = null;
+	}
+
+	refreshDisplay(): void {
+		// Clear the screen and redraw if there are errors
+		if (this.currentError) {
+			this.clearScreen();
+			this.showCursor();
+		}
+	}
+
+	clearScreen(): void {
 		process.stdout.write("\u001b[2J\u001b[0;0H");
 	}
+
+	private renderErrorSection(): void {
+		if (this.currentError) {
+			this.xConsole.log(colorify.red("\n  ❌ Error:"));
+			this.xConsole.log(colorify.red(`  ${this.currentError}`));
+		}
+	}
+
+	// async waitForErrorAcknowledgment(): Promise<void> {
+	// 	if (!this.currentError) return;
+
+	// 	return new Promise((resolve) => {
+	// 		const onKeyPress = (data: Buffer) => {
+	// 			process.stdin.removeListener("data", onKeyPress);
+	// 			resolve();
+	// 		};
+
+	// 		process.stdin.on("data", onKeyPress);
+	// 	});
+	// }
 
 	private hideCursor() {
 		process.stdout.write("\u001b[?25l");
@@ -141,7 +210,13 @@ export class InteractiveCLI {
 	}
 
 	async select(question: string, options: string[], config: SelectConfig = {}): Promise<string[]> {
-		const { clearScreen = true, allowMultiple = false, exitOnCtrlC = true } = config;
+		const {
+			clearScreen = true,
+			allowMultiple = false,
+			exitOnCtrlC = true,
+			onLeft,
+			quickActions = [],
+		} = config;
 
 		if (clearScreen) this.clearScreen();
 		this.hideCursor();
@@ -152,8 +227,7 @@ export class InteractiveCLI {
 		const render = () => {
 			if (clearScreen) this.clearScreen();
 
-			console.log(colorify.blue(`\n  ${question}\n`));
-
+			this.xConsole.log(question);
 			for (let i = 0; i < options.length; i++) {
 				const isHighlighted = i === selectedIndex;
 				const isSelected = selected.has(i);
@@ -169,22 +243,34 @@ export class InteractiveCLI {
 						: isSelected
 							? colorify.green(options[i])
 							: colorify.gray(options[i]);
-					console.log(`${prefix}${checkbox}${text}`);
+					this.xConsole.log(`${prefix}${checkbox}${text}`);
 				} else {
 					prefix = isHighlighted ? colorify.green("❯ ") : "  ";
 					text = isHighlighted ? colorify.green(options[i]) : colorify.gray(options[i]);
-					console.log(`${prefix}${text}`);
+					this.xConsole.log(`${prefix}${text}`);
 				}
 			}
 
+			this.renderErrorSection();
+
+			// Show quick actions if available
+			if (quickActions.length > 0) {
+				this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
+				quickActions.forEach((action) => {
+					const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
+					this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
+				});
+			}
+
 			const instructions = allowMultiple
-				? "\n  ↑/↓ Navigate • Space Toggle • Enter Continue • Ctrl+C Exit"
-				: "\n  ↑/↓ Navigate • Enter Select • Ctrl+C Exit";
-			console.log(colorify.gray(instructions));
+				? "\n  ↑/↓ Navigate • ← Back • Space Toggle • Enter Continue • Ctrl+C Exit"
+				: "\n  ↑/↓ Navigate • ← Back • Enter Select • Ctrl+C Exit";
+			this.xConsole.log(colorify.gray(instructions));
 
 			if (allowMultiple && selected.size > 0) {
-				console.log(
+				this.xConsole.log(
 					colorify.blue(`  Selected: ${selected.size} item${selected.size > 1 ? "s" : ""}`),
+					this.xConsole,
 				);
 			}
 		};
@@ -200,15 +286,14 @@ export class InteractiveCLI {
 						selectedIndex = Math.min(options.length - 1, selectedIndex + 1);
 						render();
 					},
+					...(onLeft ? { onLeft } : {}),
 					onSpace: () => {
-						if (allowMultiple) {
-							if (selected.has(selectedIndex)) {
-								selected.delete(selectedIndex);
-							} else {
-								selected.add(selectedIndex);
-							}
-							render();
+						if (selected.has(selectedIndex)) {
+							selected.delete(selectedIndex);
+						} else {
+							selected.add(selectedIndex);
 						}
+						render();
 					},
 					onReturn: () => {
 						process.stdin.removeListener("data", onKeyPress);
@@ -217,6 +302,13 @@ export class InteractiveCLI {
 							resolve(result);
 						} else {
 							resolve([options[selectedIndex]]);
+						}
+					},
+					onQuickAction: (action) => {
+						// Handle quick action shortcuts
+						const char = action.shortcut?.toLowerCase();
+						if (char && char.length === 1) {
+							action.action();
 						}
 					},
 					onCtrlC: exitOnCtrlC
@@ -228,7 +320,23 @@ export class InteractiveCLI {
 				});
 			};
 
-			process.stdin.on("data", onKeyPress);
+			// Add direct key handling for quick actions
+			const handleQuickActionKey = (data: Buffer) => {
+				const key = this.getKey(data);
+				if (key.name && key.name.length === 1) {
+					const char = key.name.toLowerCase();
+					const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
+					if (action) {
+						this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
+						action.action();
+						return;
+					}
+				}
+				// If no quick action found, pass to regular handler
+				onKeyPress(data);
+			};
+
+			process.stdin.on("data", handleQuickActionKey);
 			render();
 		});
 	}
@@ -236,20 +344,39 @@ export class InteractiveCLI {
 	async prompt(question: string, config: PromptConfig = {}): Promise<string> {
 		const {
 			clearScreen = true,
-			placeholder,
 			allowEmpty = true,
 			showCursor = true,
 			exitOnCtrlC = true,
+			quickActions = [],
 		} = config;
 
 		if (clearScreen) this.clearScreen();
 		if (showCursor) this.showCursor();
 
-		console.log(colorify.blue(`\n  ${question}`));
-		if (placeholder) {
-			console.log(colorify.gray(`  ${placeholder}`));
+		this.xConsole.log(question);
+		// Show error if exists, but don't let it interfere with input
+		if (this.currentError) {
+			this.xConsole.log(colorify.red("\n  ❌ Error:"));
+			this.xConsole.log(colorify.red(`\n  ${this.currentError}\n`));
+			this.xConsole.log(""); // Add spacing
 		}
-		process.stdout.write(colorify.green("\n  ❯ "));
+
+		// Show quick actions if available
+		if (quickActions.length > 0) {
+			this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
+			quickActions.forEach((action) => {
+				const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
+				this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
+			});
+		}
+
+		// Show helper text for available actions
+		if (config.onLeft) {
+			this.xConsole.log(colorify.gray("\n← Back • ESC Clear • Ctrl+C Exit"));
+		} else {
+			this.xConsole.log(colorify.gray("\nESC Clear • Ctrl+C Exit"));
+		}
+		process.stdout.write(colorify.green("❯ "));
 
 		let input = "";
 
@@ -269,9 +396,24 @@ export class InteractiveCLI {
 							process.stdout.write("\b \b");
 						}
 					},
+					onEscape: () => {
+						// Clear the input
+						input = "";
+						// Clear the current line and redraw
+						process.stdout.write("\r\x1b[K"); // Clear line
+						process.stdout.write(colorify.green("❯ "));
+					},
 					onChar: (char: string) => {
 						input += char;
 						process.stdout.write(char);
+					},
+					onLeft: config.onLeft,
+					onQuickAction: (action) => {
+						// Handle quick action shortcuts
+						const char = action.shortcut?.toLowerCase();
+						if (char && char.length === 1) {
+							action.action();
+						}
 					},
 					onCtrlC: exitOnCtrlC
 						? () => {
@@ -282,12 +424,34 @@ export class InteractiveCLI {
 				});
 			};
 
-			process.stdin.on("data", onKeyPress);
+			// Add direct key handling for quick actions
+			const handleQuickActionKey = (data: Buffer) => {
+				const key = this.getKey(data);
+				if (key.name && key.name.length === 1) {
+					const char = key.name.toLowerCase();
+					const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
+					if (action) {
+						this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
+						action.action();
+						return;
+					}
+				}
+				// If no quick action found, pass to regular handler
+				onKeyPress(data);
+			};
+
+			process.stdin.on("data", handleQuickActionKey);
 		});
 	}
 
 	async confirm(question: string, config: ConfirmConfig = {}): Promise<boolean> {
-		const { clearScreen = true, defaultValue = false, message, exitOnCtrlC = true } = config;
+		const {
+			clearScreen = true,
+			defaultValue = false,
+			message,
+			exitOnCtrlC = true,
+			quickActions = [],
+		} = config;
 
 		if (clearScreen) this.clearScreen();
 		this.hideCursor();
@@ -299,23 +463,35 @@ export class InteractiveCLI {
 
 			// Show additional message if provided
 			if (message) {
-				console.log(colorify.green("\n  ✅ Generated commit message:\n"));
-				console.log(colorify.cyan("  ─".repeat(5)));
-				console.log(`  ${message}`);
-				console.log(colorify.cyan("  ─".repeat(5)));
-				console.log("");
+				this.xConsole.log(colorify.green("\n  ✅ Generated commit message:\n"));
+				this.xConsole.log(colorify.cyan("  ─".repeat(5)));
+				this.xConsole.log(`  ${message}`);
+				this.xConsole.log(colorify.cyan("  ─".repeat(5)));
+				this.xConsole.log("");
 			}
 
-			console.log(colorify.blue(`  ${question}\n`));
+			this.xConsole.log(colorify.blue(`  ${question}\n`));
 
 			const yesPrefix = selected ? colorify.green("❯ ") : "  ";
 			const noPrefix = !selected ? colorify.red("❯ ") : "  ";
 			const yesText = selected ? colorify.green("Yes") : colorify.gray("Yes");
 			const noText = !selected ? colorify.red("No") : colorify.gray("No");
 
-			console.log(`${yesPrefix}${yesText}`);
-			console.log(`${noPrefix}${noText}`);
-			console.log(colorify.gray("\n  ↑/↓ Navigate • Enter Select • Ctrl+C Exit"));
+			this.xConsole.log(`${yesPrefix}${yesText}`);
+			this.xConsole.log(`${noPrefix}${noText}`);
+
+			// Show quick actions if available
+			if (quickActions.length > 0) {
+				this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
+				quickActions.forEach((action) => {
+					const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
+					this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
+				});
+			}
+
+			this.xConsole.log(colorify.gray("\n  ↑/↓ Navigate • Enter Select • Ctrl+C Exit"));
+
+			this.renderErrorSection();
 		};
 
 		return new Promise((resolve) => {
@@ -351,7 +527,23 @@ export class InteractiveCLI {
 				});
 			};
 
-			process.stdin.on("data", onKeyPress);
+			// Add direct key handling for quick actions
+			const handleQuickActionKey = (data: Buffer) => {
+				const key = this.getKey(data);
+				if (key.name && key.name.length === 1) {
+					const char = key.name.toLowerCase();
+					const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
+					if (action) {
+						this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
+						action.action();
+						return;
+					}
+				}
+				// If no quick action found, pass to regular handler
+				onKeyPress(data);
+			};
+
+			process.stdin.on("data", handleQuickActionKey);
 			render();
 		});
 	}

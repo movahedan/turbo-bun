@@ -1,48 +1,214 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
+import { EntityCommit, validBranchPrefixes } from "./entities";
 import { colorify } from "./shell/colorify";
-import { parseCommitMessage, validateCommitMessage } from "./shell/commit-utils";
 import { createScript, validators } from "./shell/create-scripts";
 
-async function checkCommitMessage(commitMsgFile?: string): Promise<boolean> {
-	let commitMessage: string;
+const scriptConfig = {
+	name: "Commit Check",
+	description:
+		"Comprehensive commit validation with step-based checking. Supports message strings, files, branch validation, and staged file checks.",
+	usage: "bun run commit-check [options]",
+	examples: [
+		"bun run commit-check",
+		"bun run commit-check --message 'feat: add new feature'",
+		"bun run commit-check --message-file .git/COMMIT_EDITMSG",
+		"bun run commit-check --branch",
+		"bun run commit-check --staged",
+		"bun run commit-check --message 'fix: resolve bug' --branch --staged",
+	],
+	options: [
+		{
+			short: "-m",
+			long: "--message",
+			description: "Validate specific commit message string",
+			required: false,
+			validator: validators.nonEmpty,
+		},
+		{
+			short: "-f",
+			long: "--message-file",
+			description: "Read and validate message from file",
+			required: false,
+			validator: validators.fileExists,
+		},
+		{
+			short: "-b",
+			long: "--branch",
+			description: "Validate current branch name",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+		{
+			short: "-s",
+			long: "--staged",
+			description: "Validate staged files for policy violations",
+			required: false,
+			defaultValue: false,
+			validator: validators.boolean,
+		},
+	],
+} as const;
 
-	if (commitMsgFile) {
-		// Read from file (used by git hooks)
-		commitMessage = await Bun.file(commitMsgFile).text();
-	} else {
-		// Get the latest commit message
-		const { stdout } = await $`git log -1 --pretty=%B`;
-		commitMessage = stdout.toString().trim();
-	}
-
-	if (!commitMessage) {
-		console.error(colorify.red("❌ No commit message found"));
-		return false;
-	}
-
-	console.log(colorify.blue("📝 Checking commit message..."));
-	console.log(colorify.gray(`Message: ${commitMessage}`));
-
-	const parsedMessage = parseCommitMessage(commitMessage);
-	if (!parsedMessage) {
-		console.warn(colorify.yellow("⚠️  Message doesn't follow conventional commit format"));
-		console.log(colorify.green("✅ Commit message check passed (non-conventional format allowed)"));
-		return true;
-	}
-
-	const errors = await validateCommitMessage(parsedMessage);
-	if (errors.length > 0) {
-		console.error(colorify.red("❌ Commit message validation errors:"));
-		for (const error of errors) {
-			console.error(colorify.red(`  • ${error}`));
+export const commitCheck = createScript(scriptConfig, async (args, xConsole) => {
+	if (args["message-file"] || args.message) {
+		xConsole.log(colorify.blue("🔍 Validating commit message from file..."));
+		const commitMessage = args["message-file"]
+			? await Bun.file(args["message-file"]).text()
+			: args.message;
+		if (!commitMessage) {
+			xConsole.error(colorify.red("❌ No commit message found"));
+			throw new Error("No commit message found");
 		}
-		return false;
+
+		const validation = await EntityCommit.validateCommitMessage(commitMessage);
+		if (validation.length > 0) {
+			xConsole.error(colorify.red("❌ Commit message validation failed:"));
+			for (const error of validation) {
+				xConsole.error(colorify.red(`  • ${error}`));
+			}
+			throw new Error("Commit message validation failed");
+		}
 	}
 
-	console.log(colorify.green("✅ Commit message validation passed"));
-	return true;
+	if (args.branch) {
+		try {
+			xConsole.log(colorify.blue("🔍 Running branch name validation..."));
+			await checkBranchName();
+		} catch (error) {
+			xConsole.error(colorify.red("❌ Branch name validation failed:"));
+			xConsole.error(colorify.red(`  • ${error instanceof Error ? error.message : String(error)}`));
+			throw new Error("Branch name validation failed");
+		}
+	}
+
+	if (args.staged) {
+		try {
+			xConsole.log(colorify.blue("🔍 Running staged files validation..."));
+			await checkStagedFiles();
+		} catch (error) {
+			xConsole.error(colorify.red("❌ Staged files validation failed:"));
+			xConsole.error(colorify.red(`  • ${error instanceof Error ? error.message : String(error)}`));
+			throw new Error("Staged files validation failed");
+		}
+	}
+});
+
+if (import.meta.main) {
+	commitCheck();
+}
+
+async function checkStagedFiles(): Promise<boolean> {
+	console.log(colorify.blue("📁 Checking staged files for policy violations..."));
+
+	const issuePatterns = [
+		{
+			filePattern: [
+				/\.vscode\/.*/,
+				/coverage\/.*/,
+				/dist\/.*/,
+				/node_modules\/.*/,
+				/\.env/,
+				/\.act/,
+			],
+			description: "development files should not be manually committed",
+		},
+		{
+			filePattern: [/CHANGELOG.md/],
+			contentPattern: [
+				/^# @repo\/[^/]+$/m, // Manual package name headers
+				/^## \[[^\]]+\] - \d{4}-\d{2}-\d{2}$/m, // Manual version headers
+				/^- [^-]/m, // Manual bullet points that don't start with "- -"
+			],
+			description: "CHANGELOG.md should be auto-generated by 'bun run version:commit'",
+		},
+		{
+			filePattern: [/package.json/],
+			contentPattern: [
+				/^[+-]\s*"version":\s*"[^"]+"/, // Manual version changes
+			],
+			ignore: { mode: "create" },
+			description: "package.json version should be auto-generated by 'bun run version:commit'",
+		},
+	];
+
+	async function findIssues(filePath: string): Promise<string[]> {
+		const issues: string[] = [];
+
+		for (const pattern of issuePatterns) {
+			const fileNameMatches = pattern.filePattern.some((p) => p.test(filePath));
+			if (!fileNameMatches) continue;
+
+			const stagedDiff = await $`git diff --cached -- ${filePath}`.text();
+			const contentMatches = pattern.contentPattern?.some((p) => p.test(stagedDiff)) ?? true;
+
+			// Check if this is a new file and should be ignored
+			const isNewFile =
+				stagedDiff.includes("new file mode") || stagedDiff.includes("--- /dev/null");
+			const shouldIgnore = pattern.ignore?.mode === "create" && isNewFile;
+
+			if (contentMatches && !shouldIgnore) {
+				issues.push(`${filePath}: ${pattern.description}`);
+			}
+		}
+
+		return issues;
+	}
+
+	async function checkGitStatus(): Promise<{ stagedFiles: string[] }> {
+		const status = await $`git status --porcelain`.text();
+		const lines = status.split("\n").filter(Boolean);
+
+		return {
+			stagedFiles: lines
+				.filter((line) => line.startsWith("A ") || line.startsWith("M "))
+				.map((line) => line.substring(3)),
+		};
+	}
+
+	try {
+		const { stagedFiles } = await checkGitStatus();
+
+		if (!stagedFiles.length) {
+			console.log(colorify.green("✅ No staged changes"));
+			return true;
+		}
+
+		console.log(
+			colorify.gray(`Found ${stagedFiles.length} staged files: ${stagedFiles.join(", ")}`),
+		);
+
+		const allIssues = await Promise.all(
+			stagedFiles.map(async (file) => await findIssues(file)),
+		).then((issues) => issues.flat());
+
+		if (allIssues.length === 0) {
+			console.log(colorify.green("✅ No policy violations found in staged files"));
+			return true;
+		}
+
+		console.error(colorify.red("❌ Policy violations found:"));
+		for (const issue of allIssues) {
+			console.error(colorify.red(`  • ${issue}`));
+		}
+
+		console.error(colorify.yellow("\n💡 To fix these issues:"));
+		console.error(
+			colorify.yellow("  • Use 'bun run version:commit' for version and changelog updates"),
+		);
+		console.error(colorify.yellow("  • Avoid committing development files manually"));
+		console.error(
+			colorify.yellow("  • Let automation handle package.json and CHANGELOG.md updates"),
+		);
+
+		return false;
+	} catch (error) {
+		console.error(colorify.red("❌ Failed to check staged files:"));
+		console.error(colorify.red(`  • ${error instanceof Error ? error.message : String(error)}`));
+		return false;
+	}
 }
 
 async function checkBranchName(): Promise<boolean> {
@@ -55,21 +221,6 @@ async function checkBranchName(): Promise<boolean> {
 		currentBranch.toString().trim() ||
 		"";
 
-	const validBranchPrefixes = [
-		"main",
-		"release",
-		"feature",
-		"fix",
-		"hotfix",
-		"docs",
-		"refactor",
-		"ci",
-		"chore",
-		"wip",
-		"renovate",
-	] as const;
-
-	// Branch naming patterns
 	const patterns = validBranchPrefixes.reduce(
 		(acc, prefix) => {
 			acc[prefix] = new RegExp(`^${prefix}/([a-z0-9.-]+)$`);
@@ -109,88 +260,4 @@ async function checkBranchName(): Promise<boolean> {
 		}
 	}
 	return false;
-}
-
-const scriptConfig = {
-	name: "Commit Check",
-	description: "Validate commit message and branch name according to conventional commit standards",
-	usage: "bun run commit-check [options] [commit-msg-file]",
-	examples: [
-		"bun run commit-check",
-		"bun run commit-check .git/COMMIT_EDITMSG",
-		"bun run commit-check --skip-branch",
-		"bun run commit-check --commit-msg-only",
-	],
-	options: [
-		{
-			short: "-c",
-			long: "--commit-msg-only",
-			description: "Only check commit message, skip branch name validation",
-			required: false,
-			defaultValue: false,
-			validator: validators.boolean,
-		},
-		{
-			short: "-b",
-			long: "--branch-only",
-			description: "Only check branch name, skip commit message validation",
-			required: false,
-			defaultValue: false,
-			validator: validators.boolean,
-		},
-		{
-			short: "-s",
-			long: "--skip-branch",
-			description: "Skip branch name validation",
-			required: false,
-			defaultValue: false,
-			validator: validators.boolean,
-		},
-		{
-			short: "-f",
-			long: "--commit-msg-file",
-			description: "Path to commit message file",
-			required: false,
-			validator: validators.nonEmpty,
-		},
-	],
-} as const;
-
-export const commitCheck = createScript(scriptConfig, async (args, xConsole) => {
-	try {
-		let success = true;
-
-		// Get commit message file from args or command line argument
-		const commitMsgFile = args["commit-msg-file"] || process.argv[process.argv.length - 1];
-		const isCommitMsgFile =
-			commitMsgFile && commitMsgFile !== "commit-check.ts" && !commitMsgFile.startsWith("-");
-
-		if (!args["branch-only"]) {
-			xConsole.log(colorify.blue("🔍 Running commit message validation..."));
-			const commitSuccess = await checkCommitMessage(isCommitMsgFile ? commitMsgFile : undefined);
-			success = success && commitSuccess;
-		}
-
-		if (!args["commit-msg-only"] && !args["skip-branch"]) {
-			xConsole.log(colorify.blue("🔍 Running branch name validation..."));
-			const branchSuccess = await checkBranchName();
-			success = success && branchSuccess;
-		}
-
-		if (success) {
-			xConsole.log(colorify.green("✅ All commit checks passed!"));
-		} else {
-			xConsole.error(colorify.red("❌ Commit checks failed!"));
-			process.exit(1);
-		}
-	} catch (error) {
-		xConsole.error(
-			colorify.red(`❌ Error: ${error instanceof Error ? error.message : String(error)}`),
-		);
-		process.exit(1);
-	}
-});
-
-if (import.meta.main) {
-	commitCheck();
 }

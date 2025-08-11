@@ -2,9 +2,9 @@
 
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
+import { EntityCompose, type ServiceHealth, type ServiceInfo } from "./entities";
 import { colorify } from "./shell/colorify";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
-import { repoUtils, type ServiceHealth, type ServiceInfo } from "./shell/repo-utils";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",
@@ -26,7 +26,7 @@ const devCheck = createScript(devCheckConfig, async function main(args, xConsole
 	xConsole.log(colorify.blue("🧪 Starting DevContainer Health Check..."));
 
 	await $`bun run dev:up --build`;
-	const compose = await repoUtils.compose.parse("dev");
+	const compose = await EntityCompose.parse("dev");
 	await monitorServiceHealth(compose.serviceHealth, compose.exposedServices, xConsole);
 
 	xConsole.log(colorify.blue("\n📊 Services are available at:"));

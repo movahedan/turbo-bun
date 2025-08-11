@@ -21,35 +21,100 @@ This workspace contains all automation scripts and utilities for the repository,
 
 ## 🚀 Scripts
 
-### Version Management
-- `version.ts` - Complete version flow orchestrator (main entry point)
-- `version-bump.ts` - Bump package versions based on commit analysis
-- `version-changelog.ts` - Generate changelogs from git commits
-- `version-commit.ts` - Commit version changes with proper formatting
-- `version-tag.ts` - Create and manage git tags for releases
+This directory contains various utility scripts for development, CI/CD, and project management.
 
-### CI/CD
-- `ci-attach-affected.ts` - Attach affected packages to GitHub Actions output
-- `ci-attach-service-ports.ts` - Attach service port mappings for deployment
-- `ci-check.ts` - Run GitHub Actions locally with `act`
-- `commit-check.ts` - Validate commit messages and branch names
-- `commit-staged-check.ts` - Check staged files for manual changes
-- `commit-interactive.ts` - Interactive commit creation with validation
+## 📝 Enhanced Interactive Commit CLI
 
-### Development
-- `dev-check.ts` - Health check for DevContainer services
-- `dev-cleanup.ts` - Clean up DevContainer artifacts
-- `dev-rm.ts` - Remove VS Code DevContainer (host only)
-- `dev-setup.ts` - Setup DevContainer environment
+The commit script now features a sophisticated interactive wizard for creating conventional commits with enhanced navigation and state management.
 
-### Local Environment
-- `local-cleanup.ts` - Comprehensive cleanup of build artifacts
-- `local-setup.ts` - Complete local development setup
-- `local-vscode.ts` - Sync VS Code configuration from DevContainer
+### ✨ Features
 
-### Utilities
-- `update-package-json.ts` - Update package.json exports automatically
-- `example-script.ts` - Template for creating new scripts
+- **🎯 Step-by-Step Wizard**: Guided commit message creation with validation
+- **📊 Progress Tracking**: Visual progress bar showing completion status
+- **⚡ Quick Actions**: Keyboard shortcuts for common operations
+- **🔄 Smart Navigation**: Go back/forward between steps with arrow keys
+- **🚫 Conditional Skipping**: Automatically skip irrelevant steps
+- **📋 Commit Preview**: See final commit message before confirming
+- **❌ Validation**: Real-time validation with helpful error messages
+
+### 🎮 Usage
+
+```bash
+# Run interactive mode
+bun run commit
+
+# Use direct message
+bun run commit -m "feat: add new feature"
+
+# Stage all files and commit
+bun run commit -a -m "fix: resolve bug"
+
+# Skip git hooks
+bun run commit -m "docs: update readme" --no-verify
+```
+
+### ⌨️ Keyboard Shortcuts
+
+- **↑/↓**: Navigate between options
+- **←**: Go back to previous step
+- **→**: Go to next step (if validation passes)
+- **Enter**: Confirm selection/input
+- **Space**: Toggle multi-select options
+- **ESC**: Clear input or go back
+- **Ctrl+C**: Exit wizard
+
+### ⚡ Quick Actions
+
+Each step shows available quick actions:
+
+- **h**: Show help for current step
+- **s**: Skip current step (if allowed)
+- **p**: Preview final commit message
+- **←**: Go back to previous step
+
+### 🔄 Step Flow
+
+1. **Type Selection**: Choose commit type (feat, fix, docs, etc.)
+2. **Scope Selection**: Select affected areas (optional)
+3. **Description**: Write short description
+4. **Body Lines**: Add detailed explanation (optional)
+5. **Breaking Change**: Specify if breaking (if type supports it)
+6. **Confirmation**: Review and confirm final message
+
+### 🎨 Customization
+
+The CLI automatically adapts based on your choices:
+- Skips body lines if description is too short
+- Skips breaking change if type doesn't support it
+- Makes scopes optional
+- Validates input in real-time
+
+### 🧪 Testing
+
+Test the enhanced CLI:
+
+```bash
+# Test interactive mode
+bun run commit
+
+# Test with staged changes
+git add .
+bun run commit
+```
+
+## 🔧 Other Scripts
+
+- **`dev-setup`**: Set up development environment
+- **`dev-cleanup`**: Clean up development resources
+- **`local-setup`**: Local environment setup
+- **`local-cleanup`**: Local environment cleanup
+- **`local-vscode`**: VSCode-specific setup
+- **`ci-*`**: CI/CD related scripts
+- **`version-*`**: Version management scripts
+
+## 📚 Documentation
+
+For detailed information about each script, see the individual script files and the main project documentation in the `docs/` directory.
 
 ## 🧪 Development
 
@@ -109,26 +174,24 @@ bun test shell/version-utils.test.ts
 - Consistent error handling and help generation
 - Type-safe argument inference
 
-#### `shell/repo-utils.ts`
-- Package.json management (`PackageJsonUtils`)
-- Workspace operations (`WorkspaceUtils`)
-- Affected package detection (`AffectedUtils`)
-- Git tag operations (`TagsUtils`)
-- Docker Compose parsing (`ComposeUtils`)
+#### `entities/` - Core Entity System
+- **EntityCommit** - Commit parsing, validation, and analysis
+- **EntityChangelog** - Changelog generation and merging
+- **EntityPackageJson** - Package.json operations and version management
+- **EntityWorkspace** - Workspace package discovery and validation
+- **EntityCompose** - Docker Compose parsing and service health
+- **EntityAffected** - Affected package detection with dependencies
+- **EntityTag** - Git tag operations and management
+- **ChangelogManager** - Stateful changelog orchestration
 
-#### `shell/version-utils.ts`
-- Git commit analysis and parsing
-- Semantic version management
-- Changelog content merging and sorting
-- PR categorization and statistics
-- Conventional commit parsing
+#### `shell/create-scripts.ts`
+- CLI argument parsing and validation
+- Consistent error handling and help generation
+- Type-safe argument inference
 
-#### `shell/changelog-generator.ts`
-- Markdown changelog generation with Keep a Changelog format
-- Badge and link formatting for PRs and commits
-- Collapsible section creation for better organization
-- Author information handling with email integration
-- PR categorization and commit type analysis
+#### `shell/interactive-cli.ts`
+- Interactive prompt system for user input
+- Selection, confirmation, and text input handling
 
 ### Design Principles
 
