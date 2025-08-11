@@ -43,7 +43,7 @@ export const ciAttachAffected = createScript(
 				: await EntityAffected.getAffectedPackages();
 
 		const affectedServicesNames = affectedList
-			.map((i) => (mode === "docker" ? i : `--filter="${i}"`))
+			.map((i) => (mode === "docker" ? (typeof i !== "string" ? i.name : i) : `--filter="${i}"`))
 			.join(" ");
 
 		// Output in GitHub Actions format
