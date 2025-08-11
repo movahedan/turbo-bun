@@ -113,7 +113,7 @@ export class EntityCommit {
 
 	static async parseByHash(hash: string): Promise<ParsedCommitData> {
 		try {
-			const commitResult = await $`git show --format="%H|%an|%ad|%s|%B" --no-patch ${hash}`
+			const commitResult = await $`git show --format="%H%n%an%n%ad%n%s%n%B" --no-patch ${hash}`
 				.quiet()
 				.nothrow();
 
@@ -122,7 +122,12 @@ export class EntityCommit {
 			}
 
 			const lines = commitResult.text().trim().split("\n");
+
 			const [commitHash, author, date, message, ...bodyLines] = lines;
+
+			if (!message) {
+				throw new Error(`No message found for commit ${hash}`);
+			}
 
 			const parsedMessage = EntityCommit.parseByMessage(message);
 			const isMerge =

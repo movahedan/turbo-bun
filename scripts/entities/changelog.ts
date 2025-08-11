@@ -11,7 +11,6 @@ export interface ChangelogData {
 const packageJson = await EntityPackageJson.getPackageJson("root");
 const repoUrl =
 	typeof packageJson.repository === "string" ? packageJson.repository : packageJson.repository?.url;
-const repoName = repoUrl?.split("/").pop();
 
 export class EntityChangelog {
 	constructor() {}
@@ -28,7 +27,6 @@ export class EntityChangelog {
 			"[![Keep a Changelog](https://img.shields.io/badge/changelog-Keep%20a%20Changelog%20v1.0.0-%23E05735)](https://keepachangelog.com)\n";
 		changelog +=
 			"[![Semantic Versioning](https://img.shields.io/badge/semver-semantic%20versioning%20v2.0.0-%23E05735)](https://semver.org)\n";
-		changelog += `[![GitHub](https://img.shields.io/badge/github-${repoName}-%23181717?logo=github)](https://github.com/${repoName})\n\n`;
 		changelog += "All notable changes to this project will be documented in this file.\n\n";
 		changelog +=
 			"The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),\n";
