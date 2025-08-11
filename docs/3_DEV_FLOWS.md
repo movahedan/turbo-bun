@@ -295,12 +295,12 @@ git commit -m "refactor(utils): optimize string processing"
 ### **Automated Versioning**
 ```bash
 # Complete version management workflow (recommended)
-bun run scripts/version-commit.ts --dry-run # Preview version changes
-bun run scripts/version-commit.ts           # Apply version changes and create release
+bun run scripts/version-ci.ts --dry-run # Preview version changes
+bun run scripts/version-ci.ts           # Apply version changes and create release
 
-# Alternative: Use the main orchestrator
-bun run scripts/version.ts --dry-run        # Preview complete versioning
-bun run scripts/version.ts                  # Execute complete versioning
+# Alternative: Use individual steps
+bun run scripts/version-prepare.ts      # Prepare versions and changelogs
+bun run scripts/version-apply.ts        # Apply version changes
 
 # Version workflow includes:
 # - Dynamic scope detection from affected packages
@@ -313,18 +313,16 @@ bun run scripts/version.ts                  # Execute complete versioning
 ### **Individual Version Scripts**
 ```bash
 # Individual version management operations
-bun run scripts/version-bump.ts --auto         # Auto-detect and bump versions
-bun run scripts/version-changelog.ts --all     # Generate changelogs
-bun run scripts/version-tag.ts --push          # Create and push tags
+bun run scripts/version-prepare.ts --package root     # Prepare version bump and changelog
+bun run scripts/version-apply.ts --no-push            # Apply changes without pushing
+bun run scripts/version-ci.ts --type minor            # Complete CI workflow
 
 # Manual version operations
-bun run scripts/version-bump.ts --package admin --type minor
-bun run scripts/version-changelog.ts --from v1.0.0 --to HEAD
-bun run scripts/version-tag.ts --version 1.2.3
+bun run scripts/version-prepare.ts --package admin --from v1.0.0
+bun run scripts/version-apply.ts --dry-run
 
 # Validation scripts
-bun run scripts/ci-staged.ts       # Staged file validation
-bun run scripts/ci-check.ts        # CI environment validation
+bun run scripts/ci-act.ts              # CI environment validation
 ```
 
 ## 🚨 Troubleshooting
