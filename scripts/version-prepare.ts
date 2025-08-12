@@ -1,12 +1,7 @@
 #!/usr/bin/env bun
 
-import {
-	ChangelogManager,
-	EntityAffected,
-	EntityChangelog,
-	EntityPackageJson,
-	EntityTag,
-} from "./entities";
+import { $ } from "bun";
+import { ChangelogManager, EntityAffected, EntityPackageJson, EntityTag } from "./entities";
 import { colorify } from "./shell/colorify";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
@@ -47,10 +42,43 @@ const scriptConfig = {
 
 export const versionPrepare = createScript(scriptConfig, async function main(args, xConsole) {
 	const packageName = args.package;
-	const fromRef = args.from || (await EntityTag.getBaseTagSha()) || "HEAD~10";
+
+	// Get the last version tag, or fall back to first commit if none exists
+	const lastVersionTag = await EntityTag.getBaseTagSha();
+	const fromRef = args.from || lastVersionTag;
 	const toRef = args.to || "HEAD";
 
 	xConsole.info(`📊 Analyzing commits from ${fromRef} to ${toRef}`);
+
+	// Check if there are any new commits since the last version tag
+	if (lastVersionTag && lastVersionTag !== fromRef) {
+		const commitsSinceLastVersion = await $`git log ${lastVersionTag}..HEAD --oneline`.text();
+		if (commitsSinceLastVersion.trim() === "") {
+			xConsole.info("✅ No new commits since last version tag, nothing to version");
+			return;
+		}
+		xConsole.info(`📝 Found commits since last version tag ${lastVersionTag}:`);
+		xConsole.log(commitsSinceLastVersion.trim());
+	} else {
+		xConsole.info("ℹ️ No version tags found, analyzing all commits in range");
+	}
+
+	// Early exit if we're analyzing the same commit range (no new commits)
+	if (fromRef === toRef) {
+		xConsole.info("✅ No commit range to analyze, nothing to version");
+		return;
+	}
+
+	// Check if there are actually any commits in the range
+	const commitsInRange = await $`git log ${fromRef}..${toRef} --oneline`.text();
+	if (commitsInRange.trim() === "") {
+		xConsole.info("✅ No commits found in the specified range, nothing to version");
+		return;
+	}
+
+	xConsole.info(
+		`📝 Found ${commitsInRange.split("\n").filter((line) => line.trim()).length} commits in range`,
+	);
 
 	let packages: string[];
 
@@ -59,32 +87,27 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		xConsole.info(`📦 Processing specific package: ${packageName}`);
 	} else {
 		xConsole.info("🔍 Detecting affected packages...");
-		const allAffectedPackages = await EntityAffected.getAffectedPackages(fromRef, toRef);
+		const affectedPackages = await EntityAffected.getAffectedPackages(fromRef, toRef);
 
-		if (allAffectedPackages.length === 0) {
+		if (affectedPackages.length === 0) {
 			xConsole.info("✅ No affected packages found");
 			return;
 		}
 
 		xConsole.info(
-			`🔍 Found ${allAffectedPackages.length} potentially affected packages, checking for actual commits...`,
+			`🔍 Found ${affectedPackages.length} potentially affected packages, checking for actual commits...`,
 		);
 
 		// Filter packages that actually have commits in the range
 		const packagesWithCommits: string[] = [];
-		for (const pkg of allAffectedPackages) {
+		for (const pkg of affectedPackages) {
 			try {
 				const changelogManager = new ChangelogManager(pkg);
 				await changelogManager.setRange(fromRef, toRef);
-				const snapshot = await changelogManager.snapshot();
 
-				const commitCount =
-					Object.values(snapshot.changelogData.prCategorizedCommits).flat().length +
-					Object.values(snapshot.changelogData.orphanCategorizedCommits).flat().length;
-
-				if (commitCount > 0) {
+				if (changelogManager.hasCommits()) {
 					packagesWithCommits.push(pkg);
-					xConsole.log(`  ✅ ${pkg}: ${commitCount} commits`);
+					xConsole.log(`  ✅ ${pkg}: ${changelogManager.getCommitCount()} commits`);
 				} else {
 					xConsole.log(`  ⏭️ ${pkg}: no commits, skipping`);
 				}
@@ -106,57 +129,52 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 	const results: Array<{
 		packageName: string;
 		currentVersion: string;
-		nextVersion: string;
+		targetVersion: string;
 		bumpType: string;
 		commitCount: number;
+		shouldBump: boolean;
 		success: boolean;
 		error?: string;
 	}> = [];
 
 	for (const pkg of packages) {
+		xConsole.info(`\n🔍 Processing package: ${pkg}`);
+
 		try {
-			xConsole.info(`\n📦 Processing package: ${pkg}`);
-
-			const currentVersion = await EntityPackageJson.getVersion(pkg);
-			xConsole.info(`🏷️ Current version: ${currentVersion}`);
-
 			const changelogManager = new ChangelogManager(pkg);
 			await changelogManager.setRange(fromRef, toRef);
 			const snapshot = await changelogManager.snapshot();
 
-			const { bumpType, nextVersion } = snapshot.versionData;
-			xConsole.info(`🚀 Bump type: ${bumpType} → ${nextVersion}`);
+			const { currentVersion, targetVersion, bumpType } = snapshot.versionData;
+			const commitCount = changelogManager.getCommitCount();
 
-			xConsole.info("📚 Generating changelog...");
-			const newChangelog = await EntityChangelog.generateContent(snapshot.changelogData);
-			const existingChangelog = await EntityPackageJson.getChangelog(pkg);
-			const mergedChangelog = EntityChangelog.mergeWithExisting(existingChangelog, newChangelog);
+			xConsole.info(`🏷️ Current version: ${currentVersion}`);
+			xConsole.info(`🎯 Target version: ${targetVersion}`);
+			xConsole.info(`🚀 Bump type: ${bumpType}`);
+			xConsole.info(`📊 Commits: ${commitCount}`);
 
-			if (args["dry-run"]) {
-				xConsole.info(
-					`✅ Changelog would be written to: ${colorify.blue(
-						EntityPackageJson.getChangelogPath(pkg),
-					)}`,
-				);
-				xConsole.info(mergedChangelog);
+			// Bump version if target is different from current
+			if (targetVersion !== currentVersion) {
+				xConsole.info(`📦 Bumping version to ${targetVersion}`);
+				await EntityPackageJson.bumpVersion(pkg, targetVersion);
 			} else {
-				await EntityPackageJson.writeChangelog(pkg, mergedChangelog);
-				xConsole.info("✅ Changelog generated and written");
+				xConsole.info("⏭️ No version bump needed: versions are the same");
 			}
 
-			xConsole.info(`📦 Bumping version to ${nextVersion}`);
-			await EntityPackageJson.bumpVersion(pkg, nextVersion);
-
-			const commitCount =
-				Object.values(snapshot.changelogData.prCategorizedCommits).flat().length +
-				Object.values(snapshot.changelogData.orphanCategorizedCommits).flat().length;
+			// Always generate changelog if there are commits
+			if (commitCount > 0) {
+				xConsole.info("📚 Generating changelog...");
+				await changelogManager.generateChangelog();
+				xConsole.info("✅ Changelog generated and written");
+			}
 
 			results.push({
 				packageName: pkg,
 				currentVersion,
-				nextVersion,
+				targetVersion,
 				bumpType,
 				commitCount,
+				shouldBump: targetVersion !== currentVersion,
 				success: true,
 			});
 
@@ -168,9 +186,10 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 			results.push({
 				packageName: pkg,
 				currentVersion: "unknown",
-				nextVersion: "unknown",
+				targetVersion: "unknown",
 				bumpType: "unknown",
 				commitCount: 0,
+				shouldBump: false,
 				success: false,
 				error: errorMessage,
 			});
@@ -186,9 +205,10 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 	if (successfulResults.length > 0) {
 		xConsole.log(colorify.green(`✅ Successful: ${successfulResults.length}`));
 		for (const result of successfulResults) {
+			const bumpStatus = result.shouldBump ? "→" : "=";
 			xConsole.log(
 				colorify.blue(
-					`  • ${result.packageName}: ${result.currentVersion} → ${result.nextVersion} (${result.bumpType}) - ${result.commitCount} commits`,
+					`  • ${result.packageName}: ${result.currentVersion} ${bumpStatus} ${result.targetVersion} (${result.bumpType}) - ${result.commitCount} commits`,
 				),
 			);
 		}

@@ -27,6 +27,7 @@ export type CommitType =
 	| "chore"
 	| "deps"
 	| "revert"
+	| "Merge"
 	| "other";
 
 export type CommitMessageData =
@@ -182,6 +183,13 @@ const validTypes: {
 		category: "other",
 		emoji: "⏪",
 		breakingAllowed: true,
+	},
+	{
+		type: "Merge",
+		description: "Merge commits (pull requests, branches)",
+		category: "other",
+		emoji: "🔀",
+		breakingAllowed: false,
 	},
 	{
 		type: "other",

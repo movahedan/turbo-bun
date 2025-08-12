@@ -1,20 +1,31 @@
 import { $ } from "bun";
 import type { ChangelogData } from "./changelog";
+import { EntityChangelog } from "./changelog";
 import { EntityCommit, type ParsedCommitData, type PRCategory } from "./commit";
 import { EntityPackageJson } from "./package-json";
 import { EntityWorkspace } from "./workspace";
 
-export type VersionBumpType = "major" | "minor" | "patch";
+export type VersionBumpType = "major" | "minor" | "patch" | "none" | "sync";
 
 export interface VersionData {
 	readonly currentVersion: string;
 	readonly nextVersion: string;
 	readonly bumpType: VersionBumpType;
+	readonly shouldBump: boolean;
+	readonly targetVersion: string;
+	readonly reason: string;
 }
 
 export interface ChangelogSnapshot {
 	readonly versionData: VersionData;
 	readonly changelogData: ChangelogData;
+}
+
+export interface VersionAction {
+	readonly shouldBump: boolean;
+	readonly targetVersion: string;
+	readonly bumpType: VersionBumpType;
+	readonly reason: string;
 }
 
 export class ChangelogManager {
@@ -40,19 +51,21 @@ export class ChangelogManager {
 		const commits = await this.getCommitsInRange();
 		const categorizedCommits = ChangelogManager.categorizeCommits(commits);
 
-		const bumpType = this.determineBumpType(commits);
 		const currentVersion = await EntityPackageJson.getVersion(this.packageName);
-		const nextVersion = this.calculateNextVersion(currentVersion, bumpType);
+		const versionAction = await this.determineVersionAction(currentVersion, commits);
 
 		this.versionData = {
 			currentVersion,
-			nextVersion,
-			bumpType,
+			nextVersion: versionAction.targetVersion,
+			bumpType: versionAction.bumpType,
+			shouldBump: versionAction.shouldBump,
+			targetVersion: versionAction.targetVersion,
+			reason: versionAction.reason,
 		};
 
 		this.changelogData = {
 			...categorizedCommits,
-			displayVersion: nextVersion,
+			displayVersion: versionAction.targetVersion,
 		};
 	}
 
@@ -64,6 +77,111 @@ export class ChangelogManager {
 		return {
 			versionData: this.versionData,
 			changelogData: this.changelogData,
+		};
+	}
+
+	/**
+	 * Generate and write the changelog for this package
+	 */
+	async generateChangelog(): Promise<string> {
+		if (!this.changelogData) {
+			throw new Error("Data not analyzed. Call setRange() first.");
+		}
+
+		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
+		const newChangelog = await EntityChangelog.generateContent(this.changelogData);
+		const mergedChangelog = EntityChangelog.mergeWithExisting(existingChangelog, newChangelog);
+
+		await EntityPackageJson.writeChangelog(this.packageName, mergedChangelog);
+		return mergedChangelog;
+	}
+
+	/**
+	 * Check if this package has any commits in the specified range
+	 */
+	hasCommits(): boolean {
+		if (!this.changelogData) return false;
+
+		const commitCount =
+			Object.values(this.changelogData.prCategorizedCommits).flat().length +
+			Object.values(this.changelogData.orphanCategorizedCommits).flat().length;
+
+		return commitCount > 0;
+	}
+
+	/**
+	 * Get the commit count for this package
+	 */
+	getCommitCount(): number {
+		if (!this.changelogData) return 0;
+
+		return (
+			Object.values(this.changelogData.prCategorizedCommits).flat().length +
+			Object.values(this.changelogData.orphanCategorizedCommits).flat().length
+		);
+	}
+
+	private async determineVersionAction(
+		currentVersion: string,
+		commits: ParsedCommitData[],
+	): Promise<VersionAction> {
+		// If no commits, no version change needed
+		if (commits.length === 0) {
+			return {
+				shouldBump: false,
+				targetVersion: currentVersion,
+				bumpType: "none",
+				reason: "No commits in range",
+			};
+		}
+
+		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
+		const latestChangelogVersion = EntityChangelog.getLatestVersion(existingChangelog);
+
+		// Check if package.json is behind the changelog version
+		if (latestChangelogVersion && latestChangelogVersion !== currentVersion) {
+			return {
+				shouldBump: true,
+				targetVersion: latestChangelogVersion,
+				bumpType: "sync",
+				reason: `Package version ${currentVersion} is behind changelog version ${latestChangelogVersion}`,
+			};
+		}
+
+		// Check if this version already exists in the changelog
+		const bumpType = this.determineBumpType(commits);
+		const nextVersion = this.calculateNextVersion(currentVersion, bumpType);
+
+		const versionAlreadyExists =
+			existingChangelog.includes(`## v${nextVersion}`) ||
+			existingChangelog.includes(`## ${nextVersion}`);
+
+		if (versionAlreadyExists) {
+			return {
+				shouldBump: false,
+				targetVersion: currentVersion,
+				bumpType: "none",
+				reason: `Version ${nextVersion} already exists in changelog`,
+			};
+		}
+
+		// Check if package.json version already matches the latest changelog version
+		const isVersionUpToDate = EntityChangelog.isVersionUpToDate(currentVersion, existingChangelog);
+		if (isVersionUpToDate) {
+			return {
+				shouldBump: false,
+				targetVersion: currentVersion,
+				bumpType: "none",
+				reason: "Package version already matches latest changelog version",
+			};
+		}
+
+		// Normal version bump
+		return {
+			shouldBump: true,
+			targetVersion: nextVersion,
+			bumpType,
+			reason: `New ${bumpType} version bump to ${nextVersion}`,
 		};
 	}
 

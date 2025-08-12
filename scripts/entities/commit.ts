@@ -189,8 +189,22 @@ export class EntityCommit {
 	}
 
 	private static extractPRNumber(mergeMessage: string): string | undefined {
-		const prMatch = mergeMessage.match(/Merge pull request #(\d+)/);
-		return prMatch ? prMatch[1] : undefined;
+		// Try different merge commit patterns
+		const patterns = [
+			/Merge pull request #(\d+)/, // "Merge pull request #123"
+			/Merge PR #(\d+)/, // "Merge PR #123"
+			/Merge.*#(\d+)/, // "Merge branch 'feature' into main #123"
+			/.*#(\d+).*/, // Any message containing #123
+		];
+
+		for (const pattern of patterns) {
+			const match = mergeMessage.match(pattern);
+			if (match) {
+				return match[1];
+			}
+		}
+
+		return undefined;
 	}
 
 	private static async getPRCommits(mergeCommitHash: string): Promise<ParsedCommitData[]> {

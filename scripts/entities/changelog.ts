@@ -20,7 +20,7 @@ export class EntityChangelog {
 		const versionHeader =
 			changelogData.displayVersion === "Unreleased"
 				? "## [Unreleased]"
-				: `## ${changelogData.displayVersion}`;
+				: `## v${changelogData.displayVersion}`;
 
 		let changelog = "# Changelog\n\n";
 		changelog +=
@@ -64,7 +64,7 @@ export class EntityChangelog {
 			if (commits && commits.length > 0) {
 				changelog += `### ${EntityChangelog.getCategoryTitle(category)}\n\n`;
 				for (const commit of commits) {
-					changelog += EntityChangelog.formatOrphanCommit(commit);
+					changelog += EntityChangelog.formatOrphanCommit(commit, repoUrl || "");
 				}
 				changelog += "\n";
 			}
@@ -93,8 +93,22 @@ export class EntityChangelog {
 		const description = commit.message.description;
 		const prNumber = commit.pr?.prNumber;
 		const commitCount = commit.pr?.prCommits?.length || 0;
-		const scope = commit.message.scopes ? `(${commit.message.scopes.join(", ")})` : "";
-		const type = commit.message.type;
+
+		// Handle merge commits specially
+		let type = commit.message.type;
+		let scope = "";
+
+		if (commit.message.isMerge) {
+			type = "Merge";
+			// Don't show scope for merge commits
+		} else {
+			// Only show scope if there are actual scopes
+			scope =
+				commit.message.scopes && commit.message.scopes.length > 0
+					? `(${commit.message.scopes.join(", ")})`
+					: "";
+		}
+
 		const prCategory = commit.pr?.prCategory;
 
 		let line = `- **${type}${scope}**: ${description}`;
@@ -121,7 +135,9 @@ export class EntityChangelog {
 			line += ` (${commitCount} commits)`;
 		}
 
-		line += ` [${hash}]\n`;
+		// Make SHA a clickable link to the commit
+		const commitUrl = `${repoUrl}/commit/${commit.info.hash}`;
+		line += ` [${hash}](${commitUrl})\n`;
 
 		// Add dropdown for PR commits if there are multiple commits
 		if (commitCount > 1 && commit.pr?.prCommits) {
@@ -130,7 +146,8 @@ export class EntityChangelog {
 			for (const prCommit of commit.pr.prCommits) {
 				const prCommitHash = prCommit.info.hash.substring(0, 7);
 				const prCommitMessage = prCommit.message.description;
-				line += `  - ${prCommitMessage} [${prCommitHash}]\n`;
+				const prCommitUrl = `${repoUrl}/commit/${prCommit.info.hash}`;
+				line += `  - ${prCommitMessage} [${prCommitHash}](${prCommitUrl})\n`;
 			}
 			line += "  </details>\n";
 		}
@@ -138,18 +155,34 @@ export class EntityChangelog {
 		return line;
 	}
 
-	private static formatOrphanCommit(commit: ParsedCommitData): string {
+	private static formatOrphanCommit(commit: ParsedCommitData, repoUrl: string): string {
 		const hash = commit.info.hash.substring(0, 7);
 		const author = commit.info.author || "Unknown";
 		const description = commit.message.description;
-		const scope = commit.message.scopes ? `(${commit.message.scopes.join(", ")})` : "";
-		const type = commit.message.type;
+
+		// Handle merge commits specially
+		let type = commit.message.type;
+		let scope = "";
+
+		if (commit.message.isMerge) {
+			type = "Merge";
+			// Don't show scope for merge commits
+		} else {
+			// Only show scope if there are actual scopes
+			scope =
+				commit.message.scopes && commit.message.scopes.length > 0
+					? `(${commit.message.scopes.join(", ")})`
+					: "";
+		}
 
 		let line = `- **${type}${scope}**: ${description}`;
 		if (commit.message.isBreaking) {
 			line += " 💥";
 		}
-		line += ` - ${author} [${hash}]\n`;
+
+		// Make SHA a clickable link to the commit
+		const commitUrl = `${repoUrl}/commit/${commit.info.hash}`;
+		line += ` - ${author} [${hash}](${commitUrl})\n`;
 
 		return line;
 	}
@@ -159,8 +192,28 @@ export class EntityChangelog {
 		const newVersions = EntityChangelog.parseChangelogVersions(newChangelog);
 
 		const mergedVersions = new Map(existingVersions);
+
+		// Only add new versions that don't already exist
 		for (const [version, content] of newVersions) {
-			mergedVersions.set(version, content);
+			// Check if this version already exists in the existing changelog
+			const versionExists = Array.from(existingVersions.keys()).some((existingVersion) => {
+				// Extract version numbers for comparison (ignoring "v" prefix)
+				const existingMatch = existingVersion.match(/## (?:\[)?(v?\d+\.\d+\.\d+)(?:\])?/);
+				const newMatch = version.match(/## (?:\[)?(v?\d+\.\d+\.\d+)(?:\])?/);
+
+				if (!existingMatch || !newMatch) return false;
+
+				// Compare version numbers (remove "v" prefix for comparison)
+				const existingVersionNum = existingMatch[1].replace(/^v/, "");
+				const newVersionNum = newMatch[1].replace(/^v/, "");
+
+				return existingVersionNum === newVersionNum;
+			});
+
+			// Only add if version doesn't exist
+			if (!versionExists) {
+				mergedVersions.set(version, content);
+			}
 		}
 
 		const newHeader = EntityChangelog.extractHeader(newChangelog);
@@ -263,5 +316,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 		if (majorA !== majorB) return majorB - majorA;
 		if (minorA !== minorB) return minorB - minorA;
 		return patchB - patchA;
+	}
+
+	/**
+	 * Get the latest version from a changelog
+	 */
+	static getLatestVersion(changelog: string): string | null {
+		const versions = EntityChangelog.parseChangelogVersions(changelog);
+		if (versions.size === 0) return null;
+
+		// Get the first version (newest, since we sort in descending order)
+		const latestVersionHeader = Array.from(versions.keys())[0];
+
+		// Extract version number from header
+		const match = latestVersionHeader.match(/## (?:\[)?(v?\d+\.\d+\.\d+)(?:\])?/);
+		if (!match) return null;
+
+		// Return version without "v" prefix for comparison
+		return match[1].replace(/^v/, "");
+	}
+
+	/**
+	 * Check if package.json version matches the latest changelog version
+	 */
+	static isVersionUpToDate(packageVersion: string, changelog: string): boolean {
+		const latestChangelogVersion = EntityChangelog.getLatestVersion(changelog);
+		if (!latestChangelogVersion) return false;
+
+		// Remove "v" prefix from package version for comparison
+		const cleanPackageVersion = packageVersion.replace(/^v/, "");
+
+		return cleanPackageVersion === latestChangelogVersion;
 	}
 }
