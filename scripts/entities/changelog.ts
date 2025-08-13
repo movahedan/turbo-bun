@@ -108,14 +108,38 @@ export class EntityChangelog {
 		for (const commit of otherPRs) {
 			const prKey = commit.pr?.prNumber || commit.info.hash;
 			if (!prCommits.has(prKey)) prCommits.set(prKey, []);
+
+			// Add the commit itself
 			prCommits.get(prKey)?.push(commit);
+
+			// If this is a merge commit with PR commits, also add all the individual commits
+			if (commit.message.isMerge && commit.pr?.prCommits) {
+				for (const prCommit of commit.pr.prCommits) {
+					// Skip if this commit is already the merge commit
+					if (prCommit.info.hash !== commit.info.hash) {
+						prCommits.get(prKey)?.push(prCommit);
+					}
+				}
+			}
 		}
 
 		// Add dependency PRs last
 		for (const commit of dependencyPRs) {
 			const prKey = commit.pr?.prNumber || commit.info.hash;
 			if (!prCommits.has(prKey)) prCommits.set(prKey, []);
+
+			// Add the commit itself
 			prCommits.get(prKey)?.push(commit);
+
+			// If this is a merge commit with PR commits, also add all the individual commits
+			if (commit.message.isMerge && commit.pr?.prCommits) {
+				for (const prCommit of commit.pr.prCommits) {
+					// Skip if this commit is already the merge commit
+					if (prCommit.info.hash !== commit.info.hash) {
+						prCommits.get(prKey)?.push(prCommit);
+					}
+				}
+			}
 		}
 
 		// Process orphan commits, ensuring dependencies appear last

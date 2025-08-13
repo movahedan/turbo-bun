@@ -134,9 +134,10 @@ bun run scripts/version-prepare.ts --from v1.0.0 --to HEAD
 
 **Features:**
 - Automatic version bump detection
-- Changelog generation
+- Changelog generation with PR commit grouping 🆕
 - Commit range analysis
 - Package-specific processing
+- Proper handling of squash merges 🆕
 
 ### **version-apply.ts**
 
@@ -158,6 +159,20 @@ bun run scripts/version-apply.ts --no-push
 - Version commit creation
 - Remote tag pushing
 - Dry run support
+
+## 🔄 Complete Version Flow
+
+### 1. **Preparation Phase**
+```bash
+bun run scripts/version-prepare.ts
+```
+
+**What happens:**
+- Analyzes commit history with PR detection 🆕
+- Groups individual commits with their PRs 🆕
+- Determines version bump types
+- Generates comprehensive changelogs 🆕
+- Updates package.json versions
 
 ### **version-ci.ts**
 

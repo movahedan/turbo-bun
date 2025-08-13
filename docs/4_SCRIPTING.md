@@ -112,11 +112,13 @@ The entity system provides reusable, type-safe components for common operations:
 - Commit parsing, validation, and analysis
 - Conventional commit format support
 - PR categorization and metadata extraction
+- Enhanced PR commit detection 🆕
 
 #### `EntityChangelog`
 - Changelog generation and merging
 - Keep a Changelog format compliance
 - Version-aware content management
+- PR commit grouping and organization 🆕
 
 #### `EntityPackageJson`
 - Package.json operations and version management
@@ -147,6 +149,13 @@ The entity system provides reusable, type-safe components for common operations:
 - Stateful changelog orchestration
 - Version bump determination
 - Commit range analysis
+- Enhanced PR commit processing 🆕
+
+#### `EntityPr` 🆕
+- PR commit extraction and analysis
+- Support for both regular and squash merges
+- Individual commit grouping with PRs
+- Enhanced changelog generation
 
 ## 🔧 Script Development
 
