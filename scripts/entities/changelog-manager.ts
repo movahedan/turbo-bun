@@ -36,8 +36,11 @@ export class ChangelogManager {
 	private changelogData: ChangelogData | undefined;
 	private versionData: VersionData | undefined;
 
+	private changelog: EntityChangelog;
+
 	constructor(packageName: string) {
 		this.packageName = packageName;
+		this.changelog = new EntityChangelog(packageName);
 	}
 
 	async setRange(from: string, to?: string): Promise<void> {
@@ -51,7 +54,7 @@ export class ChangelogManager {
 		const commits = await this.getCommitsInRange();
 		const categorizedCommits = ChangelogManager.categorizeCommits(commits);
 
-		const currentVersion = await EntityPackageJson.getVersion(this.packageName);
+		const currentVersion = EntityPackageJson.getVersion(this.packageName);
 		const versionAction = await this.determineVersionAction(currentVersion, commits);
 
 		this.versionData = {
@@ -88,12 +91,9 @@ export class ChangelogManager {
 			throw new Error("Data not analyzed. Call setRange() first.");
 		}
 
-		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
-		const newChangelog = await EntityChangelog.generateContent(this.changelogData);
-		const mergedChangelog = EntityChangelog.mergeWithExisting(existingChangelog, newChangelog);
-
-		await EntityPackageJson.writeChangelog(this.packageName, mergedChangelog);
-		return mergedChangelog;
+		const newChangelog = this.changelog.generateContent(this.changelogData);
+		await EntityPackageJson.writeChangelog(this.packageName, newChangelog);
+		return newChangelog;
 	}
 
 	/**
@@ -135,27 +135,26 @@ export class ChangelogManager {
 			};
 		}
 
-		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
-		const latestChangelogVersion = EntityChangelog.getLatestVersion(existingChangelog);
+		const changelog = new EntityChangelog(this.packageName);
+		const latestChangelogVersion = changelog.getLatestVersion();
 
-		// Check if package.json is behind the changelog version
-		if (latestChangelogVersion && latestChangelogVersion !== currentVersion) {
+		// First, analyze commits to determine what bump type is needed
+		const bumpType = await this.determineBumpType(commits);
+
+		// If no bump type determined, no version change needed
+		if (!bumpType) {
 			return {
-				shouldBump: true,
-				targetVersion: latestChangelogVersion,
-				bumpType: "sync",
-				reason: `Package version ${currentVersion} is behind changelog version ${latestChangelogVersion}`,
+				shouldBump: false,
+				targetVersion: currentVersion,
+				bumpType: "none",
+				reason: "All commits already documented in changelog",
 			};
 		}
 
-		// Check if this version already exists in the changelog
-		const bumpType = this.determineBumpType(commits);
 		const nextVersion = this.calculateNextVersion(currentVersion, bumpType);
 
-		const versionAlreadyExists =
-			existingChangelog.includes(`## v${nextVersion}`) ||
-			existingChangelog.includes(`## ${nextVersion}`);
-
+		// Check if this version already exists in the changelog
+		const versionAlreadyExists = changelog.isVersionUpToDate(nextVersion);
 		if (versionAlreadyExists) {
 			return {
 				shouldBump: false,
@@ -165,24 +164,54 @@ export class ChangelogManager {
 			};
 		}
 
-		// Check if package.json version already matches the latest changelog version
-		const isVersionUpToDate = EntityChangelog.isVersionUpToDate(currentVersion, existingChangelog);
-		if (isVersionUpToDate) {
+		// Check if package.json version already matches the next version we would bump to
+		if (currentVersion === nextVersion) {
 			return {
 				shouldBump: false,
 				targetVersion: currentVersion,
 				bumpType: "none",
-				reason: "Package version already matches latest changelog version",
+				reason: `Package version ${currentVersion} already matches next version ${nextVersion}`,
 			};
 		}
 
-		// Normal version bump
+		// Check if package.json is behind the changelog version (sync case)
+		if (latestChangelogVersion && latestChangelogVersion !== currentVersion) {
+			// Only sync if the changelog version is actually newer than what we would bump to
+			if (this.isVersionNewer(latestChangelogVersion, nextVersion)) {
+				return {
+					shouldBump: true,
+					targetVersion: latestChangelogVersion,
+					bumpType: "sync",
+					reason: `Package version ${currentVersion} is behind changelog version ${latestChangelogVersion}`,
+				};
+			}
+		}
+
+		// Normal version bump - if we have commits and the next version doesn't exist, we should bump
 		return {
 			shouldBump: true,
 			targetVersion: nextVersion,
 			bumpType,
 			reason: `New ${bumpType} version bump to ${nextVersion}`,
 		};
+	}
+
+	/**
+	 * Compare two version strings to determine if the first is newer than the second
+	 */
+	private isVersionNewer(version1: string, version2: string): boolean {
+		const parseVersion = (version: string) => {
+			const match = version.match(/^v?(\d+)\.(\d+)\.(\d+)/);
+			if (!match) return [0, 0, 0];
+			return [Number.parseInt(match[1]), Number.parseInt(match[2]), Number.parseInt(match[3])];
+		};
+
+		const [major1, minor1, patch1] = parseVersion(version1);
+		const [major2, minor2, patch2] = parseVersion(version2);
+
+		if (major1 !== major2) return major1 > major2;
+		if (minor1 !== minor2) return minor1 > minor2;
+		return patch1 > patch2;
 	}
 
 	static categorizeCommits(commits: ParsedCommitData[]): ChangelogData {
@@ -204,6 +233,7 @@ export class ChangelogManager {
 			infrastructure: [],
 			documentation: [],
 			refactoring: [],
+			merge: [],
 			other: [],
 		};
 
@@ -211,8 +241,15 @@ export class ChangelogManager {
 		const orphanCommits = commits.filter((commit) => !commit.message.isMerge);
 
 		for (const commit of mergeCommits) {
-			const category = commit.pr?.prCategory || "other";
-			prCategorizedCommits[category].push(commit);
+			if (commit.pr?.prCategory) {
+				// This merge commit has a PR, categorize it by PR category
+				const category = commit.pr.prCategory;
+				prCategorizedCommits[category].push(commit);
+			} else {
+				// This merge commit has no PR, categorize it as an orphan commit
+				const category = ChangelogManager.categorizeOrphanCommit(commit);
+				orphanCategorizedCommits[category].push(commit);
+			}
 		}
 
 		for (const commit of orphanCommits) {
@@ -229,6 +266,7 @@ export class ChangelogManager {
 
 	private static categorizeOrphanCommit(commit: ParsedCommitData): string {
 		if (commit.message.isBreaking) return "breaking";
+		if (commit.message.isMerge) return "merge";
 
 		switch (commit.message.type) {
 			case "feat":
@@ -282,7 +320,21 @@ export class ChangelogManager {
 		}
 	}
 
-	private determineBumpType(commits: ParsedCommitData[]): "major" | "minor" | "patch" {
+	private async determineBumpType(
+		commits: ParsedCommitData[],
+	): Promise<"major" | "minor" | "patch" | undefined> {
+		// Check if all commits are already in the changelog
+		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
+		const allCommitsInChangelog = commits.every((commit) => {
+			const commitHash = commit.info.hash.substring(0, 7);
+			return existingChangelog.includes(commitHash);
+		});
+
+		// If all commits are already documented, no bump needed
+		if (allCommitsInChangelog) {
+			return undefined;
+		}
+
 		let hasBreaking = false;
 		let hasFeature = false;
 		for (const commit of commits) {
