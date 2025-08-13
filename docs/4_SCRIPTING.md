@@ -1,6 +1,6 @@
 # 🐚 Scripting Guide
 
-> **Advanced automation system with interactive CLI, entity-based architecture, and sophisticated script management**
+> **Comprehensive scripting system for the Monobun monorepo with Bun shell runtime and interactive CLI**
 
 ## 📋 Table of Contents
 
@@ -14,7 +14,7 @@
 
 ## 🎯 Overview
 
-The Turboobun monorepo features a sophisticated scripting system built on Bun's shell runtime that provides:
+The Monobun monorepo features a sophisticated scripting system built on Bun's shell runtime that provides:
 
 - **🎯 Interactive CLI**: Step-by-step wizards with navigation and validation
 - **🏗️ Entity Architecture**: Modular, reusable components for common operations

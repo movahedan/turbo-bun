@@ -282,19 +282,19 @@ vault write auth/oidc/role/default \
 
 ```hcl
 # policies/default.hcl
-path "secret/data/turboobun/*" {
+path "secret/data/monobun/*" {
   capabilities = ["read", "list"]
 }
 
-path "secret/data/turboobun/development/*" {
+path "secret/data/monobun/development/*" {
   capabilities = ["read", "write", "delete"]
 }
 
-path "secret/data/turboobun/staging/*" {
+path "secret/data/monobun/staging/*" {
   capabilities = ["read", "write"]
 }
 
-path "secret/data/turboobun/production/*" {
+path "secret/data/monobun/production/*" {
   capabilities = ["read"]
 }
 ```
@@ -373,7 +373,7 @@ export class VaultZitadelCore {
     }
     
     try {
-      const response = await this.vaultClient.read(`secret/data/turboobun/${environment}`);
+      const response = await this.vaultClient.read(`secret/data/monobun/${environment}`);
       return response.data.data || {};
     } catch (error) {
       console.error(`Failed to get secrets for ${environment}:`, error);
@@ -393,7 +393,7 @@ export class VaultZitadelCore {
       // Update with new variable
       const updated = { ...existing, [key]: value };
       
-      await this.vaultClient.write(`secret/data/turboobun/${environment}`, {
+      await this.vaultClient.write(`secret/data/monobun/${environment}`, {
         data: updated,
       });
       
@@ -413,7 +413,7 @@ export class VaultZitadelCore {
       const existing = await this.getEnvironmentVariables(environment);
       delete existing[key];
       
-      await this.vaultClient.write(`secret/data/turboobun/${environment}`, {
+      await this.vaultClient.write(`secret/data/monobun/${environment}`, {
         data: existing,
       });
       
@@ -858,7 +858,7 @@ export class DynamicSecrets {
   
   async generateDatabaseCredentials(environment: string): Promise<DatabaseCredentials> {
     try {
-      const response = await this.vaultClient.write('database/creds/turboobun-db', {
+      const response = await this.vaultClient.write('database/creds/monobun-db', {
         environment,
         ttl: '1h',
       });
@@ -877,7 +877,7 @@ export class DynamicSecrets {
   async generateApiKey(environment: string): Promise<string> {
     try {
       const response = await this.vaultClient.write('auth/token/create', {
-        policies: [`turboobun-${environment}-read`],
+        policies: [`monobun-${environment}-read`],
         ttl: '24h',
       });
       

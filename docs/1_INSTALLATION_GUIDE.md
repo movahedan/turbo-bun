@@ -1,6 +1,6 @@
 # 🚀 Installation Guide
 
-> **Complete step-by-step installation guide for Turboobun monorepo**
+> **Complete step-by-step installation guide for Monobun monorepo**
 
 This guide walks you through the complete installation process, from initial setup to development environment configuration and cleanup.
 
@@ -85,10 +85,10 @@ bun --version
 
 ```bash
 # Clone the repository
-git clone https://github.com/movahedan/turbo-bun.git
+git clone https://github.com/movahedan/monobun.git
 
 # Navigate to the project directory
-cd turbo-bun
+cd monobun
 
 # Verify the clone was successful
 ls -la
@@ -118,7 +118,7 @@ code .
 **Alternative Method:**
 - Open VS Code manually
 - Go to `File` → `Open Folder`
-- Select the `turbo-bun` directory
+- Select the `monobun` directory
 
 ### **1.3 Verify Bun Installation**
 
@@ -391,9 +391,9 @@ bun run dev:health
 🐳 Development Services Status
 
 Name                  Command               State           Ports
-turbo-bun-admin-1     bun run dev          Up              0.0.0.0:3001->3001/tcp
-turbo-bun-storefront  bun run dev          Up              0.0.0.0:3002->3002/tcp
-turbo-bun-api-1       bun run dev          Up              0.0.0.0:3003->3003/tcp
+monobun-admin-1     bun run dev          Up              0.0.0.0:3001->3001/tcp
+monobun-storefront  bun run dev          Up              0.0.0.0:3002->3002/tcp
+monobun-api-1       bun run dev          Up              0.0.0.0:3003->3003/tcp
 ```
 
 ### **5.3 Test Applications**
@@ -591,4 +591,4 @@ After successful installation:
 
 ---
 
-**🎉 Congratulations! You've successfully installed and configured the Turboobun monorepo development environment.** 
+**🎉 Congratulations! You've successfully installed and configured the Monobun monorepo development environment.** 

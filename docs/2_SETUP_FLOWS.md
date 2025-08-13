@@ -1,6 +1,6 @@
 # ⚡ Setup Flows
 
-> **Comprehensive setup workflows with enhanced automation, interactive CLI, and sophisticated environment management**
+> **Comprehensive setup workflows for the Monobun monorepo with enhanced automation and interactive CLI**
 
 ## 📋 Table of Contents
 
@@ -15,7 +15,7 @@
 
 ## 🎯 Overview
 
-The Turboobun monorepo provides sophisticated setup workflows built on:
+The Monobun monorepo provides sophisticated setup workflows built on:
 
 - **🎮 Interactive CLI**: Step-by-step setup wizards with validation
 - **🏗️ Entity Architecture**: Modular, reusable components for environment setup
@@ -29,8 +29,8 @@ The Turboobun monorepo provides sophisticated setup workflows built on:
 
 ```bash
 # Clone repository
-git clone https://github.com/movahedan/turbo-bun.git
-cd turbo-bun
+git clone https://github.com/movahedan/monobun.git
+cd monobun
 
 # Open in VS Code DevContainer
 # Ctrl+Shift+P → Dev Containers: Reopen in Container
@@ -49,8 +49,8 @@ bun run dev:check
 
 ```bash
 # Clone repository
-git clone https://github.com/movahedan/turbo-bun.git
-cd turbo-bun
+git clone https://github.com/movahedan/monobun.git
+cd monobun
 
 # Setup local environment
 bun run local:setup
@@ -118,8 +118,8 @@ bun --version
 
 ```bash
 # Clone repository
-git clone https://github.com/movahedan/turbo-bun.git
-cd turbo-bun
+git clone https://github.com/movahedan/monobun.git
+cd monobun
 
 # Setup local environment
 bun run local:setup
@@ -167,8 +167,8 @@ bun test
 
 ```bash
 # Clone repository
-git clone https://github.com/movahedan/turbo-bun.git
-cd turbo-bun
+git clone https://github.com/movahedan/monobun.git
+cd monobun
 
 # Open in VS Code
 code .

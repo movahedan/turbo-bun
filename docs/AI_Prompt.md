@@ -1,6 +1,6 @@
-# 🤖 AI Prompt
+# 🤖 AI Assistant Guide
 
-> **Comprehensive guide for AI assistants working with the Turboobun monorepo**
+> **Comprehensive guide for AI assistants working with the Monobun monorepo**
 
 ## 📋 Table of Contents
 
@@ -14,7 +14,7 @@
 
 ## 🎯 Overview
 
-The Turboobun monorepo is a sophisticated development environment built on modern technologies with enhanced automation and interactive CLI systems. This guide helps AI assistants understand the project structure, workflows, and best practices.
+The Monobun monorepo is a sophisticated development environment built on modern technologies with enhanced automation and interactive CLI systems. This guide helps AI assistants understand the project structure, workflows, and best practices.
 
 ### **Key Technologies**
 

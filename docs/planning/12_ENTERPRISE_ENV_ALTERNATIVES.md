@@ -44,7 +44,7 @@ export class AWSSecretsManager {
   }
   
   async getEnvironmentVariables(environment: string): Promise<Record<string, string>> {
-    const secretName = `turboobun-${environment}-env`;
+    const secretName = `monobun-${environment}-env`;
     
     try {
       const command = new GetSecretValueCommand({ SecretId: secretName });
@@ -62,7 +62,7 @@ export class AWSSecretsManager {
   }
   
   async updateEnvironmentVariables(environment: string, variables: Record<string, string>): Promise<void> {
-    const secretName = `turboobun-${environment}-env`;
+    const secretName = `monobun-${environment}-env`;
     
     try {
       await this.client.send(new UpdateSecretCommand({
@@ -151,7 +151,7 @@ export class HashiCorpVault {
   
   async getEnvironmentVariables(environment: string): Promise<Record<string, string>> {
     try {
-      const response = await this.client.read(`secret/data/turboobun/${environment}`);
+      const response = await this.client.read(`secret/data/monobun/${environment}`);
       return response.data.data;
     } catch (error) {
       console.error(`Failed to get secrets for ${environment}:`, error);
@@ -161,7 +161,7 @@ export class HashiCorpVault {
   
   async setEnvironmentVariables(environment: string, variables: Record<string, string>): Promise<void> {
     try {
-      await this.client.write(`secret/data/turboobun/${environment}`, { data: variables });
+      await this.client.write(`secret/data/monobun/${environment}`, { data: variables });
       console.log(`✅ Updated environment variables for ${environment}`);
     } catch (error) {
       console.error(`Failed to set secrets for ${environment}:`, error);
@@ -357,12 +357,12 @@ aws configure
 
 # Create secrets for each environment
 aws secretsmanager create-secret \
-  --name "turboobun-development-env" \
+  --name "monobun-development-env" \
   --description "Development environment variables" \
   --secret-string '{"DATABASE_URL":"dev-db-url","API_KEY":"dev-key"}'
 
 aws secretsmanager create-secret \
-  --name "turboobun-production-env" \
+  --name "monobun-production-env" \
   --description "Production environment variables" \
   --secret-string '{"DATABASE_URL":"prod-db-url","API_KEY":"prod-key"}'
 ```
@@ -374,11 +374,11 @@ aws secretsmanager create-secret \
 bun add @azure/identity @azure/keyvault-secrets
 
 # Create Key Vault
-az keyvault create --name "turboobun-vault" --resource-group "turboobun-rg"
+az keyvault create --name "monobun-vault" --resource-group "monobun-rg"
 
 # Create secrets
-az keyvault secret set --vault-name "turboobun-vault" --name "development-DATABASE_URL" --value "dev-db-url"
-az keyvault secret set --vault-name "turboobun-vault" --name "production-DATABASE_URL" --value "prod-db-url"
+az keyvault secret set --vault-name "monobun-vault" --name "development-DATABASE_URL" --value "dev-db-url"
+az keyvault secret set --vault-name "monobun-vault" --name "production-DATABASE_URL" --value "prod-db-url"
 ```
 
 ### 3. **HashiCorp Vault Setup**
@@ -394,8 +394,8 @@ vault server -dev
 vault secrets enable -path=secret kv
 
 # Create secrets
-vault kv put secret/turboobun/development DATABASE_URL="dev-db-url" API_KEY="dev-key"
-vault kv put secret/turboobun/production DATABASE_URL="prod-db-url" API_KEY="prod-key"
+vault kv put secret/monobun/development DATABASE_URL="dev-db-url" API_KEY="dev-key"
+vault kv put secret/monobun/production DATABASE_URL="prod-db-url" API_KEY="prod-key"
 ```
 
 ### 4. **Self-Hosted PostgreSQL Setup**

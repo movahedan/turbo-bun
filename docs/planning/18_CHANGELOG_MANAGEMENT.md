@@ -1,6 +1,6 @@
 # 📝 Changelog Management: Automated Documentation Strategy
 
-> Comprehensive changelog management system for the Turboobun monorepo with automated generation, semantic versioning, and multi-format output
+> Comprehensive changelog management system for the Monobun monorepo with automated generation, semantic versioning, and multi-format output
 
 ## 📋 Table of Contents
 
@@ -19,7 +19,7 @@
 
 ## 🎯 Overview
 
-This document outlines a comprehensive changelog management strategy for the Turboobun monorepo, focusing on automated generation, consistent formatting, and seamless integration with our existing development workflow.
+This document outlines a comprehensive changelog management strategy for the Monobun monorepo, focusing on automated generation, consistent formatting, and seamless integration with our existing development workflow.
 
 ### Key Objectives
 
@@ -27,7 +27,7 @@ This document outlines a comprehensive changelog management strategy for the Tur
 - **📦 Monorepo Support**: Per-package changelog management with workspace-wide coordination
 - **🔄 Semantic Versioning**: Tight integration with semantic versioning workflow
 - **📋 Multiple Formats**: Support for various changelog formats (Keep a Changelog, GitHub Releases, etc.)
-- **🚀 Release Integration**: Seamless integration with release management process
+- [Release Management](#-release-management)
 - **👨‍💻 Developer Experience**: Minimal manual intervention required
 
 ### Current Challenges
@@ -456,7 +456,7 @@ export class WorkspaceCoordinator {
     packageChangelogs: Map<string, string>
   ): Promise<string> {
     const workspaceTemplate = `
-# Turboobun Monorepo Changelog
+# Monobun Monorepo Changelog
 
 ## Release Summary
 
@@ -876,7 +876,7 @@ const generator = new ChangelogGenerator();
 
 program
   .name('changelog')
-  .description('Turboobun changelog management CLI')
+  .description('Monobun changelog management CLI')
   .version('1.0.0');
 
 program
@@ -915,11 +915,7 @@ program
   .action(async (options) => {
     try {
       const lastVersion = await generator.getLastVersion(options.package);
-      const changelog = await generator.generateChangelog(
-        options.package,
-        lastVersion,
-        'HEAD'
-      );
+      const changelog = await generator.generateChangelog(packageName, lastVersion, 'HEAD');
       
       console.log('📋 Preview of unreleased changes:\n');
       console.log(changelog);
@@ -1469,4 +1465,4 @@ interface TeamWorkflow {
 
 ---
 
-**Changelog Management**: This comprehensive plan provides automated changelog generation, multi-package support, and seamless integration with our existing development workflow, ensuring consistent and high-quality release documentation across the entire Turboobun monorepo.
+**Changelog Management**: This comprehensive plan provides automated changelog generation, multi-package support, and seamless integration with our existing development workflow, ensuring consistent and high-quality release documentation across the entire Monobun monorepo.

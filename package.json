@@ -75,10 +75,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/movahedan/turbo-bun"
+		"url": "https://github.com/movahedan/monobun"
 	},
-	"homepage": "https://github.com/movahedan/turbo-bun",
-	"bugs": "https://github.com/movahedan/turbo-bun/issues",
+	"homepage": "https://github.com/movahedan/monobun",
+	"bugs": "https://github.com/movahedan/monobun/issues",
 	"keywords": [
 		"turbo",
 		"bun",

@@ -1,5 +1,5 @@
 {
-	"name": "turbo-bun",
+	"name": "monobun",
 	"dockerComposeFile": ["docker-compose.dev.yml"],
 	"service": "vscode-service",
 	"workspaceFolder": "/app",
