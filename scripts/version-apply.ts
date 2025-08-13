@@ -46,6 +46,7 @@ export const versionApply = createScript(scriptConfig, async function main(args,
 		xConsole.log(colorify.gray(`  • Commit version changes for ${version}`));
 		xConsole.log(colorify.gray(`  • Create tag v${version}`));
 		if (!args["no-push"]) {
+			xConsole.log(colorify.gray("  • Push commit changes to remote"));
 			xConsole.log(colorify.gray("  • Push tag to remote"));
 		}
 		return;
@@ -53,9 +54,35 @@ export const versionApply = createScript(scriptConfig, async function main(args,
 
 	await commitVersionChanges(xConsole);
 	await createTag(version, args, xConsole);
+	await pushChanges(args, xConsole);
 
 	xConsole.log(colorify.green("✅ Version apply operation completed successfully!"));
 });
+
+async function pushChanges(
+	args: InferArgs<typeof scriptConfig>,
+	xConsole: typeof console,
+): Promise<void> {
+	if (args["no-push"]) {
+		xConsole.log(colorify.yellow("⚠️ Skipping push (--no-push specified)"));
+		return;
+	}
+
+	if (args["dry-run"]) {
+		xConsole.log(colorify.yellow("⚠️ Skipping push (--dry-run specified)"));
+		return;
+	}
+
+	try {
+		xConsole.info("📤 Pushing commit changes to remote...");
+		await $`git push --follow-tags`;
+		xConsole.log("✅ Pushed commit changes to remote");
+	} catch (error) {
+		throw new Error(
+			`Failed to push commit changes to remote: ${error instanceof Error ? error.message : String(error)}`,
+		);
+	}
+}
 
 async function createTag(
 	version: string,
@@ -73,13 +100,6 @@ async function createTag(
 		});
 
 		xConsole.log(`✅ Created tag: ${tagName}`);
-
-		if (!args["no-push"]) {
-			await EntityTag.pushVersionTag(tagName);
-			xConsole.log(`✅ Pushed tag to remote: ${tagName}`);
-		} else {
-			xConsole.log(colorify.yellow("⚠️ Skipping push (--no-push specified)"));
-		}
 	} catch (error) {
 		throw new Error(
 			`Failed to create tag ${tagName}: ${error instanceof Error ? error.message : String(error)}`,
