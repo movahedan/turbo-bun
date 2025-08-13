@@ -12,6 +12,24 @@ import {
 } from "./shell/create-scripts";
 import { InteractiveCLI } from "./shell/interactive-cli";
 
+// Shared quick actions for commit type selection
+const commitTypeQuickActions = [
+	{
+		key: "help",
+		label: "Show Help",
+		description: "Display help for this step",
+		shortcut: "h",
+		action: () => {},
+	},
+	{
+		key: "preview",
+		label: "Preview Commit",
+		description: "Show what the final commit will look like",
+		shortcut: "p",
+		action: () => {},
+	},
+];
+
 const commitConfig = {
 	name: "Commit",
 	description: "Execute git commit with the provided message",
@@ -245,43 +263,19 @@ function createPageAwareSteps(): CLIStepHandler[] {
 						const options = validTypes.map((t) => `${t.emoji} ${t.type} - ${t.description}`);
 
 						const selected = await cli.select("Choose the commit type:", options, {
-							quickActions: [
-								{
-									key: "help",
-									label: "Show Help",
-									description: "Display help for this step",
-									shortcut: "h",
-									action: () => context.renderPage("help"),
-								},
-								{
-									key: "preview",
-									label: "Preview Commit",
-									description: "Show what the final commit will look like",
-									shortcut: "p",
-									action: () => context.renderPage("preview"),
-								},
-							],
+							quickActions: commitTypeQuickActions.map((action) => ({
+								...action,
+								action:
+									action.key === "help"
+										? () => context.renderPage("help")
+										: () => context.renderPage("preview"),
+							})),
 						});
 
 						const selectedType = selected[0].split(" ")[1]; // Extract type from selected option
 						context.commitMessage = `${selectedType}: `;
 					},
-					quickActions: [
-						{
-							key: "help",
-							label: "Show Help",
-							description: "Display help for this step",
-							shortcut: "h",
-							action: () => {},
-						},
-						{
-							key: "preview",
-							label: "Preview Commit",
-							description: "Show what the final commit will look like",
-							shortcut: "p",
-							action: () => {},
-						},
-					],
+					quickActions: commitTypeQuickActions,
 				},
 				cliUtils.createHelpPage(
 					"type",
