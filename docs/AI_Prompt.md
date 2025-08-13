@@ -178,6 +178,20 @@ bun run scripts/version-prepare.ts --package root
 bun run scripts/version-apply.ts
 ```
 
+### **5. Changelog Generation** 🆕
+
+The changelog system now properly handles individual commits from PRs:
+
+```bash
+# Generate changelog for specific range
+bun run scripts/version-prepare.ts --package root --from v0.0.2 --to HEAD
+
+# Features:
+# - Automatically detects PR commits vs merge commits
+# - Groups individual commits with their PR sections
+# - Handles both regular merges and squash merges
+# - Properly categorizes commits by type (feat, fix, etc.)
+
 ## 📋 Code Standards
 
 ### **TypeScript Standards**

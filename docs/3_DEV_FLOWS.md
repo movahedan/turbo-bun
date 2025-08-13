@@ -198,7 +198,7 @@ Automatically validates changes and determines affected packages:
 Handles automated versioning and deployment:
 
 ```yaml
-- name: 🔍 Generate changelog and bump versions
+- name: �� Generate changelog and bump versions
   id: packages-to-deploy
   run: bun run version:ci
 ```
@@ -222,6 +222,21 @@ Automatically attaches service ports to GitHub Actions:
 ```bash
 # Attach service ports
 bun run scripts/ci-attach-service-ports.ts --output-id service-ports
+```
+
+### **Changelog Generation** 🆕
+
+The changelog system now provides comprehensive commit tracking:
+
+```bash
+# Generate changelog for version range
+bun run scripts/version-prepare.ts --package root --from v0.0.2 --to HEAD
+
+# Features:
+# - PR commit detection and grouping
+# - Individual commit inclusion in PR sections
+# - Proper categorization by commit type
+# - Support for both merge strategies
 ```
 
 ## 🧪 Testing & Quality
