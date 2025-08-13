@@ -27,7 +27,7 @@ export type CommitType =
 	| "chore"
 	| "deps"
 	| "revert"
-	| "Merge"
+	| "merge"
 	| "other";
 
 export type CommitMessageData =
@@ -65,6 +65,36 @@ export interface ParsedCommitData {
 	};
 }
 
+export const prCategories: Record<PRCategory, { emoji: string; label: string }> = {
+	features: {
+		emoji: "🚀",
+		label: "Feature Releases",
+	},
+	infrastructure: {
+		emoji: "🛠️",
+		label: "Infrastructure & Tooling",
+	},
+	bugfixes: {
+		emoji: "🐛",
+		label: "Bug Fixes & Improvements",
+	},
+	refactoring: {
+		emoji: "🔄",
+		label: "Code Quality & Refactoring",
+	},
+	documentation: {
+		emoji: "📚",
+		label: "Documentation",
+	},
+	dependencies: {
+		emoji: "📦",
+		label: "Dependency Updates",
+	},
+	other: {
+		emoji: "🔄",
+		label: "Other Changes",
+	},
+};
 export type PRCategory =
 	| "features"
 	| "bugfixes"
@@ -92,110 +122,140 @@ type CommitRules = Record<
 	}
 >;
 
-const validScopes = await EntityWorkspace.getAllPackages();
-const validTypes: {
+const validScopes = [...(await EntityWorkspace.getAllPackages()), "deps"];
+export const validTypes: {
 	type: CommitType;
+	label: string;
 	description: string;
 	category: PRCategory;
 	emoji: string;
+	badgeColor: string;
 	breakingAllowed: boolean;
 }[] = [
 	{
 		type: "feat",
+		label: "🚀 Features",
 		description: "A new feature",
 		category: "features",
 		emoji: "🚀",
+		badgeColor: "00D4AA",
 		breakingAllowed: true,
 	},
 	{
 		type: "fix",
+		label: "🐛 Bug Fixes",
 		description: "A bug fix",
 		category: "bugfixes",
 		emoji: "🐛",
+		badgeColor: "EF4444",
 		breakingAllowed: true,
 	},
 	{
 		type: "docs",
+		label: "📚 Documentation",
 		description: "Documentation only changes",
 		category: "documentation",
 		emoji: "📚",
+		badgeColor: "646CFF",
 		breakingAllowed: false,
 	},
 	{
 		type: "style",
+		label: "🎨 Style",
 		description: "Changes that do not affect the meaning of the code",
 		category: "refactoring",
 		emoji: "💄",
+		badgeColor: "8B5CF6",
 		breakingAllowed: false,
 	},
 	{
 		type: "refactor",
+		label: "🔄 Refactoring",
 		description: "A code change that neither fixes a bug nor adds a feature",
 		category: "refactoring",
 		emoji: "🔧",
+		badgeColor: "007ACC",
 		breakingAllowed: true,
 	},
 	{
 		type: "perf",
+		label: "⚡ Performance",
 		description: "A code change that improves performance",
 		category: "refactoring",
 		emoji: "⚡",
+		badgeColor: "60a5fa",
 		breakingAllowed: true,
 	},
 	{
 		type: "test",
+		label: "🧪 Testing",
 		description: "Adding missing tests or correcting existing tests",
 		category: "infrastructure",
 		emoji: "🧪",
+		badgeColor: "10B981",
 		breakingAllowed: false,
 	},
 	{
 		type: "build",
+		label: "📦 Build",
 		description: "Changes that affect the build system or external dependencies",
 		category: "infrastructure",
 		emoji: "📦",
+		badgeColor: "F59E0B",
 		breakingAllowed: false,
 	},
 	{
 		type: "ci",
+		label: "🚀 CI/CD",
 		description: "Changes to CI configuration files and scripts",
 		category: "infrastructure",
 		emoji: "👷",
+		badgeColor: "2496ED",
 		breakingAllowed: false,
 	},
 	{
 		type: "chore",
+		label: "🔧 Chores",
 		description: "Other changes that don't modify src or test files",
 		category: "other",
 		emoji: "🔨",
+		badgeColor: "495057",
+		breakingAllowed: false,
+	},
+	{
+		type: "revert",
+		label: "⏪ Revert",
+		description: "Reverts a previous commit",
+		category: "other",
+		emoji: "⏪",
+		badgeColor: "DC2626",
+		breakingAllowed: true,
+	},
+	{
+		type: "merge",
+		label: "🔀 Merge",
+		description: "Merge commits (pull requests, branches)",
+		category: "other",
+		emoji: "🔀",
+		badgeColor: "6B7280",
 		breakingAllowed: false,
 	},
 	{
 		type: "deps",
+		label: "📦 Dependencies",
 		description: "Dependency updates and changes",
 		category: "dependencies",
 		emoji: "📦",
+		badgeColor: "059669",
 		breakingAllowed: true,
-	},
-	{
-		type: "revert",
-		description: "Reverts a previous commit",
-		category: "other",
-		emoji: "⏪",
-		breakingAllowed: true,
-	},
-	{
-		type: "Merge",
-		description: "Merge commits (pull requests, branches)",
-		category: "other",
-		emoji: "🔀",
-		breakingAllowed: false,
 	},
 	{
 		type: "other",
+		label: "🔀 Other",
 		description: "Other types of changes",
 		category: "other",
 		emoji: "🔀",
+		badgeColor: "6B7280",
 		breakingAllowed: false,
 	},
 ];
