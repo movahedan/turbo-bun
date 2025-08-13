@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
+import { colorify } from "./shell/colorify";
+import { createScript, type ScriptConfig } from "./shell/create-scripts";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",

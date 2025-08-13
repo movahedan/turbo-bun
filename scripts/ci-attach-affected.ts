@@ -1,9 +1,6 @@
 #!/usr/bin/env bun
-import {
-	getAffectedPackages,
-	getAffectedServicesWithDependencies,
-} from "./scripting-utils/affected";
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
+import { EntityAffected } from "./entities";
+import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",
@@ -42,12 +39,12 @@ export const ciAttachAffected = createScript(
 
 		const affectedList =
 			mode === "docker"
-				? await getAffectedServicesWithDependencies("prod").then((services) =>
-						services.map((s) => s.name),
-					)
-				: await getAffectedPackages().then((packages) => packages.map((p) => `--filter=${p}`));
+				? await EntityAffected.getAffectedServices()
+				: await EntityAffected.getAffectedPackages();
 
-		const affectedServicesNames = affectedList.join(" ");
+		const affectedServicesNames = affectedList
+			.map((i) => (mode === "docker" ? (typeof i !== "string" ? i.name : i) : `--filter="${i}"`))
+			.join(" ");
 
 		// Output in GitHub Actions format
 		if (process.env.GITHUB_OUTPUT) {

@@ -1,147 +1,502 @@
-# 🏷️ Auto-Versioning System
+# 🔄 Auto Versioning
 
-> **Automated version management that respects existing changesets and creates new ones for affected packages**
+> **Modern automated versioning system for the Turboobun monorepo without changesets dependency**
 
-## 👉 Before anything!
-For regular development:
-```
-1. Create a PR 
-2. Merge the PR
-3. Trigger the `Version` workflow manually
-  3.1. [auto] Patch the root package.json separately
-  3.2. [auto] Patch all the affected package.json with changesets
-  3.3. [auto] Commit all the CHANGELOGS and package.json
-  3.4. [auto] Tag version to the commit
-  4.5. [auto] Push everything to origin
-  3.4. [auto] Attach affected packages for github actions!
-```
 
-## 🔄 Process Overview
+## 📋 Table of Contents
 
-The versioning system uses a single automated approach that:
+- [Overview](#-overview)
+- [System Architecture](#-system-architecture)
+- [Individual Scripts](#-individual-scripts)
+- [Complete Version Flow](#-complete-version-flow)
+- [Conventional Commits](#-conventional-commits)
+- [GitHub Actions Integration](#-github-actions-integration)
+- [Manual Operations](#-manual-operations)
+- [Best Practices](#-best-practices)
 
-1. **Respects existing changesets** - If users created manual changesets, they're used
-2. **Creates automatic changesets** - For affected packages without existing changesets
-3. **Runs versioning workflow** - Generates changelog, commits, and tags
+## 🎯 Overview
 
-### **Regular Development**
+The Turboobun monorepo uses a modern, automated versioning system that completely eliminates the need for changesets while providing full automation and control:
+
+### ✨ Key Features
+
+- ✅ **No Changesets Dependency** - Removed `@changesets/cli` completely
+- ✅ **Conventional Commits** - Automatically detects version bumps from commit messages
+- ✅ **Automatic Changelog Generation** - Creates beautiful Keep a Changelog format
+- ✅ **Monorepo Aware** - Handles multiple packages intelligently
+- ✅ **Git Tag Automation** - Creates and manages version tags
+- ✅ **CI/CD Integration** - Exports affected packages for deployment
+- ✅ **Dry Run Support** - Preview changes before applying
+
+### 🚀 Quick Start
+
 ```bash
-# 1. Make your changes
-# 2. Create PR and merge it
+# Complete automated versioning flow
+bun run version:commit --dry-run  # Preview changes
+bun run version:commit            # Execute full flow
+
+# Individual operations
+bun run scripts/version-prepare.ts --package root # Prepare version and changelog
+bun run scripts/version-apply.ts --no-push        # Apply changes without pushing
+bun run scripts/version-ci.ts --dry-run           # Preview complete workflow
+```
+
+## 🏗️ System Architecture
+
+Our versioning system consists of 3 main scripts with an entity-based architecture:
+
+```
+📁 scripts/
+├── version-ci.ts        # 🎯 Main orchestrator (complete CI flow)
+├── version-prepare.ts   # 🔧 Version preparation and changelog generation
+└── version-apply.ts     # 🚀 Version application and git operations
+
+📁 scripts/entities/
+├── changelog-manager.ts # 📋 Changelog generation and management
+├── package-json.ts      # 📦 Package.json operations
+├── tag.ts              # 🏷️ Git tag management
+└── workspace.ts        # 🏢 Workspace and package discovery
+```
+
+### 🔄 Flow Sequence
+
+
+<svg aria-roledescription="sequence" role="graphics-document document" viewBox="-104.5 -10 1876.5 2067" style="max-width: 1876.5px;" xmlns="http://www.w3.org/2000/svg" width="100%" id="mermaid-svg-1754745066508-bdgbx2y0h"><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="1535"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="1610"><tspan dy="0" x="1610">GitHub</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="1335"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="1410"><tspan dy="0" x="1410">version-tag.ts</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="1135"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="1210"><tspan dy="0" x="1210">version-commit.ts</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="153" stroke="#666" fill="#eaeaea" y="1981" x="932"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="1008.5"><tspan dy="0" x="1008.5">version-changelog.ts</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="732"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="807"><tspan dy="0" x="807">version-bump.ts</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="517"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="592"><tspan dy="0" x="592">version.ts</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="200"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="275"><tspan dy="0" x="275">Git Repository</tspan></text></g><g><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="1981" x="0"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="2013.5" x="75"><tspan dy="0" x="75">Developer</tspan></text></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="1610" y1="5" x1="1610" id="actor95"/><g id="root-95"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="1535"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="1610"><tspan dy="0" x="1610">GitHub</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="1410" y1="5" x1="1410" id="actor94"/><g id="root-94"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="1335"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="1410"><tspan dy="0" x="1410">version-tag.ts</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="1210" y1="5" x1="1210" id="actor93"/><g id="root-93"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="1135"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="1210"><tspan dy="0" x="1210">version-commit.ts</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="1008.5" y1="5" x1="1008.5" id="actor92"/><g id="root-92"><rect class="actor" ry="3" rx="3" height="65" width="153" stroke="#666" fill="#eaeaea" y="0" x="932"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="1008.5"><tspan dy="0" x="1008.5">version-changelog.ts</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="807" y1="5" x1="807" id="actor91"/><g id="root-91"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="732"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="807"><tspan dy="0" x="807">version-bump.ts</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="592" y1="5" x1="592" id="actor90"/><g id="root-90"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="517"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="592"><tspan dy="0" x="592">version.ts</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="275" y1="5" x1="275" id="actor89"/><g id="root-89"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="200"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="275"><tspan dy="0" x="275">Git Repository</tspan></text></g></g><g><line stroke="#999" stroke-width="0.5px" class="200" y2="1981" x2="75" y1="5" x1="75" id="actor88"/><g id="root-88"><rect class="actor" ry="3" rx="3" height="65" width="150" stroke="#666" fill="#eaeaea" y="0" x="0"/><text style="text-anchor: middle; font-size: 16px; font-weight: 400;" class="actor" alignment-baseline="central" dominant-baseline="central" y="32.5" x="75"><tspan dy="0" x="75">Developer</tspan></text></g></g><style>#mermaid-svg-1754745066508-bdgbx2y0h{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .error-icon{fill:#5a1d1d;}#mermaid-svg-1754745066508-bdgbx2y0h .error-text{fill:#f97583;stroke:#f97583;}#mermaid-svg-1754745066508-bdgbx2y0h .edge-thickness-normal{stroke-width:2px;}#mermaid-svg-1754745066508-bdgbx2y0h .edge-thickness-thick{stroke-width:3.5px;}#mermaid-svg-1754745066508-bdgbx2y0h .edge-pattern-solid{stroke-dasharray:0;}#mermaid-svg-1754745066508-bdgbx2y0h .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-svg-1754745066508-bdgbx2y0h .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-svg-1754745066508-bdgbx2y0h .marker{fill:#d1d5da;stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .marker.cross{stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-svg-1754745066508-bdgbx2y0h .actor{stroke:hsl(134.3181818182, 25.671641791%, 36.2745098039%);fill:#176f2c;}#mermaid-svg-1754745066508-bdgbx2y0h text.actor&gt;tspan{fill:#dcffe4;stroke:none;}#mermaid-svg-1754745066508-bdgbx2y0h .actor-line{stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .messageLine0{stroke-width:1.5;stroke-dasharray:none;stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .messageLine1{stroke-width:1.5;stroke-dasharray:2,2;stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h #arrowhead path{fill:#d1d5da;stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .sequenceNumber{fill:#959da5;}#mermaid-svg-1754745066508-bdgbx2y0h #sequencenumber{fill:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h #crosshead path{fill:#d1d5da;stroke:#d1d5da;}#mermaid-svg-1754745066508-bdgbx2y0h .messageText{fill:#d1d5da;stroke:none;}#mermaid-svg-1754745066508-bdgbx2y0h .labelBox{stroke:#454545;fill:#1f2428;}#mermaid-svg-1754745066508-bdgbx2y0h .labelText,#mermaid-svg-1754745066508-bdgbx2y0h .labelText&gt;tspan{fill:#d1d5da;stroke:none;}#mermaid-svg-1754745066508-bdgbx2y0h .loopText,#mermaid-svg-1754745066508-bdgbx2y0h .loopText&gt;tspan{fill:#e1e4e8;stroke:none;}#mermaid-svg-1754745066508-bdgbx2y0h .loopLine{stroke-width:2px;stroke-dasharray:2,2;stroke:#454545;fill:#454545;}#mermaid-svg-1754745066508-bdgbx2y0h .note{stroke:#454545;fill:#1f2428;}#mermaid-svg-1754745066508-bdgbx2y0h .noteText,#mermaid-svg-1754745066508-bdgbx2y0h .noteText&gt;tspan{fill:#d1d5da;stroke:none;}#mermaid-svg-1754745066508-bdgbx2y0h .activation0{fill:rgba(51, 146, 255, 0.13);stroke:#005cc5;}#mermaid-svg-1754745066508-bdgbx2y0h .activation1{fill:rgba(51, 146, 255, 0.13);stroke:#005cc5;}#mermaid-svg-1754745066508-bdgbx2y0h .activation2{fill:rgba(51, 146, 255, 0.13);stroke:#005cc5;}#mermaid-svg-1754745066508-bdgbx2y0h .actorPopupMenu{position:absolute;}#mermaid-svg-1754745066508-bdgbx2y0h .actorPopupMenuPanel{position:absolute;fill:#176f2c;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);filter:drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));}#mermaid-svg-1754745066508-bdgbx2y0h .actor-man line{stroke:hsl(134.3181818182, 25.671641791%, 36.2745098039%);fill:#176f2c;}#mermaid-svg-1754745066508-bdgbx2y0h .actor-man circle,#mermaid-svg-1754745066508-bdgbx2y0h line{stroke:hsl(134.3181818182, 25.671641791%, 36.2745098039%);fill:#176f2c;stroke-width:2px;}#mermaid-svg-1754745066508-bdgbx2y0h :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g/><defs><symbol height="24" width="24" id="computer"><path d="M2 2v13h20v-13h-20zm18 11h-16v-9h16v9zm-10.228 6l.466-1h3.524l.467 1h-4.457zm14.228 3h-24l2-6h2.104l-1.33 4h18.45l-1.297-4h2.073l2 6zm-5-10h-14v-7h14v7z" transform="scale(.5)"/></symbol></defs><defs><symbol clip-rule="evenodd" fill-rule="evenodd" id="database"><path d="M12.258.001l.256.004.255.005.253.008.251.01.249.012.247.015.246.016.242.019.241.02.239.023.236.024.233.027.231.028.229.031.225.032.223.034.22.036.217.038.214.04.211.041.208.043.205.045.201.046.198.048.194.05.191.051.187.053.183.054.18.056.175.057.172.059.168.06.163.061.16.063.155.064.15.066.074.033.073.033.071.034.07.034.069.035.068.035.067.035.066.035.064.036.064.036.062.036.06.036.06.037.058.037.058.037.055.038.055.038.053.038.052.038.051.039.05.039.048.039.047.039.045.04.044.04.043.04.041.04.04.041.039.041.037.041.036.041.034.041.033.042.032.042.03.042.029.042.027.042.026.043.024.043.023.043.021.043.02.043.018.044.017.043.015.044.013.044.012.044.011.045.009.044.007.045.006.045.004.045.002.045.001.045v17l-.001.045-.002.045-.004.045-.006.045-.007.045-.009.044-.011.045-.012.044-.013.044-.015.044-.017.043-.018.044-.02.043-.021.043-.023.043-.024.043-.026.043-.027.042-.029.042-.03.042-.032.042-.033.042-.034.041-.036.041-.037.041-.039.041-.04.041-.041.04-.043.04-.044.04-.045.04-.047.039-.048.039-.05.039-.051.039-.052.038-.053.038-.055.038-.055.038-.058.037-.058.037-.06.037-.06.036-.062.036-.064.036-.064.036-.066.035-.067.035-.068.035-.069.035-.07.034-.071.034-.073.033-.074.033-.15.066-.155.064-.16.063-.163.061-.168.06-.172.059-.175.057-.18.056-.183.054-.187.053-.191.051-.194.05-.198.048-.201.046-.205.045-.208.043-.211.041-.214.04-.217.038-.22.036-.223.034-.225.032-.229.031-.231.028-.233.027-.236.024-.239.023-.241.02-.242.019-.246.016-.247.015-.249.012-.251.01-.253.008-.255.005-.256.004-.258.001-.258-.001-.256-.004-.255-.005-.253-.008-.251-.01-.249-.012-.247-.015-.245-.016-.243-.019-.241-.02-.238-.023-.236-.024-.234-.027-.231-.028-.228-.031-.226-.032-.223-.034-.22-.036-.217-.038-.214-.04-.211-.041-.208-.043-.204-.045-.201-.046-.198-.048-.195-.05-.19-.051-.187-.053-.184-.054-.179-.056-.176-.057-.172-.059-.167-.06-.164-.061-.159-.063-.155-.064-.151-.066-.074-.033-.072-.033-.072-.034-.07-.034-.069-.035-.068-.035-.067-.035-.066-.035-.064-.036-.063-.036-.062-.036-.061-.036-.06-.037-.058-.037-.057-.037-.056-.038-.055-.038-.053-.038-.052-.038-.051-.039-.049-.039-.049-.039-.046-.039-.046-.04-.044-.04-.043-.04-.041-.04-.04-.041-.039-.041-.037-.041-.036-.041-.034-.041-.033-.042-.032-.042-.03-.042-.029-.042-.027-.042-.026-.043-.024-.043-.023-.043-.021-.043-.02-.043-.018-.044-.017-.043-.015-.044-.013-.044-.012-.044-.011-.045-.009-.044-.007-.045-.006-.045-.004-.045-.002-.045-.001-.045v-17l.001-.045.002-.045.004-.045.006-.045.007-.045.009-.044.011-.045.012-.044.013-.044.015-.044.017-.043.018-.044.02-.043.021-.043.023-.043.024-.043.026-.043.027-.042.029-.042.03-.042.032-.042.033-.042.034-.041.036-.041.037-.041.039-.041.04-.041.041-.04.043-.04.044-.04.046-.04.046-.039.049-.039.049-.039.051-.039.052-.038.053-.038.055-.038.056-.038.057-.037.058-.037.06-.037.061-.036.062-.036.063-.036.064-.036.066-.035.067-.035.068-.035.069-.035.07-.034.072-.034.072-.033.074-.033.151-.066.155-.064.159-.063.164-.061.167-.06.172-.059.176-.057.179-.056.184-.054.187-.053.19-.051.195-.05.198-.048.201-.046.204-.045.208-.043.211-.041.214-.04.217-.038.22-.036.223-.034.226-.032.228-.031.231-.028.234-.027.236-.024.238-.023.241-.02.243-.019.245-.016.247-.015.249-.012.251-.01.253-.008.255-.005.256-.004.258-.001.258.001zm-9.258 20.499v.01l.001.021.003.021.004.022.005.021.006.022.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.023.018.024.019.024.021.024.022.025.023.024.024.025.052.049.056.05.061.051.066.051.07.051.075.051.079.052.084.052.088.052.092.052.097.052.102.051.105.052.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.048.144.049.147.047.152.047.155.047.16.045.163.045.167.043.171.043.176.041.178.041.183.039.187.039.19.037.194.035.197.035.202.033.204.031.209.03.212.029.216.027.219.025.222.024.226.021.23.02.233.018.236.016.24.015.243.012.246.01.249.008.253.005.256.004.259.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.021.224-.024.22-.026.216-.027.212-.028.21-.031.205-.031.202-.034.198-.034.194-.036.191-.037.187-.039.183-.04.179-.04.175-.042.172-.043.168-.044.163-.045.16-.046.155-.046.152-.047.148-.048.143-.049.139-.049.136-.05.131-.05.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.053.083-.051.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.05.023-.024.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.023.01-.022.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.127l-.077.055-.08.053-.083.054-.085.053-.087.052-.09.052-.093.051-.095.05-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.045-.118.044-.12.043-.122.042-.124.042-.126.041-.128.04-.13.04-.132.038-.134.038-.135.037-.138.037-.139.035-.142.035-.143.034-.144.033-.147.032-.148.031-.15.03-.151.03-.153.029-.154.027-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.01-.179.008-.179.008-.181.006-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.006-.179-.008-.179-.008-.178-.01-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.027-.153-.029-.151-.03-.15-.03-.148-.031-.146-.032-.145-.033-.143-.034-.141-.035-.14-.035-.137-.037-.136-.037-.134-.038-.132-.038-.13-.04-.128-.04-.126-.041-.124-.042-.122-.042-.12-.044-.117-.043-.116-.045-.113-.045-.112-.046-.109-.047-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.05-.093-.052-.09-.051-.087-.052-.085-.053-.083-.054-.08-.054-.077-.054v4.127zm0-5.654v.011l.001.021.003.021.004.021.005.022.006.022.007.022.009.022.01.022.011.023.012.023.013.023.015.024.016.023.017.024.018.024.019.024.021.024.022.024.023.025.024.024.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.052.11.051.114.051.119.052.123.05.127.051.131.05.135.049.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.044.171.042.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.022.23.02.233.018.236.016.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.012.241-.015.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.048.139-.05.136-.049.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.051.051-.049.023-.025.023-.024.021-.025.02-.024.019-.024.018-.024.017-.024.015-.023.014-.023.013-.024.012-.022.01-.023.01-.023.008-.022.006-.022.006-.022.004-.021.004-.022.001-.021.001-.021v-4.139l-.077.054-.08.054-.083.054-.085.052-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.044-.118.044-.12.044-.122.042-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.035-.143.033-.144.033-.147.033-.148.031-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.009-.179.009-.179.007-.181.007-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.007-.179-.007-.179-.009-.178-.009-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.031-.146-.033-.145-.033-.143-.033-.141-.035-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.04-.126-.041-.124-.042-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.051-.093-.051-.09-.051-.087-.053-.085-.052-.083-.054-.08-.054-.077-.054v4.139zm0-5.666v.011l.001.02.003.022.004.021.005.022.006.021.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.024.018.023.019.024.021.025.022.024.023.024.024.025.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.051.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.043.171.043.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.021.23.02.233.018.236.017.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.013.241-.014.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.049.139-.049.136-.049.131-.051.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.049.023-.025.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.022.01-.023.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.153l-.077.054-.08.054-.083.053-.085.053-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.048-.105.048-.106.048-.109.046-.111.046-.114.046-.115.044-.118.044-.12.043-.122.043-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.034-.143.034-.144.033-.147.032-.148.032-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.024-.161.024-.162.023-.163.023-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.01-.178.01-.179.009-.179.007-.181.006-.182.006-.182.004-.184.003-.184.001-.185.001-.185-.001-.184-.001-.184-.003-.182-.004-.182-.006-.181-.006-.179-.007-.179-.009-.178-.01-.176-.01-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.023-.162-.023-.161-.024-.159-.024-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.032-.146-.032-.145-.033-.143-.034-.141-.034-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.041-.126-.041-.124-.041-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.048-.105-.048-.102-.048-.1-.05-.097-.049-.095-.051-.093-.051-.09-.052-.087-.052-.085-.053-.083-.053-.08-.054-.077-.054v4.153zm8.74-8.179l-.257.004-.254.005-.25.008-.247.011-.244.012-.241.014-.237.016-.233.018-.231.021-.226.022-.224.023-.22.026-.216.027-.212.028-.21.031-.205.032-.202.033-.198.034-.194.036-.191.038-.187.038-.183.04-.179.041-.175.042-.172.043-.168.043-.163.045-.16.046-.155.046-.152.048-.148.048-.143.048-.139.049-.136.05-.131.05-.126.051-.123.051-.118.051-.114.052-.11.052-.106.052-.101.052-.096.052-.092.052-.088.052-.083.052-.079.052-.074.051-.07.052-.065.051-.06.05-.056.05-.051.05-.023.025-.023.024-.021.024-.02.025-.019.024-.018.024-.017.023-.015.024-.014.023-.013.023-.012.023-.01.023-.01.022-.008.022-.006.023-.006.021-.004.022-.004.021-.001.021-.001.021.001.021.001.021.004.021.004.022.006.021.006.023.008.022.01.022.01.023.012.023.013.023.014.023.015.024.017.023.018.024.019.024.02.025.021.024.023.024.023.025.051.05.056.05.06.05.065.051.07.052.074.051.079.052.083.052.088.052.092.052.096.052.101.052.106.052.11.052.114.052.118.051.123.051.126.051.131.05.136.05.139.049.143.048.148.048.152.048.155.046.16.046.163.045.168.043.172.043.175.042.179.041.183.04.187.038.191.038.194.036.198.034.202.033.205.032.21.031.212.028.216.027.22.026.224.023.226.022.231.021.233.018.237.016.241.014.244.012.247.011.25.008.254.005.257.004.26.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.022.224-.023.22-.026.216-.027.212-.028.21-.031.205-.032.202-.033.198-.034.194-.036.191-.038.187-.038.183-.04.179-.041.175-.042.172-.043.168-.043.163-.045.16-.046.155-.046.152-.048.148-.048.143-.048.139-.049.136-.05.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.05.051-.05.023-.025.023-.024.021-.024.02-.025.019-.024.018-.024.017-.023.015-.024.014-.023.013-.023.012-.023.01-.023.01-.022.008-.022.006-.023.006-.021.004-.022.004-.021.001-.021.001-.021-.001-.021-.001-.021-.004-.021-.004-.022-.006-.021-.006-.023-.008-.022-.01-.022-.01-.023-.012-.023-.013-.023-.014-.023-.015-.024-.017-.023-.018-.024-.019-.024-.02-.025-.021-.024-.023-.024-.023-.025-.051-.05-.056-.05-.06-.05-.065-.051-.07-.052-.074-.051-.079-.052-.083-.052-.088-.052-.092-.052-.096-.052-.101-.052-.106-.052-.11-.052-.114-.052-.118-.051-.123-.051-.126-.051-.131-.05-.136-.05-.139-.049-.143-.048-.148-.048-.152-.048-.155-.046-.16-.046-.163-.045-.168-.043-.172-.043-.175-.042-.179-.041-.183-.04-.187-.038-.191-.038-.194-.036-.198-.034-.202-.033-.205-.032-.21-.031-.212-.028-.216-.027-.22-.026-.224-.023-.226-.022-.231-.021-.233-.018-.237-.016-.241-.014-.244-.012-.247-.011-.25-.008-.254-.005-.257-.004-.26-.001-.26.001z" transform="scale(.5)"/></symbol></defs><defs><symbol height="24" width="24" id="clock"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.848 12.459c.202.038.202.333.001.372-1.907.361-6.045 1.111-6.547 1.111-.719 0-1.301-.582-1.301-1.301 0-.512.77-5.447 1.125-7.445.034-.192.312-.181.343.014l.985 6.238 5.394 1.011z" transform="scale(.5)"/></symbol></defs><defs><marker orient="auto" markerHeight="12" markerWidth="12" markerUnits="userSpaceOnUse" refY="5" refX="7.9" id="arrowhead"><path d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><defs><marker refY="4.5" refX="4" orient="auto" markerHeight="8" markerWidth="15" id="crosshead"><path style="stroke-dasharray: 0, 0;" d="M 1,2 L 6,7 M 6,2 L 1,7" stroke-width="1pt" stroke="#000000" fill="none"/></marker></defs><defs><marker orient="auto" markerHeight="28" markerWidth="20" refY="7" refX="15.5" id="filled-head"><path d="M 18,7 L9,13 L14,7 L9,1 Z"/></marker></defs><defs><marker orient="auto" markerHeight="40" markerWidth="60" refY="15" refX="15" id="sequencenumber"><circle r="6" cy="15" cx="15"/></marker></defs><g><rect class="note" ry="0" rx="0" height="39" width="246" stroke="#666" fill="#EDF2AE" y="336" x="469"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="341" x="592"><tspan x="592">Set up git user.name and user.email</tspan></text></g><g><rect class="note" ry="0" rx="0" height="39" width="151" stroke="#666" fill="#EDF2AE" y="800" x="731.5"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="805" x="807"><tspan x="807">✅ Versions bumped</tspan></text></g><g><rect class="note" ry="0" rx="0" height="57" width="210" stroke="#666" fill="#EDF2AE" y="1071" x="903.5"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1076" x="1009"><tspan x="1009">Group by categories</tspan></text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1095" x="1009"><tspan x="1009">(Breaking/Features/Fixes/etc)</tspan></text></g><g><rect class="note" ry="0" rx="0" height="39" width="182" stroke="#666" fill="#EDF2AE" y="1294" x="917.5"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1299" x="1009"><tspan x="1009">✅ Changelogs generated</tspan></text></g><g><rect class="note" ry="0" rx="0" height="39" width="168" stroke="#666" fill="#EDF2AE" y="1487" x="191"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1492" x="275"><tspan x="275">✅ Changes committed</tspan></text></g><g><rect class="note" ry="0" rx="0" height="39" width="150" stroke="#666" fill="#EDF2AE" y="1632" x="200"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1637" x="275"><tspan x="275">✅ Tag created</tspan></text></g><g><rect class="note" ry="0" rx="0" height="39" width="224" stroke="#666" fill="#EDF2AE" y="1855" x="1498"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="noteText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1860" x="1610"><tspan x="1610">For CI/CD deployment pipeline</tspan></text></g><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="80" x="76">Make commits with conventional format</text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="99" x="76">(feat: add new feature</text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="117" x="76">fix: resolve bug</text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="136" x="76">BREAKING CHANGE: major update)</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 76,170 C 136,160 136,200 76,190"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="215" x="332">Run bun run scripts/version-commit.ts</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="248" x2="588" y1="248" x1="76"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="263" x="593">Configure Git authentication</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 593,296 C 653,286 653,326 593,316"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="390" x="435">Get affected packages from Turborepo</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="423" x2="279" y1="423" x1="591"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="438" x="432">Returns affected package list</text><line style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine1" y2="471" x2="588" y1="471" x1="276"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="486" x="698">Step 1: Bump versions</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="519" x2="803" y1="519" x1="593"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="534" x="543">Parse commit history</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="567" x2="279" y1="567" x1="806"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="582" x="540">Returns commits since last version</text><line style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine1" y2="615" x2="803" y1="615" x1="276"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="630" x="808">Detect version bump type</text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="649" x="808">(major/minor/patch)</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 808,682 C 868,672 868,712 808,702"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="727" x="808">Update package.json files</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 808,760 C 868,750 868,790 808,780"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="854" x="799">Step 2: Generate changelogs</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="887" x2="1004.5" y1="887" x1="593"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="902" x="643">Get commits for each package</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="935" x2="279" y1="935" x1="1007.5"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="950" x="640">Returns commit history</text><line style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine1" y2="983" x2="1004.5" y1="983" x1="276"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="998" x="1010">Parse conventional commits</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 1009.5,1031 C 1069.5,1021 1069.5,1061 1009.5,1051"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1143" x="1010">Generate Keep a Changelog format</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 1009.5,1176 C 1069.5,1166 1069.5,1206 1009.5,1196"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1221" x="1010">Write CHANGELOG.md files</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 1009.5,1254 C 1069.5,1244 1069.5,1284 1009.5,1274"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1348" x="900">Step 3: Commit changes</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1381" x2="1206" y1="1381" x1="593"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1396" x="744">git add .</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1429" x2="279" y1="1429" x1="1209"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1444" x="744">git commit -m "chore: release vX.Y.Z"</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1477" x2="279" y1="1477" x1="1209"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1541" x="1000">Step 4: Create version tag</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1574" x2="1406" y1="1574" x1="593"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1589" x="844">git tag -a vX.Y.Z -m "Release vX.Y.Z"</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1622" x2="279" y1="1622" x1="1409"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1686" x="435">Step 5: Push changes</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1719" x2="279" y1="1719" x1="591"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1734" x="276">Push commits and tags</text><path style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" d="M 276,1767 C 336,1757 336,1797 276,1787"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1812" x="1100">Step 6: Export affected packages</text><line style="fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine0" y2="1845" x2="1606" y1="1845" x1="593"/><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1909" x="335">✨ Version flow completed!</text><text style="font-size: 16px; font-weight: 400;" dy="1em" class="messageText" alignment-baseline="middle" dominant-baseline="middle" text-anchor="middle" y="1928" x="335">Summary with new versions and affected packages</text><line style="stroke-dasharray: 3, 3; fill: none;" marker-end="url(#arrowhead)" stroke="none" stroke-width="2" class="messageLine1" y2="1961" x2="79" y1="1961" x1="591"/></svg>
+
+1. **Analyze** → Detect affected packages (Turborepo)
+2. **Bump** → Update versions based on commit types
+3. **Generate** → Create changelogs from git history
+4. **Commit** → Stage and commit all changes
+5. **Tag** → Create annotated git tags
+6. **Push** → Push commits and tags to remote
+7. **Export** → Output affected packages for CI/CD
+
+## 📜 Individual Scripts
+
+### 🔧 version-prepare.ts
+
+Prepares version bumps and generates changelogs based on conventional commits:
+
+```bash
+# Prepare version for root package
+bun run scripts/version-prepare.ts
+
+# Prepare specific package
+bun run scripts/version-prepare.ts --package admin
+
+# Custom version range
+bun run scripts/version-prepare.ts --from v1.0.0 --to HEAD
+
+# Preview changes
+bun run scripts/version-prepare.ts --dry-run
+```
+
+**Version Detection Logic:**
+- `feat:` commits → **minor** version bump
+- `fix:` commits → **patch** version bump  
+- `BREAKING CHANGE:` → **major** version bump
+- Other commits → **patch** version bump
+
+### 🚀 version-apply.ts
+
+<svg aria-roledescription="flowchart-v2" role="graphics-document document" viewBox="-8 -8 1170.642578125 3726.453125" style="max-width: 1170.642578125px;" xmlns="http://www.w3.org/2000/svg" width="100%" id="mermaid-svg-1754745327228-4p8io3lmm"><style>#mermaid-svg-1754745327228-4p8io3lmm{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm .error-icon{fill:#5a1d1d;}#mermaid-svg-1754745327228-4p8io3lmm .error-text{fill:#f97583;stroke:#f97583;}#mermaid-svg-1754745327228-4p8io3lmm .edge-thickness-normal{stroke-width:2px;}#mermaid-svg-1754745327228-4p8io3lmm .edge-thickness-thick{stroke-width:3.5px;}#mermaid-svg-1754745327228-4p8io3lmm .edge-pattern-solid{stroke-dasharray:0;}#mermaid-svg-1754745327228-4p8io3lmm .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-svg-1754745327228-4p8io3lmm .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-svg-1754745327228-4p8io3lmm .marker{fill:#d1d5da;stroke:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm .marker.cross{stroke:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-svg-1754745327228-4p8io3lmm .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm .cluster-label text{fill:#e1e4e8;}#mermaid-svg-1754745327228-4p8io3lmm .cluster-label span,#mermaid-svg-1754745327228-4p8io3lmm p{color:#e1e4e8;}#mermaid-svg-1754745327228-4p8io3lmm .label text,#mermaid-svg-1754745327228-4p8io3lmm span,#mermaid-svg-1754745327228-4p8io3lmm p{fill:#d1d5da;color:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm .node rect,#mermaid-svg-1754745327228-4p8io3lmm .node circle,#mermaid-svg-1754745327228-4p8io3lmm .node ellipse,#mermaid-svg-1754745327228-4p8io3lmm .node polygon,#mermaid-svg-1754745327228-4p8io3lmm .node path{fill:#24292e;stroke:#1b1f23;stroke-width:1px;}#mermaid-svg-1754745327228-4p8io3lmm .flowchart-label text{text-anchor:middle;}#mermaid-svg-1754745327228-4p8io3lmm .node .label{text-align:center;}#mermaid-svg-1754745327228-4p8io3lmm .node.clickable{cursor:pointer;}#mermaid-svg-1754745327228-4p8io3lmm .arrowheadPath{fill:#dbd6d1;}#mermaid-svg-1754745327228-4p8io3lmm .edgePath .path{stroke:#d1d5da;stroke-width:2.0px;}#mermaid-svg-1754745327228-4p8io3lmm .flowchart-link{stroke:#d1d5da;fill:none;}#mermaid-svg-1754745327228-4p8io3lmm .edgeLabel{background-color:#24292e99;text-align:center;}#mermaid-svg-1754745327228-4p8io3lmm .edgeLabel rect{opacity:0.5;background-color:#24292e99;fill:#24292e99;}#mermaid-svg-1754745327228-4p8io3lmm .labelBkg{background-color:rgba(36, 41, 46, 0.5);}#mermaid-svg-1754745327228-4p8io3lmm .cluster rect{fill:rgba(51, 146, 255, 0.13);stroke:#005cc5;stroke-width:1px;}#mermaid-svg-1754745327228-4p8io3lmm .cluster text{fill:#e1e4e8;}#mermaid-svg-1754745327228-4p8io3lmm .cluster span,#mermaid-svg-1754745327228-4p8io3lmm p{color:#e1e4e8;}#mermaid-svg-1754745327228-4p8io3lmm div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:#044289;border:1px solid #005cc5;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-svg-1754745327228-4p8io3lmm .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#d1d5da;}#mermaid-svg-1754745327228-4p8io3lmm :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker orient="auto" markerHeight="12" markerWidth="12" markerUnits="userSpaceOnUse" refY="5" refX="6" viewBox="0 0 10 10" class="marker flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"/></marker><marker orient="auto" markerHeight="12" markerWidth="12" markerUnits="userSpaceOnUse" refY="5" refX="4.5" viewBox="0 0 10 10" class="marker flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"/></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="11" viewBox="0 0 10 10" class="marker flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"/></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5" refX="-1" viewBox="0 0 10 10" class="marker flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"/></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="12" viewBox="0 0 11 11" class="marker cross flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"/></marker><marker orient="auto" markerHeight="11" markerWidth="11" markerUnits="userSpaceOnUse" refY="5.2" refX="-1" viewBox="0 0 11 11" class="marker cross flowchart" id="mermaid-svg-1754745327228-4p8io3lmm_flowchart-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-Start LE-GetCommits" id="L-Start-GetCommits-0" d="M324.945,33.5L324.945,37.667C324.945,41.833,324.945,50.167,324.945,57.617C324.945,65.067,324.945,71.633,324.945,74.917L324.945,78.2"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GetCommits LE-ParseCommits" id="L-GetCommits-ParseCommits-0" d="M324.945,135.5L324.945,139.667C324.945,143.833,324.945,152.167,325.011,159.7C325.077,167.234,325.209,173.967,325.275,177.334L325.341,180.701"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-ParseCommits LE-IsMerge" id="L-ParseCommits-IsMerge-0" d="M290.968,335.436L284.938,345.266C278.909,355.096,266.85,374.755,260.886,387.951C254.923,401.148,255.055,407.881,255.121,411.248L255.187,414.615"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-IsMerge LE-ExtractPR" id="L-IsMerge-ExtractPR-0" d="M324.19,524.921L389.713,542.03C455.235,559.138,586.281,593.354,651.803,615.287C717.326,637.22,717.326,646.87,717.326,651.695L717.326,656.52"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-ExtractPR LE-GetPRCommits" id="L-ExtractPR-GetPRCommits-0" d="M717.326,713.82L717.326,717.987C717.326,722.154,717.326,730.487,717.326,750.434C717.326,770.382,717.326,801.943,717.326,817.724L717.326,833.505"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GetPRCommits LE-CategorizePR" id="L-GetPRCommits-CategorizePR-0" d="M704.523,890.805L695.557,909.01C686.592,927.216,668.661,963.628,659.696,988.2C650.73,1012.772,650.73,1025.506,650.73,1031.872L650.73,1038.239"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GetPRCommits LE-GetPRStats" id="L-GetPRCommits-GetPRStats-0" d="M764.748,890.805L797.953,909.01C831.159,927.216,897.57,963.628,930.775,991.908C963.98,1020.189,963.98,1040.339,963.98,1050.414L963.98,1060.489"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-IsMerge LE-ParseConventional" id="L-IsMerge-ParseConventional-0" d="M217.567,556.096L208.291,568.008C199.015,579.921,180.464,603.746,171.188,620.483C161.912,637.22,161.912,646.87,161.912,651.695L161.912,656.52"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-ParseConventional LE-DetectBreaking" id="L-ParseConventional-DetectBreaking-0" d="M161.912,713.82L161.912,717.987C161.912,722.154,161.912,730.487,161.978,738.02C162.044,745.554,162.176,752.288,162.242,755.654L162.308,759.021"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-DetectBreaking LE-MarkBreaking" id="L-DetectBreaking-MarkBreaking-0" d="M129.091,932.968L123.462,944.147C117.833,955.325,106.575,977.682,100.946,1000.477C95.316,1023.272,95.316,1046.506,95.316,1058.122L95.316,1069.739"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-DetectBreaking LE-CategorizeCommit" id="L-DetectBreaking-CategorizeCommit-0" d="M220.047,908.654L240.324,923.885C260.602,939.116,301.156,969.577,321.434,989.633C341.711,1009.689,341.711,1019.339,341.711,1024.164L341.711,1028.989"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-MarkBreaking LE-CreateEntry" id="L-MarkBreaking-CreateEntry-0" d="M95.316,1108.539L95.316,1119.497C95.316,1130.456,95.316,1152.372,116.014,1167.33C136.711,1182.287,178.105,1190.285,198.802,1194.285L219.5,1198.284"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CategorizeCommit LE-CreateEntry" id="L-CategorizeCommit-CreateEntry-0" d="M341.711,1149.289L341.711,1153.456C341.711,1157.622,341.711,1165.956,339.204,1173.574C336.697,1181.193,331.684,1188.097,329.177,1191.549L326.67,1195.001"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CategorizePR LE-CreateEntry" id="L-CategorizePR-CreateEntry-0" d="M650.73,1140.039L650.73,1145.747C650.73,1151.456,650.73,1162.872,609.979,1173.595C569.227,1184.317,487.723,1194.344,446.971,1199.358L406.219,1204.372"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GetPRStats LE-CreateEntry" id="L-GetPRStats-CreateEntry-0" d="M963.98,1117.789L963.98,1127.206C963.98,1136.622,963.98,1155.456,871.025,1170.819C778.07,1186.183,592.159,1198.077,499.204,1204.024L406.248,1209.971"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CreateEntry LE-AllParsed" id="L-CreateEntry-AllParsed-0" d="M311.393,1232.789L311.393,1236.956C311.393,1241.122,311.393,1249.456,317.486,1262.325C323.579,1275.193,335.766,1292.598,341.859,1301.3L347.953,1310.002"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-AllParsed LE-ParseCommits" id="L-AllParsed-ParseCommits-0" d="M448.389,1349.631L557.706,1334.324C667.022,1319.017,885.656,1288.403,994.972,1266.138C1104.289,1243.872,1104.289,1229.956,1104.289,1216.039C1104.289,1202.122,1104.289,1188.206,1104.289,1167.497C1104.289,1146.789,1104.289,1119.289,1104.289,1090.247C1104.289,1061.206,1104.289,1030.622,1104.289,992.792C1104.289,954.961,1104.289,909.883,1104.289,866.346C1104.289,822.81,1104.289,780.815,1104.289,751.318C1104.289,721.82,1104.289,704.82,1104.289,686.279C1104.289,667.737,1104.289,647.654,1104.289,617.411C1104.289,587.169,1104.289,546.768,1104.289,507.909C1104.289,469.049,1104.289,431.732,988.682,395.794C873.074,359.856,641.86,325.298,526.252,308.019L410.645,290.74"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-AllParsed LE-SeparateCommits" id="L-AllParsed-SeparateCommits-0" d="M382.047,1434.438L381.964,1440.063C381.88,1445.688,381.714,1456.938,381.63,1467.388C381.547,1477.837,381.547,1487.488,381.547,1492.313L381.547,1497.138"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-SeparateCommits LE-FilterOrphans" id="L-SeparateCommits-FilterOrphans-0" d="M381.547,1554.438L381.547,1558.604C381.547,1562.771,381.547,1571.104,381.547,1578.554C381.547,1586.004,381.547,1592.571,381.547,1595.854L381.547,1599.138"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-FilterOrphans LE-GroupByCategory" id="L-FilterOrphans-GroupByCategory-0" d="M381.547,1656.438L381.547,1660.604C381.547,1664.771,381.547,1673.104,381.547,1680.554C381.547,1688.004,381.547,1694.571,381.547,1697.854L381.547,1701.138"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GroupByCategory LE-GenerateHeader" id="L-GroupByCategory-GenerateHeader-0" d="M381.547,1739.938L381.547,1744.104C381.547,1748.271,381.547,1756.604,381.547,1764.054C381.547,1771.504,381.547,1778.071,381.547,1781.354L381.547,1784.638"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GenerateHeader LE-GeneratePRSections" id="L-GenerateHeader-GeneratePRSections-0" d="M381.547,1841.938L381.547,1846.104C381.547,1850.271,381.547,1858.604,381.547,1866.054C381.547,1873.504,381.547,1880.071,381.547,1883.354L381.547,1886.638"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GeneratePRSections LE-PRLoop" id="L-GeneratePRSections-PRLoop-0" d="M381.547,1925.438L381.547,1929.604C381.547,1933.771,381.547,1942.104,381.613,1949.638C381.679,1957.171,381.811,1963.905,381.877,1967.272L381.943,1970.639"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-PRLoop LE-CreatePREntry" id="L-PRLoop-CreatePREntry-0" d="M340.994,2135.205L332.193,2147.672C323.393,2160.139,305.792,2185.073,296.992,2202.366C288.191,2219.658,288.191,2229.308,288.191,2234.133L288.191,2238.958"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CreatePREntry LE-FormatPRBadges" id="L-CreatePREntry-FormatPRBadges-0" d="M288.191,2340.758L288.191,2344.924C288.191,2349.091,288.191,2357.424,288.191,2376.141C288.191,2394.857,288.191,2423.956,288.191,2438.506L288.191,2453.055"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-FormatPRBadges LE-AddCommitBadges" id="L-FormatPRBadges-AddCommitBadges-0" d="M288.191,2554.855L288.191,2571.83C288.191,2588.805,288.191,2622.754,298.185,2648.56C308.179,2674.367,328.167,2692.03,338.16,2700.862L348.154,2709.693"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-AddCommitBadges LE-PRLoop" id="L-AddCommitBadges-PRLoop-0" d="M394.101,2713.203L398.648,2703.786C403.195,2694.37,412.289,2675.536,416.836,2641.104C421.383,2606.671,421.383,2556.638,421.383,2508.147C421.383,2459.656,421.383,2412.707,421.383,2377.024C421.383,2341.341,421.383,2316.924,421.383,2290.966C421.383,2265.008,421.383,2237.508,418.889,2215.165C416.396,2192.822,411.409,2175.636,408.916,2167.042L406.422,2158.449"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-PRLoop LE-GenerateOrphanSections" id="L-PRLoop-GenerateOrphanSections-0" d="M455.138,2103.167L503.361,2120.974C551.585,2138.78,648.032,2174.394,696.255,2202.276C744.479,2230.158,744.479,2250.308,744.479,2260.383L744.479,2270.458"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GenerateOrphanSections LE-OrphanLoop" id="L-GenerateOrphanSections-OrphanLoop-0" d="M744.479,2309.258L744.479,2318.674C744.479,2328.091,744.479,2346.924,744.545,2359.708C744.611,2372.491,744.743,2379.225,744.809,2382.592L744.875,2385.959"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-OrphanLoop LE-CreateCollapsible" id="L-OrphanLoop-CreateCollapsible-0" d="M704.134,2582.108L697.234,2594.541C690.335,2606.973,676.537,2631.838,669.637,2649.096C662.738,2666.353,662.738,2676.003,662.738,2680.828L662.738,2685.653"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CreateCollapsible LE-FormatOrphanEntry" id="L-CreateCollapsible-FormatOrphanEntry-0" d="M662.738,2787.453L662.738,2791.62C662.738,2795.786,662.738,2804.12,662.738,2813.111C662.738,2822.103,662.738,2831.753,662.738,2836.578L662.738,2841.403"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-FormatOrphanEntry LE-GetAuthorEmail" id="L-FormatOrphanEntry-GetAuthorEmail-0" d="M662.738,2898.703L662.738,2904.411C662.738,2910.12,662.738,2921.536,662.738,2932.278C662.738,2943.02,662.738,2953.086,662.738,2958.12L662.738,2963.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GetAuthorEmail LE-FormatAuthorInfo" id="L-GetAuthorEmail-FormatAuthorInfo-0" d="M662.738,3001.953L662.738,3007.87C662.738,3013.786,662.738,3025.62,671.138,3036.777C679.537,3047.935,696.337,3058.416,704.736,3063.657L713.136,3068.898"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-FormatAuthorInfo LE-OrphanLoop" id="L-FormatAuthorInfo-OrphanLoop-0" d="M771.325,3071.703L780.474,3065.995C789.623,3060.286,807.921,3048.87,817.07,3034.453C826.219,3020.036,826.219,3002.62,826.219,2985.203C826.219,2967.786,826.219,2950.37,826.219,2931.62C826.219,2912.87,826.219,2892.786,826.219,2872.703C826.219,2852.62,826.219,2832.536,826.219,2810.286C826.219,2788.036,826.219,2763.62,826.219,2737.661C826.219,2711.703,826.219,2684.203,819.907,2658.797C813.595,2633.392,800.971,2610.08,794.659,2598.424L788.347,2586.769"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-OrphanLoop LE-GenerateDependencySection" id="L-OrphanLoop-GenerateDependencySection-0" d="M820.948,2546.984L855.859,2565.271C890.77,2583.557,960.593,2620.13,995.505,2648.492C1030.416,2676.853,1030.416,2697.003,1030.416,2707.078L1030.416,2717.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-GenerateDependencySection LE-FilterDependencies" id="L-GenerateDependencySection-FilterDependencies-0" d="M1030.416,2755.953L1030.416,2765.37C1030.416,2774.786,1030.416,2793.62,1030.416,2806.32C1030.416,2819.02,1030.416,2825.586,1030.416,2828.87L1030.416,2832.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-FilterDependencies LE-CreateDependencyCollapsible" id="L-FilterDependencies-CreateDependencyCollapsible-0" d="M1030.416,2907.953L1030.416,2912.12C1030.416,2916.286,1030.416,2924.62,1030.416,2932.07C1030.416,2939.52,1030.416,2946.086,1030.416,2949.37L1030.416,2952.653"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-CreateDependencyCollapsible LE-AddFooter" id="L-CreateDependencyCollapsible-AddFooter-0" d="M1030.416,3012.453L1030.416,3016.62C1030.416,3020.786,1030.416,3029.12,1030.416,3036.57C1030.416,3044.02,1030.416,3050.586,1030.416,3053.87L1030.416,3057.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-AddFooter LE-MergeWithExisting" id="L-AddFooter-MergeWithExisting-0" d="M1030.416,3114.453L1030.416,3118.62C1030.416,3122.786,1030.416,3131.12,1030.416,3138.57C1030.416,3146.02,1030.416,3152.586,1030.416,3155.87L1030.416,3159.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-MergeWithExisting LE-ParseExistingVersions" id="L-MergeWithExisting-ParseExistingVersions-0" d="M1030.416,3216.453L1030.416,3220.62C1030.416,3224.786,1030.416,3233.12,1030.416,3240.57C1030.416,3248.02,1030.416,3254.586,1030.416,3257.87L1030.416,3261.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-ParseExistingVersions LE-SortVersions" id="L-ParseExistingVersions-SortVersions-0" d="M1030.416,3318.453L1030.416,3322.62C1030.416,3326.786,1030.416,3335.12,1030.416,3342.57C1030.416,3350.02,1030.416,3356.586,1030.416,3359.87L1030.416,3363.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-SortVersions LE-ReconstructChangelog" id="L-SortVersions-ReconstructChangelog-0" d="M1030.416,3420.453L1030.416,3424.62C1030.416,3428.786,1030.416,3437.12,1030.416,3444.57C1030.416,3452.02,1030.416,3458.586,1030.416,3461.87L1030.416,3465.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-ReconstructChangelog LE-WriteFile" id="L-ReconstructChangelog-WriteFile-0" d="M1030.416,3522.453L1030.416,3526.62C1030.416,3530.786,1030.416,3539.12,1030.416,3546.57C1030.416,3554.02,1030.416,3560.586,1030.416,3563.87L1030.416,3567.153"/><path marker-end="url(#mermaid-svg-1754745327228-4p8io3lmm_flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-WriteFile LE-End" id="L-WriteFile-End-0" d="M1030.416,3605.953L1030.416,3610.12C1030.416,3614.286,1030.416,3622.62,1030.416,3630.07C1030.416,3637.52,1030.416,3644.086,1030.416,3647.37L1030.416,3650.653"/></g><g class="edgeLabels"><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(717.326171875, 627.5703125)" class="edgeLabel"><g transform="translate(-11.32421875, -9.25)" class="label"><foreignObject height="18.5" width="22.6484375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">Yes</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(161.912109375, 627.5703125)" class="edgeLabel"><g transform="translate(-9.3984375, -9.25)" class="label"><foreignObject height="18.5" width="18.796875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">No</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(95.31640625, 1000.0390625)" class="edgeLabel"><g transform="translate(-11.32421875, -9.25)" class="label"><foreignObject height="18.5" width="22.6484375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">Yes</span></div></foreignObject></g></g><g transform="translate(341.7109375, 1000.0390625)" class="edgeLabel"><g transform="translate(-9.3984375, -9.25)" class="label"><foreignObject height="18.5" width="18.796875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">No</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(1104.2890625, 864.8046875)" class="edgeLabel"><g transform="translate(-9.3984375, -9.25)" class="label"><foreignObject height="18.5" width="18.796875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">No</span></div></foreignObject></g></g><g transform="translate(381.546875, 1468.1875)" class="edgeLabel"><g transform="translate(-11.32421875, -9.25)" class="label"><foreignObject height="18.5" width="22.6484375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">Yes</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(744.478515625, 2210.0078125)" class="edgeLabel"><g transform="translate(-44.09765625, -9.25)" class="label"><foreignObject height="18.5" width="88.1953125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">All PRs done</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g transform="translate(1030.416015625, 2656.703125)" class="edgeLabel"><g transform="translate(-59.78515625, -9.25)" class="label"><foreignObject height="18.5" width="119.5703125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel">All orphans done</span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignObject height="0" width="0"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g transform="translate(324.9453125, 16.75)" id="flowchart-Start-1241" class="node default default flowchart-label"><rect height="33.5" width="171" y="-16.75" x="-85.5" ry="16.75" rx="16.75" style="fill:#4CAF50;"/><g transform="translate(-73.8125, -9.25)" style="color:#fff;" class="label"><rect/><foreignObject height="18.5" width="147.625"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">version-changelog.ts</span></div></foreignObject></g></g><g transform="translate(324.9453125, 109.5)" id="flowchart-GetCommits-1242" class="node default default flowchart-label"><rect height="52" width="197.703125" y="-26" x="-98.8515625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-91.3515625, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="182.703125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Get commits from git log<br />--oneline --pretty=format</span></div></foreignObject></g></g><g transform="translate(324.9453125, 277.45703125)" id="flowchart-ParseCommits-1244" class="node default default flowchart-label"><polygon style="" transform="translate(-91.95703125,91.95703125)" class="label-container" points="91.95703125,0 183.9140625,-91.95703125 91.95703125,-183.9140625 0,-91.95703125"/><g transform="translate(-67.70703125, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="135.4140625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Parse each commit</span></div></foreignObject></g></g><g transform="translate(254.791015625, 506.3671875)" id="flowchart-IsMerge-1246" class="node default default flowchart-label"><polygon style="fill:#2196F3;" transform="translate(-86.953125,86.953125)" class="label-container" points="86.953125,0 173.90625,-86.953125 86.953125,-173.90625 0,-86.953125"/><g transform="translate(-62.703125, -9.25)" style="color:#fff;" class="label"><rect/><foreignObject height="18.5" width="125.40625"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">Is merge commit?</span></div></foreignObject></g></g><g transform="translate(717.326171875, 687.8203125)" id="flowchart-ExtractPR-1248" class="node default default flowchart-label"><rect height="52" width="163.75" y="-26" x="-81.875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-74.375, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="148.75"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Extract PR number<br />from merge message</span></div></foreignObject></g></g><g transform="translate(717.326171875, 864.8046875)" id="flowchart-GetPRCommits-1250" class="node default default flowchart-label"><rect height="52" width="191.8046875" y="-26" x="-95.90234375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-88.40234375, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="176.8046875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Get PR commits<br />git log merge^..merge^2</span></div></foreignObject></g></g><g transform="translate(650.73046875, 1091.7890625)" id="flowchart-CategorizePR-1252" class="node default default flowchart-label"><rect height="96.5" width="315.8828125" y="-48.25" x="-157.94140625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-150.44140625, -40.75)" style="" class="label"><rect/><foreignObject height="81.5" width="300.8828125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Categorize PR based on commits<br />🚀 features, 🔧 bugfixes, 📦 dependencies<br />🏗️ infrastructure, 📚 documentation<br />🔄 refactoring, 🔀 other</span></div></foreignObject></g></g><g transform="translate(963.98046875, 1091.7890625)" id="flowchart-GetPRStats-1254" class="node default default flowchart-label"><rect height="52" width="210.6171875" y="-26" x="-105.30859375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-97.80859375, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="195.6171875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Get PR stats<br />commit count, file changes</span></div></foreignObject></g></g><g transform="translate(161.912109375, 687.8203125)" id="flowchart-ParseConventional-1256" class="node default default flowchart-label"><rect height="52" width="208.53125" y="-26" x="-104.265625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-96.765625, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="193.53125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Parse conventional commit<br />type: scope: description</span></div></foreignObject></g></g><g transform="translate(161.912109375, 864.8046875)" id="flowchart-DetectBreaking-1258" class="node default default flowchart-label"><polygon style="fill:#FF9800;" transform="translate(-100.984375,100.984375)" class="label-container" points="100.984375,0 201.96875,-100.984375 100.984375,-201.96875 0,-100.984375"/><g transform="translate(-67.484375, -18.5)" style="color:#fff;" class="label"><rect/><foreignObject height="37" width="134.96875"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">BREAKING CHANGE<br />or ! in type?</span></div></foreignObject></g></g><g transform="translate(95.31640625, 1091.7890625)" id="flowchart-MarkBreaking-1260" class="node default default flowchart-label"><rect height="33.5" width="190.6328125" y="-16.75" x="-95.31640625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-87.81640625, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="175.6328125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Mark as breaking change</span></div></foreignObject></g></g><g transform="translate(341.7109375, 1091.7890625)" id="flowchart-CategorizeCommit-1262" class="node default default flowchart-label"><rect height="115" width="202.15625" y="-57.5" x="-101.078125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-93.578125, -50)" style="" class="label"><rect/><foreignObject height="100" width="187.15625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Categorize by type<br />feat → ✨ Features<br />fix → 🐛 Bug Fixes<br />docs → 📚 Documentation<br />etc.</span></div></foreignObject></g></g><g transform="translate(311.392578125, 1216.0390625)" id="flowchart-CreateEntry-1264" class="node default default flowchart-label"><rect height="33.5" width="179.1328125" y="-16.75" x="-89.56640625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-82.06640625, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="164.1328125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Create ChangelogEntry</span></div></foreignObject></g></g><g transform="translate(381.546875, 1358.36328125)" id="flowchart-AllParsed-1272" class="node default default flowchart-label"><polygon style="fill:#2196F3;" transform="translate(-75.57421875,75.57421875)" class="label-container" points="75.57421875,0 151.1484375,-75.57421875 75.57421875,-151.1484375 0,-75.57421875"/><g transform="translate(-42.07421875, -18.5)" style="color:#fff;" class="label"><rect/><foreignObject height="37" width="84.1484375"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">All commits<br />processed?</span></div></foreignObject></g></g><g transform="translate(381.546875, 1528.4375)" id="flowchart-SeparateCommits-1276" class="node default default flowchart-label"><rect height="52" width="193.515625" y="-26" x="-96.7578125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-89.2578125, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="178.515625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Separate merge commits<br />from orphan commits</span></div></foreignObject></g></g><g transform="translate(381.546875, 1630.4375)" id="flowchart-FilterOrphans-1278" class="node default default flowchart-label"><rect height="52" width="205.8359375" y="-26" x="-102.91796875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-95.41796875, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="190.8359375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Filter out commits already<br />included in PRs</span></div></foreignObject></g></g><g transform="translate(381.546875, 1723.1875)" id="flowchart-GroupByCategory-1280" class="node default default flowchart-label"><rect height="33.5" width="201.46875" y="-16.75" x="-100.734375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-93.234375, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="186.46875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Group entries by category</span></div></foreignObject></g></g><g transform="translate(381.546875, 1815.9375)" id="flowchart-GenerateHeader-1282" class="node default default flowchart-label"><rect height="52" width="240.6796875" y="-26" x="-120.33984375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-112.83984375, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="225.6796875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Generate changelog header<br />with package name and version</span></div></foreignObject></g></g><g transform="translate(381.546875, 1908.6875)" id="flowchart-GeneratePRSections-1284" class="node default default flowchart-label"><rect height="33.5" width="167.421875" y="-16.75" x="-83.7109375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-76.2109375, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="152.421875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Generate PR sections</span></div></foreignObject></g></g><g transform="translate(381.546875, 2075.59765625)" id="flowchart-PRLoop-1286" class="node default default flowchart-label"><polygon style="fill:#9C27B0;" transform="translate(-100.16015625,100.16015625)" class="label-container" points="100.16015625,0 200.3203125,-100.16015625 100.16015625,-200.3203125 0,-100.16015625"/><g transform="translate(-75.91015625, -9.25)" style="color:#fff;" class="label"><rect/><foreignObject height="18.5" width="151.8203125"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">For each PR category</span></div></foreignObject></g></g><g transform="translate(288.19140625, 2292.5078125)" id="flowchart-CreatePREntry-1288" class="node default default flowchart-label"><rect height="96.5" width="196.3828125" y="-48.25" x="-98.19140625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-90.69140625, -40.75)" style="" class="label"><rect/><foreignObject height="81.5" width="181.3828125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Create PR entry with:<br />🚀 Branch name + badges<br />📝 PR body description<br />🏷️ Commit type badges</span></div></foreignObject></g></g><g transform="translate(288.19140625, 2506.60546875)" id="flowchart-FormatPRBadges-1290" class="node default default flowchart-label"><rect height="96.5" width="147.40625" y="-48.25" x="-73.703125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-66.203125, -40.75)" style="" class="label"><rect/><foreignObject height="81.5" width="132.40625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Format badges:<br />📊 Category badge<br />🔗 PR number link<br />📈 Commit count</span></div></foreignObject></g></g><g transform="translate(381.546875, 2739.203125)" id="flowchart-AddCommitBadges-1292" class="node default default flowchart-label"><rect height="52" width="230.1328125" y="-26" x="-115.06640625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-107.56640625, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="215.1328125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Add individual commit badges<br />with colors and links</span></div></foreignObject></g></g><g transform="translate(744.478515625, 2292.5078125)" id="flowchart-GenerateOrphanSections-1296" class="node default default flowchart-label"><rect height="33.5" width="257.59375" y="-16.75" x="-128.796875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-121.296875, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="242.59375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Generate orphan commit sections</span></div></foreignObject></g></g><g transform="translate(744.478515625, 2506.60546875)" id="flowchart-OrphanLoop-1298" class="node default default flowchart-label"><polygon style="fill:#9C27B0;" transform="translate(-115.84765625,115.84765625)" class="label-container" points="115.84765625,0 231.6953125,-115.84765625 115.84765625,-231.6953125 0,-115.84765625"/><g transform="translate(-91.59765625, -9.25)" style="color:#fff;" class="label"><rect/><foreignObject height="18.5" width="183.1953125"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">For each orphan category</span></div></foreignObject></g></g><g transform="translate(662.73828125, 2739.203125)" id="flowchart-CreateCollapsible-1300" class="node default default flowchart-label"><rect height="96.5" width="200.65625" y="-48.25" x="-100.328125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-92.828125, -40.75)" style="" class="label"><rect/><foreignObject height="81.5" width="185.65625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Create collapsible section<br />💥 Breaking Changes<br />✨ Features, 🐛 Bug Fixes<br />🔧 Improvements, etc.</span></div></foreignObject></g></g><g transform="translate(662.73828125, 2872.703125)" id="flowchart-FormatOrphanEntry-1302" class="node default default flowchart-label"><rect height="52" width="256.9609375" y="-26" x="-128.48046875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-120.98046875, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="241.9609375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Format orphan entry:<br />scope: description hash by author</span></div></foreignObject></g></g><g transform="translate(662.73828125, 2985.203125)" id="flowchart-GetAuthorEmail-1304" class="node default default flowchart-label"><rect height="33.5" width="226" y="-16.75" x="-113" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-105.5, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="211"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Get author email from git log</span></div></foreignObject></g></g><g transform="translate(744.478515625, 3088.453125)" id="flowchart-FormatAuthorInfo-1306" class="node default default flowchart-label"><rect height="33.5" width="229.8984375" y="-16.75" x="-114.94921875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-107.44921875, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="214.8984375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Format author with email link</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 2739.203125)" id="flowchart-GenerateDependencySection-1310" class="node default default flowchart-label"><rect height="33.5" width="228.9296875" y="-16.75" x="-114.46484375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-106.96484375, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="213.9296875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Generate dependency section</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 2872.703125)" id="flowchart-FilterDependencies-1312" class="node default default flowchart-label"><rect height="70.5" width="228.4921875" y="-35.25" x="-114.24609375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-106.74609375, -27.75)" style="" class="label"><rect/><foreignObject height="55.5" width="213.4921875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Filter dependency commits<br />and PRs by patterns:<br />deps:, renovate, update, etc.</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 2985.203125)" id="flowchart-CreateDependencyCollapsible-1314" class="node default default flowchart-label"><rect height="54.5" width="238.7265625" y="-27.25" x="-119.36328125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-111.86328125, -19.75)" style="" class="label"><rect/><foreignObject height="39.5" width="223.7265625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Create 📦 Dependency Updates<br />collapsible section</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3088.453125)" id="flowchart-AddFooter-1316" class="node default default flowchart-label"><rect height="52" width="178.1640625" y="-26" x="-89.08203125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-81.58203125, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="163.1640625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Add changelog footer<br />with generation notice</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3190.453125)" id="flowchart-MergeWithExisting-1318" class="node default default flowchart-label"><rect height="52" width="231.4375" y="-26" x="-115.71875" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-108.21875, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="216.4375"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Merge with existing changelog<br />preserving version order</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3292.453125)" id="flowchart-ParseExistingVersions-1320" class="node default default flowchart-label"><rect height="52" width="230.28125" y="-26" x="-115.140625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-107.640625, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="215.28125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Parse existing version headers<br />using regex patterns</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3394.453125)" id="flowchart-SortVersions-1322" class="node default default flowchart-label"><rect height="52" width="201.3046875" y="-26" x="-100.65234375" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-93.15234375, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="186.3046875"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Sort versions semantically<br />newest first</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3496.453125)" id="flowchart-ReconstructChangelog-1324" class="node default default flowchart-label"><rect height="52" width="248.453125" y="-26" x="-124.2265625" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-116.7265625, -18.5)" style="" class="label"><rect/><foreignObject height="37" width="233.453125"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Reconstruct complete changelog<br />with header + sorted versions</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3589.203125)" id="flowchart-WriteFile-1326" class="node default default flowchart-label"><rect height="33.5" width="195.1015625" y="-16.75" x="-97.55078125" ry="0" rx="0" style="" class="basic label-container"/><g transform="translate(-90.05078125, -9.25)" style="" class="label"><rect/><foreignObject height="18.5" width="180.1015625"><div style="display: inline-block; white-space: nowrap;" xmlns="http://www.w3.org/1999/xhtml"><span class="nodeLabel">Write to CHANGELOG.md</span></div></foreignObject></g></g><g transform="translate(1030.416015625, 3683.203125)" id="flowchart-End-1328" class="node default default flowchart-label"><rect height="54.5" width="208.875" y="-27.25" x="-104.4375" ry="27.25" rx="27.25" style="fill:#4CAF50;"/><g transform="translate(-90.125, -19.75)" style="color:#fff;" class="label"><rect/><foreignObject height="39.5" width="180.25"><div xmlns="http://www.w3.org/1999/xhtml" style="color: rgb(255, 255, 255); display: inline-block; white-space: nowrap;"><span style="color:#fff;" class="nodeLabel">✅ Changelog generated<br />Keep a Changelog format</span></div></foreignObject></g></g></g></g></g></svg>
+
+Generates beautiful changelogs in Keep a Changelog format:
+
+```bash
+# Generate changelogs for all packages
+bun run scripts/version-changelog.ts --all
+
+# Generate for specific package
+bun run scripts/version-changelog.ts --package admin
+
+# Custom version range
+bun run scripts/version-changelog.ts --from v1.0.0 --to HEAD
+
+# Custom output file
+bun run scripts/version-changelog.ts --output RELEASE_NOTES.md
+```
+
+**Changelog Categories:**
+- 💥 **Breaking Changes** - BREAKING CHANGE commits
+- ✨ **Features** - feat: commits
+- 🐛 **Bug Fixes** - fix: commits  
+- 🔧 **Improvements** - refactor:, style: commits
+- 📚 **Documentation** - docs: commits
+- 🧪 **Testing** - test: commits
+- 📦 **Other Changes** - chore:, etc.
+
+### 🚀 version-apply.ts
+
+Applies version changes and handles git operations:
+
+```bash
+# Apply version changes without pushing
+bun run scripts/version-apply.ts --no-push
+
+# Preview changes
+bun run scripts/version-apply.ts --dry-run
+
+# Complete version application
+bun run scripts/version-apply.ts
+```
+
+### 🎯 version-ci.ts
+
+Complete CI versioning workflow orchestrator:
+
+```bash
+# Complete CI workflow with preview
+bun run scripts/version-ci.ts --dry-run
+
+# Execute complete CI workflow
+bun run scripts/version-ci.ts
+
+# Force specific version bump type
+bun run scripts/version-ci.ts --type minor
+
+# Don't push after completion
+bun run scripts/version-ci.ts --no-push
+```
+
+## 🎯 Complete Version Flow
+
+The `version-ci.ts` script orchestrates the entire process:
+
+### Basic Usage
+
+```bash
+# Complete flow with preview
+bun run scripts/version-ci.ts --dry-run
+
+# Execute complete flow
+bun run scripts/version-ci.ts
+
+# Force specific version bump type
+bun run scripts/version-ci.ts --type minor
+
+# Don't push after completion
+bun run scripts/version-ci.ts --no-push
+```
+
+### Flow Steps in Detail
+
+#### 1️⃣ **Configure Git Authentication**
+```bash
+# Automatically configures git for CI/CD environments
+git config user.name "github-actions[bot]"
+git config user.email "github-actions[bot]@users.noreply.github.com"
+```
+
+#### 2️⃣ **Get Affected Packages**
+```bash
+# Uses Turborepo to detect changed packages
+turbo run build --dry-run --filter='...[HEAD^]'
+```
+
+#### 3️⃣ **Bump Versions**
+- Analyzes conventional commits
+- Detects appropriate version bump type
+- Updates `package.json` files
+
+#### 4️⃣ **Generate Changelogs**
+- Parses git commit history
+- Groups commits by category
+- Generates Keep a Changelog format
+- Writes `CHANGELOG.md` files
+
+#### 5️⃣ **Commit Changes**
+```bash
 git add .
-git commit -m "feat(ui): add new component"
-git push origin feature/new-feature
-# Create PR on GitHub and merge it
+git commit -m "chore: release version X.Y.Z
 
-# 3. Go to GitHub Actions → Version workflow
-# 4. Click "Run workflow" to trigger versioning
+- Automated version bump
+- Updated changelogs  
+- Generated by version management system"
 ```
 
-### **With Manual Changesets**
+#### 6️⃣ **Create Git Tag**
 ```bash
-# 1. Create manual changeset (optional)
-bun run version:add
-# Select packages and version bump types
-
-# 2. Create PR and merge it
-git add .
-git commit -m "feat: add manual changeset"
-git push origin feature/custom-versioning
-# Create PR on GitHub and merge it
-
-# 3. Go to GitHub Actions → Version workflow
-# 4. Click "Run workflow" to trigger versioning
+git tag -a vX.Y.Z -m "Release version X.Y.Z (auto-generated)"
 ```
 
-## ⚙️ GitHub Actions Workflow
-
-### **Version.yml** - On-Demand Versioning
-- **Trigger**: Manual via GitHub Actions button
-- **What it does**:
-  1. Analyzes affected packages from last version tag
-  2. Uses existing changesets if available
-  3. Creates automated changesets for packages without changesets
-  4. Generates changelog and commits changes
-  5. Creates Git tag for the new version
-  6. Pushes to main branch
-
-## 🔬 Technical Implementation: version-commit.ts
-
-> **📁 Source Code**: [`scripts/version-commit.ts`](../../scripts/version-commit.ts)
-
-The `version-commit.ts` script orchestrates the entire auto-versioning process through several key phases:
-
-### **🔐 Git Authentication Setup**
-The script first configures Git authentication for GitHub Actions, setting up the bot user credentials and remote URL with access token. This ensures the script can push changes and tags to the repository when running in CI/CD environments.
-
-**Technical Details:**
-- Uses `github-actions[bot]` as the Git user with `github-actions[bot]@users.noreply.github.com` email
-- Constructs remote URL with format: `https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
-- Masks sensitive tokens in logs for security
-- Only configures authentication when running in GitHub Actions environment
-
-### **📦 Affected Package Detection**
-Using the last version tag SHA as the baseline, the script analyzes which packages have been modified since the last release. It leverages the monorepo's affected package detection to identify packages that need version bumps, ensuring only changed packages are versioned.
-
-**Technical Details:**
-- `getLastVersionTagSha()`: Retrieves the SHA of the most recent version tag (e.g., `v1.2.3`)
-- Falls back to initial commit SHA if no version tags exist
-- Uses `getAffectedPackages(lastVersionTagSha)` to detect packages changed since last release
-- Filters packages based on monorepo dependency graph and file changes
-
-### **📋 Changeset Management**
-The script reads existing manual changesets from the `.changeset` directory and respects them. For packages without existing changesets, it automatically creates new changesets with "patch" version bumps. This hybrid approach allows developers to manually specify breaking changes while automating routine updates.
-
-**Technical Details:**
-- `readChangesets()`: Scans `.changeset/` directory for `.md` files (excluding `README.md`)
-- `parseChangeset()`: Extracts package names and version types from changeset files
-- `createChangeset()`: Generates automated changesets with format:
-  ```yaml
-  ---
-  "package-name": patch
-  ---
-  
-  Automated version bump for package-name and other affected packages on root version tag: v1.2.3.
-  ```
-- Uses timestamp-based filenames: `auto-${Date.now()}.md`
-
-### **🏷️ Version Bumping & Tagging**
-The root package.json version is incremented by one patch level, and a new Git tag is created with the version prefix. The script ensures no duplicate tags exist and handles the initial commit scenario gracefully by falling back to the repository's first commit.
-
-**Technical Details:**
-- Parses current version: `packageJson.version.split(".").map(Number)`
-- Increments patch version: `${major}.${minor}.${patch + 1}`
-- `tagVersion()`: Creates annotated Git tags with format `v${version}`
-- Validates tag uniqueness before creation
-- Uses `bun biome check --write` to format updated package.json
-
-### **🚀 Git Operations & Output**
-Finally, the script pushes the version tag and any pending commits to the main branch. It also attaches the list of affected packages to GitHub Actions outputs for downstream deployment workflows, enabling automated deployment of only the changed packages.
-
-**Technical Details:**
-- `git rev-list --count origin/main..HEAD`: Checks for unpushed commits
-- `bunx @changesets/cli version`: Generates changelog and updates package versions
-- GitHub Actions output format: `${outputId}<<EOF\n${JSON.stringify(affectedPackages)}\nEOF\n`
-- Writes to `process.env.GITHUB_OUTPUT` for downstream workflow consumption
-- Supports dry-run mode for testing without actual Git operations
-
-### **🐛 Debugging Version Tags**
-
-When debugging versioning issues, you may need to remove tags from origin to re-try the process:
-
-**Remove Both Local and Remote Tags:**
+#### 7️⃣ **Push to Remote**
 ```bash
-# Remove local tag
-git tag -d v1.2.3
-# Remove remote tag
-git push origin --delete v1.2.3
-
-bun run version:commit --dry-run # try again github actions in cloud
+git push origin main
+git push origin vX.Y.Z
 ```
 
+#### 8️⃣ **Export for CI/CD**
+```bash
+# Exports affected packages to GitHub Actions output
+echo "packages-to-deploy=[\"admin\",\"api\",\"ui\"]" >> $GITHUB_OUTPUT
+```
 
-**💡 Pro Tip**: Always remove both local and remote tags when debugging to ensure a clean slate for re-testing the versioning process.
+## 📝 Conventional Commits
+
+Our system relies on conventional commit format for automatic version detection:
+
+### Commit Format
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer]
+```
+
+### Examples
+
+```bash
+# Feature (minor version bump)
+feat(ui): add new Button component with accessibility support
+
+# Bug fix (patch version bump)  
+fix(api): resolve authentication timeout issue
+
+# Breaking change (major version bump)
+feat(auth)!: redesign authentication flow
+
+BREAKING CHANGE: The authentication API has changed. 
+Users must update their integration code.
+
+# Documentation (patch version bump)
+docs(readme): update installation instructions
+
+# Refactoring (patch version bump)
+refactor(utils): optimize string processing functions
+```
+
+### Commit Types
+
+| Type | Description | Version Bump | Changelog Section |
+|------|-------------|--------------|-------------------|
+| `feat` | New feature | minor | ✨ Features |
+| `fix` | Bug fix | patch | 🐛 Bug Fixes |
+| `docs` | Documentation | patch | 📚 Documentation |
+| `style` | Code style changes | patch | 🔧 Improvements |
+| `refactor` | Code refactoring | patch | 🔧 Improvements |
+| `test` | Tests | patch | 🧪 Testing |
+| `chore` | Maintenance | patch | 📦 Other Changes |
+| `BREAKING CHANGE` | Breaking change | major | 💥 Breaking Changes |
+
+## 🚀 GitHub Actions Integration
+
+### Complete Workflow
+
+```yaml
+# .github/workflows/version.yml
+name: Automated Versioning
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      packages-to-deploy: ${{ steps.version.outputs.packages-to-deploy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run version flow
+        id: version
+        run: bun run version:flow --push --attach-to-output-id packages-to-deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: version
+    if: needs.version.outputs.packages-to-deploy != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{ fromJson(needs.version.outputs.packages-to-deploy) }}
+    steps:
+      - name: Deploy ${{ matrix.package }}
+        run: |
+          echo "🚀 Deploying ${{ matrix.package }}"
+          # Add your deployment logic here
+```
+
+### Integration Features
+
+- **Automatic Triggering** - Runs on every push to main
+- **Affected Package Detection** - Only deploys changed packages
+- **Matrix Deployment** - Parallel deployment of multiple packages
+- **Git Authentication** - Handles GitHub token automatically
+- **Zero Manual Intervention** - Fully automated process
+
+## 🛠️ Manual Operations
+
+### Emergency Version Bump
+
+```bash
+# Force major version bump
+bun run version:bump --type major --dry-run
+bun run version:bump --type major
+
+# Update changelogs manually
+bun run version:changelog --all
+
+# Commit and tag
+bun run version:commit
+bun run version:tag --push
+```
+
+### Custom Changelog Entries
+
+```bash
+# Generate changelog for specific version range
+bun run version:changelog --from v1.0.0 --to v1.1.0 --output RELEASE_NOTES.md
+
+# Edit the generated changelog manually if needed
+# Then commit the changes
+bun run version:commit --message "docs: update release notes"
+```
+
+### Tag Management
+
+```bash
+# List all version tags
+bun run version:tag --list
+
+# Delete incorrect tag (local and remote)
+bun run version:tag --delete v1.2.3
+
+# Recreate tag with force
+bun run version:tag --version 1.2.3 --force --push
+```
+
+## 🎯 Best Practices
+
+### Commit Message Guidelines
+
+1. **Use conventional format** - Always follow `type(scope): description`
+2. **Be descriptive** - Write clear, meaningful commit messages
+3. **Include breaking changes** - Use `BREAKING CHANGE:` footer for major bumps
+4. **Scope appropriately** - Use package names or feature areas as scopes
+
+### Version Management Strategy
+
+```typescript
+// Recommended version bump strategy
+const versionStrategy = {
+  bugFixes: 'patch',        // fix: commits → 0.0.X
+  newFeatures: 'minor',     // feat: commits → 0.X.0  
+  breakingChanges: 'major', // BREAKING CHANGE → X.0.0
+  documentation: 'patch',   // docs: commits → 0.0.X
+  refactoring: 'patch',     // refactor: commits → 0.0.X
+  dependencies: 'patch',    // dependency updates → 0.0.X
+};
+```
+
+### Development Workflow
+
+1. **Make changes** with conventional commits
+2. **Test locally** with `bun run version:flow --dry-run`
+3. **Push to main** - GitHub Actions handles the rest
+4. **Monitor deployment** - Check affected packages are deployed correctly
+
+### Monorepo Considerations
+
+- **Package dependencies** - Internal dependencies are updated automatically
+- **Cross-package changes** - Properly detected by Turborepo
+- **Selective deployment** - Only changed packages are deployed
+- **Version coordination** - Root version tracks overall monorepo state
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### No Version Bump Detected
+```bash
+# Check if commits follow conventional format
+git log --oneline -10
+
+# Force version bump
+bun run version:bump --type patch
+```
+
+#### Changelog Generation Fails
+```bash
+# Check git history
+git log --oneline --since="1 week ago"
+
+# Generate manually with specific range
+bun run version:changelog --from HEAD~10 --to HEAD
+```
+
+#### Git Authentication Issues
+```bash
+# Verify GitHub token permissions
+# Token needs: repo, write:packages permissions
+
+# Test git authentication
+git remote -v
+git push --dry-run
+```
+
+#### Tag Conflicts
+```bash
+# List existing tags
+bun run version:tag --list
+
+# Delete conflicting tag
+bun run version:tag --delete v1.2.3
+
+# Recreate with force
+bun run version:tag --force
+```
+
+### Debug Commands
+
+```bash
+# Check affected packages
+bun run turbo run build --dry-run
+
+# Preview version flow
+bun run version:flow --dry-run --verbose
+
+# Test individual components
+bun run version:bump --dry-run
+bun run version:changelog --package root
+bun run version:tag --list
+```
+
+## 📊 Monitoring & Analytics
+
+### Version Tracking
+
+```bash
+# View version history
+git tag -l --sort=-version:refname | head -10
+
+# Check package versions
+find . -name "package.json" -exec grep '"version"' {} + | head -5
+
+# View recent releases
+git log --oneline --grep="chore: release" -10
+```
+
+### Release Metrics
+
+- **Release frequency** - Track via git tag timestamps
+- **Version bump patterns** - Monitor major vs minor vs patch frequency  
+- **Package update frequency** - Identify most active packages
+- **Automation effectiveness** - Measure manual vs automated releases
+
 
 ---
 
-**💡 Pro Tip**: [`read the source code!`](../scripts/version-commit.ts)
+**🎉 Ready for fully automated versioning?** Our system handles everything from commit analysis to deployment while maintaining full transparency and control! 🚀

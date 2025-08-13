@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
-import { parseCompose } from "./scripting-utils/docker-compose-parser";
+import { EntityCompose } from "./entities";
+import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const ciAttachServicePortsConfig = {
 	name: "GitHub Attach Service Ports",
@@ -24,7 +24,7 @@ export const ciAttachServicePorts = createScript(
 	async function main(options, xConsole) {
 		const outputId = options["output-id"];
 
-		const portMappings = (await parseCompose("prod")).servicePorts();
+		const portMappings = await EntityCompose.parse("prod").then((c) => c.servicePorts());
 
 		// Output in GitHub Actions format
 		if (process.env.GITHUB_OUTPUT) {

@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import type { ScriptConfig } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
+import { colorify } from "./shell/colorify";
+import type { ScriptConfig } from "./shell/create-scripts";
+import { createScript } from "./shell/create-scripts";
 
 const devCleanupConfig = {
 	name: "DevContainer Cleanup",

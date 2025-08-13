@@ -1,9 +1,9 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
-import { parseCompose } from "./scripting-utils/docker-compose-parser";
+import { EntityCompose } from "./entities";
+import { colorify } from "./shell/colorify";
+import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const devSetupConfig = {
 	name: "DevContainer Setup",
@@ -36,7 +36,7 @@ const devSetup = createScript(devSetupConfig, async function main(args, xConsole
 	}
 
 	xConsole.log(colorify.cyan("\n💡 Services are running and available at:"));
-	const parsedCompose = await parseCompose("dev");
+	const parsedCompose = await EntityCompose.parse("dev");
 	const devUrls = parsedCompose.serviceUrls();
 	for (const [name, url] of Object.entries(devUrls)) {
 		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));

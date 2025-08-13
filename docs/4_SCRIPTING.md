@@ -31,9 +31,9 @@ Our script system provides type-safe command-line tools with automatic argument 
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
-import { colorify } from "./scripting-utils/colorify";
+import { validators } from "./shell/create-scripts";
+import { createScript } from "./shell/create-scripts";
+import { colorify } from "./shell/colorify";
 
 const scriptConfig = {
   name: "My Script",
@@ -92,9 +92,9 @@ Every script follows this pattern:
 #!/usr/bin/env bun
 
 // 1. Imports
-import { validators } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
-import { colorify } from "./scripting-utils/colorify";
+import { validators } from "./shell/create-scripts";
+import { createScript } from "./shell/create-scripts";
+import { colorify } from "./shell/colorify";
 
 // 2. Configuration
 const scriptConfig = {
@@ -140,7 +140,7 @@ if (import.meta.main) {
 
 #### **Colorify Utility**
 ```typescript
-import { colorify } from "./scripting-utils/colorify";
+import { colorify } from "./shell/colorify";
 
 // Available colors
 colorify.red("Error message");
@@ -164,7 +164,7 @@ colorify.enable();
 
 #### **Directory Utilities**
 ```typescript
-import { getAllDirectories, getAllDirectoryNames } from "./scripting-utils/get-all-directories";
+import { getAllDirectories, getAllDirectoryNames } from "./shell/get-all-directories";
 
 // Get all package directories
 const directories = await getAllDirectories();
@@ -175,7 +175,7 @@ const scopes = await getAllDirectoryNames();
 
 #### **Docker Compose Parser**
 ```typescript
-import { parseDockerCompose } from "./scripting-utils/docker-compose-parser";
+import { parseDockerCompose } from "./shell/docker-compose-parser";
 
 // Parse docker-compose.yml
 const services = await parseDockerCompose("docker-compose.yml");
@@ -183,7 +183,7 @@ const services = await parseDockerCompose("docker-compose.yml");
 
 #### **Changeset Parser**
 ```typescript
-import { parseChangesets } from "./scripting-utils/changeset-parser";
+import { parseChangesets } from "./shell/changeset-parser";
 
 // Parse changeset files
 const changesets = await parseChangesets();
@@ -194,7 +194,7 @@ const changesets = await parseChangesets();
 ### Built-in Validators
 
 ```typescript
-import { validators } from "./scripting-utils/create-scripts";
+import { validators } from "./shell/create-scripts";
 
 // String validation
 validators.string("input")           // Validates string input
@@ -272,9 +272,9 @@ export const myScript = createScript(
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
-import { colorify } from "./scripting-utils/colorify";
+import { validators } from "./shell/create-scripts";
+import { createScript } from "./shell/create-scripts";
+import { colorify } from "./shell/colorify";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const scriptConfig = {
@@ -346,10 +346,10 @@ if (import.meta.main) {
 ```typescript
 #!/usr/bin/env bun
 
-import { validators } from "./scripting-utils/create-scripts";
-import { createScript } from "./scripting-utils/create-scripts";
-import { colorify } from "./scripting-utils/colorify";
-import { getAllDirectories } from "./scripting-utils/get-all-directories";
+import { validators } from "./shell/create-scripts";
+import { createScript } from "./shell/create-scripts";
+import { colorify } from "./shell/colorify";
+import { getAllDirectories } from "./shell/get-all-directories";
 
 const scriptConfig = {
   name: "Directory Analyzer",
@@ -465,4 +465,4 @@ interface Colorify {
 
 ---
 
-**Ready to build powerful, type-safe scripts?** Start with the examples above and explore the utility functions in `scripts/scripting-utils/` for more advanced features! 
+**Ready to build powerful, type-safe scripts?** Start with the examples above and explore the utility functions in `scripts/shell/` for more advanced features! 

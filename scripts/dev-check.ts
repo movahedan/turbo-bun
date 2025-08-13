@@ -2,9 +2,9 @@
 
 import { setTimeout } from "node:timers/promises";
 import { $ } from "bun";
-import { colorify } from "./scripting-utils/colorify";
-import { createScript, type ScriptConfig, validators } from "./scripting-utils/create-scripts";
-import { parseCompose, type ServiceHealth } from "./scripting-utils/docker-compose-parser";
+import { EntityCompose, type ServiceHealth, type ServiceInfo } from "./entities";
+import { colorify } from "./shell/colorify";
+import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",
@@ -26,11 +26,11 @@ const devCheck = createScript(devCheckConfig, async function main(args, xConsole
 	xConsole.log(colorify.blue("🧪 Starting DevContainer Health Check..."));
 
 	await $`bun run dev:up --build`;
-	const parsedCompose = await parseCompose("dev");
-	await monitorServiceHealth(parsedCompose.serviceHealth, parsedCompose.exposedServices, xConsole);
+	const compose = await EntityCompose.parse("dev");
+	await monitorServiceHealth(compose.serviceHealth, compose.exposedServices, xConsole);
 
 	xConsole.log(colorify.blue("\n📊 Services are available at:"));
-	const devUrls = parsedCompose.serviceUrls();
+	const devUrls = compose.serviceUrls();
 	for (const [name, url] of Object.entries(devUrls)) {
 		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));
 	}
@@ -64,8 +64,8 @@ const colors: Record<ServiceHealth["status"], (text: string) => string> = {
 	none: colorify.gray,
 };
 async function monitorServiceHealth(
-	serviceHealth: Awaited<ReturnType<typeof parseCompose>>["serviceHealth"],
-	services: Awaited<ReturnType<typeof parseCompose>>["exposedServices"],
+	serviceHealth: () => Promise<ServiceHealth[]>,
+	services: () => ServiceInfo[],
 	xConsole: typeof console,
 ) {
 	xConsole.log(colorify.yellow("⏳ Waiting for services to become healthy..."));

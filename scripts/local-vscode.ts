@@ -3,8 +3,8 @@
 import { exists, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { $ } from "bun";
-import { createScript, type ScriptConfig } from "./scripting-utils/create-scripts";
-import { getAllDirectoryNames } from "./scripting-utils/get-all-directories";
+import { EntityWorkspace } from "./entities";
+import { createScript, type ScriptConfig } from "./shell/create-scripts";
 
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",
@@ -25,7 +25,7 @@ export const syncVscodeConfigScript = createScript(
 	async function main(args, xConsole) {
 		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
-		const scopes = await getAllDirectoryNames();
+		const scopes = await EntityWorkspace.getAllPackages();
 		xConsole.log(`📋 Generated scopes: ${scopes.join(", ")}`);
 
 		const {
