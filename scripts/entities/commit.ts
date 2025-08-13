@@ -6,13 +6,16 @@ import {
 	type CommitType,
 	commitRules,
 	type ParsedCommitData,
+	validTypes,
 } from "./commit.types";
 
 export * from "./commit.types";
 
 export class EntityCommit {
 	static parseByMessage(message: string): CommitMessageData {
-		const conventionalCommitRegex = /^(\w+)(?:\(([^)]+)\))?(!)?:\s*([^\r\n]+?)\s*$/;
+		const conventionalCommitRegex = new RegExp(
+			`^(${validTypes.map((t) => t.type).join("|")})(\\([a-z]+\\))?(!)?:\\s([a-z].{0,72})$`,
+		);
 		const match = message.match(conventionalCommitRegex);
 		const isMerge = message.startsWith("Merge pull request") || message.startsWith("Merge branch");
 		if (!match) {

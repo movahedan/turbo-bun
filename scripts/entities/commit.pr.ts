@@ -37,7 +37,7 @@ export class EntityPr {
 			/Merge pull request #(\d+)/, // "Merge pull request #123"
 			/Merge PR #(\d+)/, // "Merge PR #123"
 			/Merge.*#(\d+)/, // "Merge branch 'feature' into main #123"
-			/.*#(\d+).*/, // Any message containing #123
+			/#(\d+)/, // Any message containing #123 (secure pattern)
 		];
 
 		for (const pattern of patterns) {
@@ -93,7 +93,7 @@ export class EntityPr {
 				(commit) => commit.info.hash && commit.message.description,
 			);
 			return validCommits;
-		} catch (error) {
+		} catch (_error) {
 			return [];
 		}
 	}
