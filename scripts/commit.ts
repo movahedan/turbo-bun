@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 
+import { validTypes } from "./entities/commit.types";
 import type { CLIStepHandler, NavigationState, PageContext } from "./shell/cli-tools";
 import { cliUtils } from "./shell/cli-tools";
 import { colorify } from "./shell/colorify";
@@ -241,18 +242,7 @@ function createPageAwareSteps(): CLIStepHandler[] {
 						console.log(colorify.blue("🎯 What type of change is this?"));
 						console.log(colorify.cyan("─".repeat(50)));
 
-						const options = [
-							"🚀 feat - A new feature",
-							"🐛 fix - A bug fix",
-							"📚 docs - Documentation changes",
-							"💄 style - Code style changes",
-							"🔧 refactor - Code refactoring",
-							"⚡ perf - Performance improvements",
-							"🧪 test - Adding tests",
-							"📦 build - Build system changes",
-							"👷 ci - CI/CD changes",
-							"🔨 chore - Other changes",
-						];
+						const options = validTypes.map((t) => `${t.emoji} ${t.type} - ${t.description}`);
 
 						const selected = await cli.select("Choose the commit type:", options, {
 							quickActions: [
@@ -273,7 +263,7 @@ function createPageAwareSteps(): CLIStepHandler[] {
 							],
 						});
 
-						const selectedType = selected[0].split(" ")[1]; // Extract type from "🚀 feat - A new feature"
+						const selectedType = selected[0].split(" ")[1]; // Extract type from selected option
 						context.commitMessage = `${selectedType}: `;
 					},
 					quickActions: [
@@ -293,23 +283,16 @@ function createPageAwareSteps(): CLIStepHandler[] {
 						},
 					],
 				},
-				cliUtils.createHelpPage("type", "What type of change is this?", [
-					"feat",
-					"fix",
-					"docs",
-					"style",
-					"refactor",
-					"perf",
-					"test",
-					"build",
-					"ci",
-					"chore",
-				]),
+				cliUtils.createHelpPage(
+					"type",
+					"What type of change is this?",
+					validTypes.map((type) => type.type),
+				),
 				cliUtils.createPreviewPage(),
 			],
 			canSkip: () => false,
 			skipMessage: "Type is required",
-			run: async () => "feat: ",
+			run: async () => `${validTypes[0].type}: `,
 			validate: () => true,
 		},
 	];
