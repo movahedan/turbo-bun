@@ -14,7 +14,7 @@ export * from "./commit.types";
 export class EntityCommit {
 	static parseByMessage(message: string): CommitMessageData {
 		const conventionalCommitRegex = new RegExp(
-			`^(${validTypes.map((t) => t.type).join("|")})(\\([a-z]+\\))?(!)?:\\s([a-z].{0,72})$`,
+			`^(${validTypes.map((t) => t.type).join("|")})(\\([a-zA-Z-,\\s]+\\))?(!)?:\\s([a-z].{0,72})\\s*$`,
 		);
 		const match = message.match(conventionalCommitRegex);
 		const isMerge = message.startsWith("Merge pull request") || message.startsWith("Merge branch");
@@ -31,7 +31,7 @@ export class EntityCommit {
 		}
 
 		const [, type, scope, isBreaking, description] = match || [];
-		const scopes = scope?.split(",") || [];
+		const scopes = scope ? scope.replace(/[()]/g, "").split(",") : [];
 		const isBreakingBoolean = isBreaking === "!";
 
 		const lines = message.split("\n");
@@ -67,22 +67,23 @@ export class EntityCommit {
 			return ["type | message does not follow conventional commit format"];
 
 		const errors: string[] = [];
-		for (const [key, value] of Object.entries(match)) {
-			if (key === "isBreaking") {
-				if (value) {
-					const breakingValidation = commitRules.isBreaking.validator([
-						match.type,
-						match.description,
-					]);
-					if (typeof breakingValidation === "string") {
-						errors.push(breakingValidation);
-					}
-				}
-			} else {
-				const validation = commitRules[key as keyof CommitMessageData].validator(
-					Array.isArray(value) ? value : [value as string],
-				);
-				if (typeof validation === "string") errors.push(validation);
+
+		const typeValidation = commitRules.type.validator([match.type]);
+		if (typeof typeValidation === "string") errors.push(typeValidation);
+
+		const scopesValidation = commitRules.scopes.validator(match.scopes || []);
+		if (typeof scopesValidation === "string") errors.push(scopesValidation);
+
+		const descriptionValidation = commitRules.description.validator([match.description]);
+		if (typeof descriptionValidation === "string") errors.push(descriptionValidation);
+
+		const bodyLinesValidation = commitRules.bodyLines.validator(match.bodyLines || []);
+		if (typeof bodyLinesValidation === "string") errors.push(bodyLinesValidation);
+
+		if (match.isBreaking) {
+			const breakingValidation = commitRules.isBreaking.validator([match.type, match.description]);
+			if (typeof breakingValidation === "string") {
+				errors.push(breakingValidation);
 			}
 		}
 

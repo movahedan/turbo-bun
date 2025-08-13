@@ -216,6 +216,36 @@ export class InteractiveCLI {
 		}
 	}
 
+	// Common key handling utilities to reduce duplication
+	private createQuickActionHandler(
+		quickActions: QuickAction[],
+		onKeyPress: (data: Buffer) => void,
+	) {
+		return (data: Buffer) => {
+			const key = this.getKey(data);
+			if (key.name && key.name.length === 1) {
+				const char = key.name.toLowerCase();
+				const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
+				if (action) {
+					this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
+					action.action();
+					return;
+				}
+			}
+			// If no quick action found, pass to regular handler
+			onKeyPress(data);
+		};
+	}
+
+	private createExitHandler(exitOnCtrlC: boolean) {
+		return exitOnCtrlC
+			? () => {
+					this.cleanup();
+					process.exit(0);
+				}
+			: undefined;
+	}
+
 	// async waitForErrorAcknowledgment(): Promise<void> {
 	// 	if (!this.currentError) return;
 
@@ -321,30 +351,12 @@ export class InteractiveCLI {
 							action.action();
 						}
 					},
-					onCtrlC: exitOnCtrlC
-						? () => {
-								this.cleanup();
-								process.exit(0);
-							}
-						: undefined,
+					onCtrlC: this.createExitHandler(exitOnCtrlC),
 				});
 			};
 
 			// Add direct key handling for quick actions
-			const handleQuickActionKey = (data: Buffer) => {
-				const key = this.getKey(data);
-				if (key.name && key.name.length === 1) {
-					const char = key.name.toLowerCase();
-					const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
-					if (action) {
-						this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
-						action.action();
-						return;
-					}
-				}
-				// If no quick action found, pass to regular handler
-				onKeyPress(data);
-			};
+			const handleQuickActionKey = this.createQuickActionHandler(quickActions, onKeyPress);
 
 			process.stdin.on("data", handleQuickActionKey);
 			render();
@@ -372,13 +384,7 @@ export class InteractiveCLI {
 		}
 
 		// Show quick actions if available
-		if (quickActions.length > 0) {
-			this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
-			quickActions.forEach((action) => {
-				const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
-				this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
-			});
-		}
+		this.renderQuickActions(quickActions);
 
 		// Show helper text for available actions
 		if (config.onLeft) {
@@ -425,30 +431,12 @@ export class InteractiveCLI {
 							action.action();
 						}
 					},
-					onCtrlC: exitOnCtrlC
-						? () => {
-								this.cleanup();
-								process.exit(0);
-							}
-						: undefined,
+					onCtrlC: this.createExitHandler(exitOnCtrlC),
 				});
 			};
 
 			// Add direct key handling for quick actions
-			const handleQuickActionKey = (data: Buffer) => {
-				const key = this.getKey(data);
-				if (key.name && key.name.length === 1) {
-					const char = key.name.toLowerCase();
-					const action = quickActions.find((a) => a.shortcut?.toLowerCase() === char);
-					if (action) {
-						this.xConsole.log(`Executing quick action: ${action.label}`); // Debug
-						action.action();
-						return;
-					}
-				}
-				// If no quick action found, pass to regular handler
-				onKeyPress(data);
-			};
+			const handleQuickActionKey = this.createQuickActionHandler(quickActions, onKeyPress);
 
 			process.stdin.on("data", handleQuickActionKey);
 		});
@@ -491,13 +479,7 @@ export class InteractiveCLI {
 			this.xConsole.log(`${noPrefix}${noText}`);
 
 			// Show quick actions if available
-			if (quickActions.length > 0) {
-				this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
-				quickActions.forEach((action) => {
-					const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
-					this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
-				});
-			}
+			this.renderQuickActions(quickActions);
 
 			this.xConsole.log(colorify.gray("\n  ↑/↓ Navigate • Enter Select • Ctrl+C Exit"));
 

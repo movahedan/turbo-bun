@@ -7,14 +7,17 @@ export class EntityWorkspace {
 	static async getAllPackages(): Promise<string[]> {
 		const packages: string[] = ["root"];
 
+		const workspaceRootResult = await $`git rev-parse --show-toplevel`;
+		const workspaceRoot = workspaceRootResult.text().trim();
+
 		let apps: string[] = [];
-		const appsResult = await $`ls apps/`.nothrow().quiet();
+		const appsResult = await $`ls ${workspaceRoot}/apps/`.nothrow().quiet();
 		if (appsResult.exitCode === 0) {
 			apps = appsResult.text().trim().split("\n").filter(Boolean);
 		}
 
 		let pkgs: string[] = [];
-		const packagesResult = await $`ls packages/`.nothrow().quiet();
+		const packagesResult = await $`ls ${workspaceRoot}/packages/`.nothrow().quiet();
 		if (packagesResult.exitCode === 0) {
 			pkgs = packagesResult
 				.text()

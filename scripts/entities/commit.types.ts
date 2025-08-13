@@ -265,8 +265,10 @@ export const commitRules = {
 		question: `📦 What is the scope of this change? (optional)\n=> [${validScopes.join(", ")}]`,
 		validator: (scopes: string[]): true | string => {
 			if (!scopes.length) return true;
-			if (scopes.every((scope) => !validScopes.includes(scope))) {
-				return `scopes | invalid scope: "${scopes.join(", ")}". valid scopes:\n  => ${validScopes.join(", ")}`;
+
+			const invalidScopes = scopes.filter((scope) => !validScopes.includes(scope));
+			if (invalidScopes.length > 0) {
+				return `scopes | invalid scope(s): "${invalidScopes.join(", ")}". valid scopes:\n  => ${validScopes.join(", ")}`;
 			}
 			return true;
 		},
