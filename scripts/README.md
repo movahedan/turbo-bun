@@ -1,56 +1,83 @@
 # 🛠️ Repository Scripts
 
-> Automation scripts and utilities for repository management, CI/CD, and development workflows.
+> **Advanced automation system with interactive CLI, entity-based architecture, and sophisticated script management**
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Scripts](#-scripts)
+- [Script Architecture](#-script-architecture)
+- [Enhanced Interactive CLI](#-enhanced-interactive-cli)
+- [Entity System](#-entity-system)
+- [Available Scripts](#-available-scripts)
 - [Development](#-development)
 - [Testing](#-testing)
-- [Architecture](#-architecture)
 
 ## 🎯 Overview
 
 This workspace contains all automation scripts and utilities for the repository, including:
 
-- **Version Management**: Automated versioning, changelog generation, and release workflows
-- **CI/CD Scripts**: GitHub Actions utilities, branch validation, and staged file checks
-- **Development Tools**: DevContainer setup, cleanup utilities, and VS Code configuration
-- **Shell Utilities**: Reusable components for git operations, package management, and Docker Compose parsing
+- **🎮 Interactive CLI**: Step-by-step wizards with navigation and validation
+- **🏗️ Entity Architecture**: Modular, reusable components for common operations
+- **🔧 Enhanced Scripts**: Type-safe automation with comprehensive error handling
+- **🧪 Automated Testing**: Comprehensive test coverage and quality checks
+- **🚀 CI/CD Integration**: Seamless GitHub Actions integration
 
-## 🚀 Scripts
+## 🏗️ Script Architecture
 
-This directory contains various utility scripts for development, CI/CD, and project management.
+### Core Components
 
-## 📝 Enhanced Interactive Commit CLI
+```
+📁 scripts/
+├── shell/                    # 🎮 CLI and interaction utilities
+│   ├── create-scripts.ts     # Script creation framework
+│   ├── interactive-cli.ts    # Interactive prompt system
+│   ├── colorify.ts          # Terminal color utilities
+│   └── cli-tools.ts         # CLI navigation and state management
+├── entities/                 # 🏛️ Core business logic
+│   ├── commit.ts            # Commit parsing, validation, and analysis
+│   ├── changelog.ts         # Changelog generation and merging
+│   ├── package-json.ts      # Package.json operations and version management
+│   ├── workspace.ts         # Workspace package discovery and validation
+│   ├── compose.ts           # Docker Compose parsing and service health
+│   ├── affected.ts          # Affected package detection with dependencies
+│   ├── tag.ts               # Git tag operations and management
+│   └── changelog-manager.ts # Stateful changelog orchestration
+└── *.ts                     # 🚀 Individual script implementations
+```
 
-The commit script now features a sophisticated interactive wizard for creating conventional commits with enhanced navigation and state management.
+### Design Principles
+
+1. **Modularity**: Each script has a single responsibility
+2. **Type Safety**: Full TypeScript support with strict types
+3. **Testability**: Comprehensive test coverage with mocking
+4. **Consistency**: Shared utilities and patterns across scripts
+5. **Documentation**: Self-documenting code with JSDoc comments
+
+## 🎮 Enhanced Interactive CLI
+
+The new interactive CLI system provides sophisticated user experience:
 
 ### ✨ Features
 
-- **🎯 Step-by-Step Wizard**: Guided commit message creation with validation
-- **📊 Progress Tracking**: Visual progress bar showing completion status
+- **🎯 Step-by-Step Wizard**: Guided workflows with validation
+- **📊 Progress Tracking**: Visual progress bars and completion status
 - **⚡ Quick Actions**: Keyboard shortcuts for common operations
 - **🔄 Smart Navigation**: Go back/forward between steps with arrow keys
 - **🚫 Conditional Skipping**: Automatically skip irrelevant steps
-- **📋 Commit Preview**: See final commit message before confirming
+- **📋 Preview Mode**: See final results before confirming
 - **❌ Validation**: Real-time validation with helpful error messages
 
-### 🎮 Usage
+### 🎮 Usage Examples
 
 ```bash
-# Run interactive mode
+# Interactive commit creation
 bun run commit
 
-# Use direct message
-bun run commit -m "feat: add new feature"
+# Interactive versioning workflow
+bun run version:commit
 
-# Stage all files and commit
-bun run commit -a -m "fix: resolve bug"
-
-# Skip git hooks
-bun run commit -m "docs: update readme" --no-verify
+# Guided development setup
+bun run dev:setup
 ```
 
 ### ⌨️ Keyboard Shortcuts
@@ -69,54 +96,85 @@ Each step shows available quick actions:
 
 - **h**: Show help for current step
 - **s**: Skip current step (if allowed)
-- **p**: Preview final commit message
+- **p**: Preview final result
 - **←**: Go back to previous step
 
-### 🔄 Step Flow
+## 🏛️ Entity System
 
-1. **Type Selection**: Choose commit type (feat, fix, docs, etc.)
-2. **Scope Selection**: Select affected areas (optional)
-3. **Description**: Write short description
-4. **Body Lines**: Add detailed explanation (optional)
-5. **Breaking Change**: Specify if breaking (if type supports it)
-6. **Confirmation**: Review and confirm final message
+The entity system provides reusable, type-safe components for common operations:
 
-### 🎨 Customization
+### Core Entities
 
-The CLI automatically adapts based on your choices:
-- Skips body lines if description is too short
-- Skips breaking change if type doesn't support it
-- Makes scopes optional
-- Validates input in real-time
+#### `EntityCommit`
+- Commit parsing, validation, and analysis
+- Conventional commit format support
+- PR categorization and metadata extraction
 
-### 🧪 Testing
+#### `EntityChangelog`
+- Changelog generation and merging
+- Keep a Changelog format compliance
+- Version-aware content management
 
-Test the enhanced CLI:
+#### `EntityPackageJson`
+- Package.json operations and version management
+- Automated version bumping
+- Changelog file management
 
-```bash
-# Test interactive mode
-bun run commit
+#### `EntityWorkspace`
+- Workspace package discovery and validation
+- Package path resolution
+- Dependency graph analysis
 
-# Test with staged changes
-git add .
-bun run commit
-```
+#### `EntityCompose`
+- Docker Compose parsing and service health
+- Service port mapping
+- Health check monitoring
 
-## 🔧 Other Scripts
+#### `EntityAffected`
+- Affected package detection with dependencies
+- Change impact analysis
+- CI/CD integration support
 
-- **`dev-setup`**: Set up development environment
+#### `EntityTag`
+- Git tag operations and management
+- Version tag creation and deletion
+- Remote tag synchronization
+
+#### `ChangelogManager`
+- Stateful changelog orchestration
+- Version bump determination
+- Commit range analysis
+
+## 🚀 Available Scripts
+
+### Development Scripts
+
+- **`dev-setup`**: Setup DevContainer environment
 - **`dev-cleanup`**: Clean up development resources
+- **`dev-check`**: Verify DevContainer health
 - **`local-setup`**: Local environment setup
 - **`local-cleanup`**: Local environment cleanup
-- **`local-vscode`**: VSCode-specific setup
-- **`ci-*`**: CI/CD related scripts
-- **`version-*`**: Version management scripts
+- **`local-vscode`**: VS Code-specific setup
 
-## 📚 Documentation
+### CI/CD Scripts
 
-For detailed information about each script, see the individual script files and the main project documentation in the `docs/` directory.
+- **`ci-act`**: Test GitHub Actions locally
+- **`ci-attach-affected`**: Attach affected packages to GitHub output
+- **`ci-attach-service-ports`**: Attach service ports to GitHub output
 
-## 🧪 Development
+### Version Management
+
+- **`version-prepare`**: Prepare version bumps and changelogs
+- **`version-apply`**: Apply version changes and create tags
+- **`version-ci`**: Complete CI version workflow
+
+### Git Operations
+
+- **`commit`**: Interactive commit creation with validation
+- **`commit-check`**: Comprehensive commit validation
+- **`update-package-json`**: Update package.json exports
+
+## 🔧 Development
 
 ### Running Scripts
 ```bash
@@ -139,31 +197,52 @@ bun run <script-name>.ts [options]
 bun run check:types
 
 # Run linting
-bun run check:lint
-
-# Fix linting issues
 bun run check:fix
+
+# Run tests
+bun test scripts/
 ```
 
 ## 🧪 Testing
 
 ```bash
 # Run all tests
-bun run test
+bun test
 
 # Run tests in watch mode
-bun run test:watch
+bun test --watch
 
 # Run with coverage
-bun run test:coverage
+bun test --coverage
 
 # Run specific test file
 bun test shell/version-utils.test.ts
 ```
 
 ### Test Coverage
-- `shell/version-utils.test.ts` - Core version management utilities
-- `shell/changelog-generator.test.ts` - Changelog generation logic
+- **`shell/`**: CLI utilities and interaction systems
+- **`entities/`**: Core business logic components
+- **`*.test.ts`**: Individual script tests
+
+### Testing Utilities
+
+```typescript
+// Create mock data
+export const createMockUser = (overrides: Partial<User> = {}): User => ({
+  id: 1,
+  name: 'Test User',
+  email: 'test@example.com',
+  ...overrides
+});
+
+// Test script execution
+describe('Script Name', () => {
+  it('should execute successfully', async () => {
+    const result = await scriptFunction();
+    expect(result).toBeDefined();
+  });
+});
+```
 
 ## 🏗️ Architecture
 
@@ -174,32 +253,19 @@ bun test shell/version-utils.test.ts
 - Consistent error handling and help generation
 - Type-safe argument inference
 
-#### `entities/` - Core Entity System
-- **EntityCommit** - Commit parsing, validation, and analysis
-- **EntityChangelog** - Changelog generation and merging
-- **EntityPackageJson** - Package.json operations and version management
-- **EntityWorkspace** - Workspace package discovery and validation
-- **EntityCompose** - Docker Compose parsing and service health
-- **EntityAffected** - Affected package detection with dependencies
-- **EntityTag** - Git tag operations and management
-- **ChangelogManager** - Stateful changelog orchestration
-
-#### `shell/create-scripts.ts`
-- CLI argument parsing and validation
-- Consistent error handling and help generation
-- Type-safe argument inference
-
 #### `shell/interactive-cli.ts`
 - Interactive prompt system for user input
 - Selection, confirmation, and text input handling
 
-### Design Principles
+#### `shell/cli-tools.ts`
+- CLI navigation and state management
+- Page-aware step system
+- Progress tracking and validation
 
-1. **Modularity**: Each script has a single responsibility
-2. **Type Safety**: Full TypeScript support with strict types
-3. **Testability**: Comprehensive test coverage with mocking
-4. **Consistency**: Shared utilities and patterns across scripts
-5. **Documentation**: Self-documenting code with JSDoc comments
+#### `shell/colorify.ts`
+- Terminal color utilities
+- Cross-platform color support
+- Consistent styling across scripts
 
 ### Dependencies
 
@@ -210,4 +276,4 @@ bun test shell/version-utils.test.ts
 
 ---
 
-*This workspace is part of the larger monorepo automation system. For more information, see the main repository documentation.*
+*This enhanced scripting system provides a robust foundation for automation, CI/CD, and development workflows. For more information, see the individual script files and the main project documentation.*
