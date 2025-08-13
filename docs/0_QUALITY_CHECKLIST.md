@@ -1,6 +1,6 @@
 # ✅ Quality Checklist
 
-> **Comprehensive quality standards for the Turboobun monorepo with enhanced automation and interactive CLI**
+> **Comprehensive quality standards for the Monobun monorepo with enhanced automation and interactive CLI**
 
 ## 📋 Table of Contents
 
@@ -14,7 +14,7 @@
 
 ## 🎯 Overview
 
-This checklist ensures consistent quality across all aspects of the Turboobun monorepo, including:
+This checklist ensures consistent quality across all aspects of the Monobun monorepo, including:
 
 - **🔷 TypeScript**: Strict type safety and modern patterns
 - **🎮 Interactive CLI**: Sophisticated user experience with validation
@@ -227,4 +227,4 @@ This checklist ensures consistent quality across all aspects of the Turboobun mo
 
 ---
 
-*This quality checklist ensures consistent, high-quality development across the Turboobun monorepo. All team members and AI assistants should follow these standards to maintain project quality and consistency.* 
+*This quality checklist ensures consistent, high-quality development across the Monobun monorepo. All team members and AI assistants should follow these standards to maintain project quality and consistency.* 

@@ -1,6 +1,6 @@
 # 🔄 Auto Versioning
 
-> **Modern automated versioning system for the Turboobun monorepo with enhanced CLI and entity-based architecture**
+> **Modern automated versioning system for the Monobun monorepo with enhanced CLI and entity-based architecture**
 
 ## 📋 Table of Contents
 
@@ -16,7 +16,7 @@
 
 ## 🎯 Overview
 
-The Turboobun monorepo uses a modern, automated versioning system that provides sophisticated automation and control:
+The Monobun monorepo uses a modern, automated versioning system that provides sophisticated automation and control:
 
 ### ✨ Key Features
 

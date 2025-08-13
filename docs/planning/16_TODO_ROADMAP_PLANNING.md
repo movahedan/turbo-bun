@@ -382,7 +382,7 @@ interface BitwardenEnvManagement {
     scrape_interval: 15s
   
   scrape_configs:
-    - job_name: 'turboobun-apps'
+    - job_name: 'monobun-apps'
       static_configs:
         - targets: ['localhost:3001', 'localhost:3002', 'localhost:3003']
   ```

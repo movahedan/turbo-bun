@@ -1,22 +1,18 @@
-# 🏎️ Turbobun
+# 🏎️ Monobun
 <div align="center">
 
-<img src="https://pbs.twimg.com/media/F6GHgqBWYAAOwUX?format=jpg&name=4096x4096" alt="Turboobun Banner" width="600" />
+<img src="https://pbs.twimg.com/media/F6GHgqBWYAAOwUX?format=jpg&name=4096x4096" alt="Monobun Banner" width="600" />
 
-![Turbobun Banner](https://img.shields.io/badge/Turboobun-Lightning%20Fast%20Monorepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)
+![Monobun Banner](https://img.shields.io/badge/Monobun-Lightning%20Fast%20Monorepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)
 </div>
 
 ---
 
 ## 🎯 What Makes This Special
 
-<table>
-<tr>
-<td width="50%">
+### 🐳 **Zero-Config DevContainers**
 
 <img src="https://www.devteds.com/assets/images/post/2023/2023-11-15-devops-local-setup-with-docker-and-devcontainers-vscode.png" alt="Bun Logo" width="400">
-
-### 🐳 **Zero-Config DevContainers**
 
 <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready" />
 <img src="https://img.shields.io/badge/DevContainer-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="DevContainer" />
@@ -25,12 +21,11 @@
 
 Say goodbye to "it works on my machine" headaches! DevContainers give everyone the exact same development environment, so new team members can start coding in minutes instead of hours. Plus, you'll never have to debug environment-specific bugs again.
 
-</td>
-<td width="50%">
-
-<img src="https://miro.medium.com/v2/resize:fit:960/1*o4ZajeN_bDPama0XfYFU7Q.jpeg" alt="Bun + Turbo + Vite Stack" width="400">
+---
 
 ### ⚡ **Bun + Turbo + Vite = Lightning Speed**
+
+<img src="https://miro.medium.com/v2/resize:fit:960/1*o4ZajeN_bDPama0XfYFU7Q.jpeg" alt="Bun + Turbo + Vite Stack" width="400">
 
 <img src="https://img.shields.io/badge/Speed-10x%20Faster-00D4AA?style=for-the-badge" alt="Speed" />
 <img src="https://img.shields.io/badge/Hot%20Reload-Real%20Time-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Hot Reload" />
@@ -39,16 +34,14 @@ Say goodbye to "it works on my machine" headaches! DevContainers give everyone t
 
 Watch your builds go from minutes to seconds! Bun's lightning-fast package management combined with Turbo's smart caching and Vite's instant hot reload means you can iterate faster than ever. Your development feedback loop just got a major speed boost.
 
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-<div align="center">
-<img src="https://bun.com/og/blog/the-bun-shell.png" alt="The bun shell">
-</div>
+---
 
 ### 🐚 **Advanced Automation with Bun $**
+
+<div align="center">
+<img src="https://bun.com/og/blog/the-bun-shell.png" alt="The bun shell" width="400">
+</div>
+
 <img src="https://img.shields.io/badge/Bun%20Shell-Type%20Safe%20Shell%20Scripts-000000?style=for-the-badge&logo=bun&logoColor=white" alt="Bun Shell" />
 <img src="https://img.shields.io/badge/Interactive%20CLI-Enhanced%20UX-8B5CF6?style=for-the-badge" alt="Interactive CLI" />
 
@@ -56,14 +49,14 @@ Watch your builds go from minutes to seconds! Bun's lightning-fast package manag
 
 From your local machine to production in one smooth pipeline! Bun's shell scripts automate all the boring stuff like building, testing, and deploying, so you can focus on writing great code. No more manual deployment headaches.
 
-</td>
-<td width="50%">
-
-<div align="center">
-<img src="https://a.storyblok.com/f/316774/1600x900/b5ec7e9cd3/cursor-pro-tips-1.jpg" arlt="Cursor - AI ready development" />
-</div>
+---
 
 ### 🤖 **AI-Ready Development**
+
+<div align="center">
+<img src="https://a.storyblok.com/f/316774/1600x900/b5ec7e9cd3/cursor-pro-tips-1.jpg" alt="Cursor - AI ready development" width="400">
+</div>
+
 <img src="https://img.shields.io/badge/AI%20Ready-Cursor%20Optimized-00D4AA?style=for-the-badge" alt="AI Ready" />
 <img src="https://img.shields.io/badge/AI%20Ready-Extensive%20Tests-00D4AA?style=for-the-badge" alt="Extensive Tests" />
 
@@ -71,12 +64,10 @@ From your local machine to production in one smooth pipeline! Bun's shell script
 
 Your AI coding buddy will love this setup! With comprehensive documentation and well-structured code, AI tools like Cursor can understand your project instantly and help you write better code faster. It's like having a super-smart pair programming partner.
 
-</td>
-</tr>
-<tr>
-<td colspan="2">
+---
 
 ### 🛠️ **Complete Tech Stack**
+
 [![Turborepo](https://img.shields.io/badge/Turborepo-Build%20System-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/)
 [![Bun](https://img.shields.io/badge/Bun-Package%20Manager-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/docs/runtime/bunfig#package-manager)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Type%20Safety-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -88,39 +79,17 @@ Your AI coding buddy will love this setup! With comprehensive documentation and 
 
 Everything you need to build rock-solid applications is right here! From linting and testing to automated deployments, this toolchain keeps your code quality high and your development process smooth. It's like having a personal QA team built into your workflow.
 
-</td>
-</tr>
-</table>
+---
 
-### 📦 **What's Inside**
-
-<table>
-<tr>
-<td width="50%">
+## 📦 **What's Inside**
 
 **🏢 Admin** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite" style="vertical-align: middle;" /></a> - **Port 3001** - Admin dashboard interface
 
-</td>
-<td width="50%">
-
 **🛍️ Storefront** <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15-000000?style=flat&logo=next.js&logoColor=white" alt="Next.js" style="vertical-align: middle;" /></a> - **Port 3002** - E-commerce frontend
-
-</td>
-</tr>
-
-<tr>
-<td width="50%">
 
 **🔌 API** <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.18-000000?style=flat&logo=express&logoColor=white" alt="Express" style="vertical-align: middle;" /></a> + <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript" style="vertical-align: middle;" /></a> - **Port 3003** - Backend API server
 
-</td>
-<td width="50%">
-
 **🎨 UI Package** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://storybook.js.org/"><img src="https://img.shields.io/badge/Storybook-7.0-FF4785?style=flat&logo=storybook&logoColor=white" alt="Storybook" style="vertical-align: middle;" /></a> - **Port 3004** - Shared components
-
-</td>
-</tr>
-</table>
 
 ---
 
@@ -160,7 +129,7 @@ curl -fsSL https://bun.com/install | bash
 # powershell -c "irm bun.sh/install.ps1|iex"
 
 # Clone and go! 🏃‍♂️
-git clone https://github.com/movahedan/turbo-bun.git && cd turbo-bun
+git clone https://github.com/movahedan/monobun.git && cd monobun
 
 # Open in Dev Container (VS Code)
 # Ctrl+Shift+P → Dev Containers: Reopen in Container
@@ -174,8 +143,8 @@ bun run dev:cleanup && bun run local:cleanup
 bun run local:setup && bun run check:quick && bun run dev
 ```
 
-[![Star](https://img.shields.io/badge/⭐%20Star%20This%20Repo-Support%20Us-00D4AA?style=for-the-badge)](https://github.com/movahedan/turbo-bun)
-[![Fork](https://img.shields.io/badge/🍴%20Fork%20%26%20Customize-Make%20It%20Yours-646CFF?style=for-the-badge)](https://github.com/movahedan/turbo-bun/fork)
+[![Star](https://img.shields.io/badge/⭐%20Star%20This%20Repo-Support%20Us-00D4AA?style=for-the-badge)](https://github.com/movahedan/monobun)
+[![Fork](https://img.shields.io/badge/🍴%20Fork%20%26%20Customize-Make%20It%20Yours-646CFF?style=for-the-badge)](https://github.com/movahedan/monobun/fork)
 
 ---
 
