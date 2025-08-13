@@ -79,9 +79,14 @@ export class EntityTag {
 
 	static async getBaseTagSha(from?: string): Promise<string> {
 		if (from) {
-			const tag = from || (await EntityTag.getBaseTag()) || (await EntityTag.getFirstCommit());
-			if (tag) {
-				return await EntityTag.getTagSha(tag);
+			// Check if 'from' is a valid SHA or ref
+			try {
+				const result = await $`git rev-parse ${from}`.nothrow().quiet();
+				if (result.exitCode === 0) {
+					return result.text().trim();
+				}
+			} catch {
+				// If not a valid SHA/ref, fall back to tag logic
 			}
 		}
 

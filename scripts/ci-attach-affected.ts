@@ -22,6 +22,13 @@ const ciAttachAffectedConfig = {
 			required: true,
 			validator: validators.enum(["docker", "turbo"]),
 		},
+		{
+			short: "-b",
+			long: "--base-sha",
+			description: "The base SHA to compare against (defaults to latest tag)",
+			required: false,
+			validator: validators.nonEmpty,
+		},
 	],
 } as const satisfies ScriptConfig;
 
@@ -37,10 +44,28 @@ export const ciAttachAffected = createScript(
 			xConsole.log("🚀 Using turbo output mode");
 		}
 
+		let baseSha = options["base-sha"];
+		if (!baseSha) {
+			const eventName = process.env.GITHUB_EVENT_NAME;
+			const isPR = eventName === "pull_request";
+
+			if (isPR) {
+				baseSha = process.env.GITHUB_BASE_REF;
+				xConsole.log(`🔍 PR detected, using base branch: ${baseSha}`);
+			} else {
+				baseSha = process.env.GITHUB_BEFORE_SHA || "HEAD~1";
+				xConsole.log(`🔍 Push detected, using base SHA: ${baseSha}`);
+			}
+		} else {
+			xConsole.log(`🔍 Using provided base SHA: ${baseSha}`);
+		}
+
+		xConsole.log(`🔍 Comparing changes from ${baseSha} to HEAD`);
 		const affectedList =
 			mode === "docker"
-				? await EntityAffected.getAffectedServices()
-				: await EntityAffected.getAffectedPackages();
+				? await EntityAffected.getAffectedServices(baseSha)
+				: await EntityAffected.getAffectedPackages(baseSha);
+		xConsole.log(`🔍 Found ${affectedList.length} affected items`);
 
 		const affectedServicesNames = affectedList
 			.map((i) => (mode === "docker" ? (typeof i !== "string" ? i.name : i) : `--filter="${i}"`))
