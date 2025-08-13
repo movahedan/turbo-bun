@@ -122,7 +122,7 @@ type CommitRules = Record<
 	}
 >;
 
-const validScopes = [...(await EntityWorkspace.getAllPackages()), "deps", "scripts"];
+const validScopes = [...(await EntityWorkspace.getAllPackages()), "scripts", "deps"];
 
 const createCommitType = (
 	type: CommitType,
