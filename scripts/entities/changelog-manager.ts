@@ -240,21 +240,42 @@ export class ChangelogManager {
 		const mergeCommits = commits.filter((commit) => commit.message.isMerge);
 		const orphanCommits = commits.filter((commit) => !commit.message.isMerge);
 
+		// First, process merge commits and their associated PR commits
 		for (const commit of mergeCommits) {
-			if (commit.pr?.prCategory) {
-				// This merge commit has a PR, categorize it by PR category
+			if (commit.pr?.prCategory && commit.pr.prCommits) {
+				// This merge commit has a PR with commits, categorize it by PR category
 				const category = commit.pr.prCategory;
+
+				// Add the merge commit itself
 				prCategorizedCommits[category].push(commit);
+
+				// Also add all the individual commits from the PR to the same category
+				// This ensures they appear in the PR section instead of the orphan section
+				for (const prCommit of commit.pr.prCommits) {
+					// Skip if this commit is already the merge commit
+					if (prCommit.info.hash !== commit.info.hash) {
+						prCategorizedCommits[category].push(prCommit);
+					}
+				}
 			} else {
-				// This merge commit has no PR, categorize it as an orphan commit
+				// This merge commit has no PR or no PR commits, categorize it as an orphan commit
 				const category = ChangelogManager.categorizeOrphanCommit(commit);
 				orphanCategorizedCommits[category].push(commit);
 			}
 		}
 
+		// Then process orphan commits (commits not associated with any PR)
 		for (const commit of orphanCommits) {
-			const category = ChangelogManager.categorizeOrphanCommit(commit);
-			orphanCategorizedCommits[category].push(commit);
+			// Check if this commit is already included in a PR section
+			const isIncludedInPR = mergeCommits.some((mergeCommit) =>
+				mergeCommit.pr?.prCommits?.some((prCommit) => prCommit.info.hash === commit.info.hash),
+			);
+
+			// Only add to orphan commits if it's not already in a PR section
+			if (!isIncludedInPR) {
+				const category = ChangelogManager.categorizeOrphanCommit(commit);
+				orphanCategorizedCommits[category].push(commit);
+			}
 		}
 
 		return {
@@ -323,18 +344,11 @@ export class ChangelogManager {
 	private async determineBumpType(
 		commits: ParsedCommitData[],
 	): Promise<"major" | "minor" | "patch" | undefined> {
-		// Check if all commits are already in the changelog
-		const existingChangelog = await EntityPackageJson.getChangelog(this.packageName);
-		const allCommitsInChangelog = commits.every((commit) => {
-			const commitHash = commit.info.hash.substring(0, 7);
-			return existingChangelog.includes(commitHash);
-		});
+		// If we have commits and we're generating a changelog, we need to determine
+		// the bump type based on the commit content. The fact that commits might
+		// already be in the changelog doesn't matter - we're creating a new version.
 
-		// If all commits are already documented, no bump needed
-		if (allCommitsInChangelog) {
-			return undefined;
-		}
-
+		// Determine the bump type based on commit content
 		let hasBreaking = false;
 		let hasFeature = false;
 		for (const commit of commits) {
