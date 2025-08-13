@@ -63,7 +63,7 @@ export const commitCheck = createScript(scriptConfig, async (args, xConsole) => 
 			throw new Error("No commit message found");
 		}
 
-		const validation = await EntityCommit.validateCommitMessage(commitMessage);
+		const validation = EntityCommit.validateCommitMessage(commitMessage);
 		if (validation.length > 0) {
 			xConsole.error(colorify.red("❌ Commit message validation failed:"));
 			for (const error of validation) {
