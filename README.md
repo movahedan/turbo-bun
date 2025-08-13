@@ -1,14 +1,18 @@
-# 🏎️ Monobun
 <div align="center">
 
+# 🏎️ Monobun
+
+
+
+<div align="center">
 <img src="https://pbs.twimg.com/media/F6GHgqBWYAAOwUX?format=jpg&name=4096x4096" alt="Monobun Banner" width="600" />
 
 ![Monobun Banner](https://img.shields.io/badge/Monobun-Lightning%20Fast%20Monorepo-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)
 </div>
 
----
-
 ## 🎯 What Makes This Special
+
+<div align="center">
 
 ### 🐳 **Zero-Config DevContainers**
 
@@ -17,11 +21,13 @@
 <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready" />
 <img src="https://img.shields.io/badge/DevContainer-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="DevContainer" />
 
-> **DevContainer isolated customized dev environment** - No more "works on my machine"!
+> **DevContainer isolated customized dev environment**
 
 Say goodbye to "it works on my machine" headaches! DevContainers give everyone the exact same development environment, so new team members can start coding in minutes instead of hours. Plus, you'll never have to debug environment-specific bugs again.
 
----
+</div>
+
+<div align="center">
 
 ### ⚡ **Bun + Turbo + Vite = Lightning Speed**
 
@@ -34,13 +40,13 @@ Say goodbye to "it works on my machine" headaches! DevContainers give everyone t
 
 Watch your builds go from minutes to seconds! Bun's lightning-fast package management combined with Turbo's smart caching and Vite's instant hot reload means you can iterate faster than ever. Your development feedback loop just got a major speed boost.
 
----
+</div>
+
+<div align="center">
 
 ### 🐚 **Advanced Automation with Bun $**
 
-<div align="center">
 <img src="https://bun.com/og/blog/the-bun-shell.png" alt="The bun shell" width="400">
-</div>
 
 <img src="https://img.shields.io/badge/Bun%20Shell-Type%20Safe%20Shell%20Scripts-000000?style=for-the-badge&logo=bun&logoColor=white" alt="Bun Shell" />
 <img src="https://img.shields.io/badge/Interactive%20CLI-Enhanced%20UX-8B5CF6?style=for-the-badge" alt="Interactive CLI" />
@@ -49,13 +55,13 @@ Watch your builds go from minutes to seconds! Bun's lightning-fast package manag
 
 From your local machine to production in one smooth pipeline! Bun's shell scripts automate all the boring stuff like building, testing, and deploying, so you can focus on writing great code. No more manual deployment headaches.
 
----
+</div>
+
+<div align="center">
 
 ### 🤖 **AI-Ready Development**
 
-<div align="center">
 <img src="https://a.storyblok.com/f/316774/1600x900/b5ec7e9cd3/cursor-pro-tips-1.jpg" alt="Cursor - AI ready development" width="400">
-</div>
 
 <img src="https://img.shields.io/badge/AI%20Ready-Cursor%20Optimized-00D4AA?style=for-the-badge" alt="AI Ready" />
 <img src="https://img.shields.io/badge/AI%20Ready-Extensive%20Tests-00D4AA?style=for-the-badge" alt="Extensive Tests" />
@@ -64,7 +70,9 @@ From your local machine to production in one smooth pipeline! Bun's shell script
 
 Your AI coding buddy will love this setup! With comprehensive documentation and well-structured code, AI tools like Cursor can understand your project instantly and help you write better code faster. It's like having a super-smart pair programming partner.
 
----
+</div>
+
+<div align="center">
 
 ### 🛠️ **Complete Tech Stack**
 
@@ -79,9 +87,15 @@ Your AI coding buddy will love this setup! With comprehensive documentation and 
 
 Everything you need to build rock-solid applications is right here! From linting and testing to automated deployments, this toolchain keeps your code quality high and your development process smooth. It's like having a personal QA team built into your workflow.
 
+</div>
+
+</div>
+
 ---
 
-## 📦 **What's Inside**
+<div align="center">
+
+## � **What's Inside**
 
 **🏢 Admin** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite" style="vertical-align: middle;" /></a> - **Port 3001** - Admin dashboard interface
 
@@ -90,8 +104,6 @@ Everything you need to build rock-solid applications is right here! From linting
 **🔌 API** <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.18-000000?style=flat&logo=express&logoColor=white" alt="Express" style="vertical-align: middle;" /></a> + <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript" style="vertical-align: middle;" /></a> - **Port 3003** - Backend API server
 
 **🎨 UI Package** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://storybook.js.org/"><img src="https://img.shields.io/badge/Storybook-7.0-FF4785?style=flat&logo=storybook&logoColor=white" alt="Storybook" style="vertical-align: middle;" /></a> - **Port 3004** - Shared components
-
----
 
 ## 📚 Documentation
 
@@ -116,7 +128,11 @@ Everything you need to build rock-solid applications is right here! From linting
 [![Testing Conventions](https://img.shields.io/badge/🧪%20Testing%20Conventions-495057?style=for-the-badge)](./.cursor/rules/testing-conventions.mdc)
 [![Security Guidelines](https://img.shields.io/badge/🔒%20Security%20Guidelines-495057?style=for-the-badge)](./.cursor/rules/security-guidelines.mdc)
 
+</div>
+
 ---
+
+<div align="center">
 
 ## 🚀 Lightning-Fast Setup <img src="https://img.shields.io/badge/Setup%20Time-30%20Seconds-00D4AA?style=flat&logo=bun&logoColor=white" alt="Setup time - 30 Seconds" style="vertical-align: middle;" />
 
@@ -146,12 +162,14 @@ bun run local:setup && bun run check:quick && bun run dev
 [![Star](https://img.shields.io/badge/⭐%20Star%20This%20Repo-Support%20Us-00D4AA?style=for-the-badge)](https://github.com/movahedan/monobun)
 [![Fork](https://img.shields.io/badge/🍴%20Fork%20%26%20Customize-Make%20It%20Yours-646CFF?style=for-the-badge)](https://github.com/movahedan/monobun/fork)
 
----
+</div>
 
 <div align="center">
 
 **Built with ❤️ using modern development tools**
 
 [![License](https://img.shields.io/badge/License-MIT-00D4AA?style=flat)](LICENSE)
+
+</div>
 
 </div>
