@@ -55,44 +55,71 @@ export class EntityPr {
 		parseByHash: (hash: string) => Promise<ParsedCommitData>,
 	): Promise<ParsedCommitData[]> {
 		try {
+			// First, try the regular merge approach
 			const result = await $`git log --pretty=format:"%H" ${mergeCommitHash}^..${mergeCommitHash}^2`
 				.quiet()
 				.nothrow();
 
-			if (result.exitCode !== 0) {
-				return [];
+			if (result.exitCode === 0) {
+				const commitHashes = result.text().trim().split("\n").filter(Boolean);
+
+				// If we found multiple commits, this is a regular merge
+				if (commitHashes.length > 1) {
+					const prCommits = await Promise.all(
+						commitHashes.map(async (hash) => {
+							try {
+								return await parseByHash(hash);
+							} catch (error) {
+								console.warn(`Failed to parse PR commit ${hash}: ${error}`);
+								// Fallback to basic info if parsing fails
+								return {
+									message: {
+										type: "other" as CommitType,
+										description: "Failed to parse commit",
+										isMerge: false,
+										isDependency: false,
+										isBreaking: false,
+									},
+									info: {
+										hash: hash.trim(),
+									},
+								} as ParsedCommitData;
+							}
+						}),
+					);
+
+					const validCommits = prCommits.filter(
+						(commit) => commit.info.hash && commit.message.description,
+					);
+					return validCommits;
+				}
+
+				// If we only found 1 commit, this might be a squash merge
+				// For squash merges, we can't recover individual commits from git history
+				// But we can create a synthetic commit representing the squashed changes
+				if (commitHashes.length === 1) {
+					const squashedHash = commitHashes[0];
+					try {
+						const squashedCommit = await parseByHash(squashedHash);
+						// Mark this as a squashed commit so the changelog can handle it appropriately
+						return [
+							{
+								...squashedCommit,
+								message: {
+									...squashedCommit.message,
+									description: `Squashed changes from PR (${squashedCommit.message.description})`,
+								},
+							},
+						];
+					} catch (error) {
+						console.warn(`Failed to parse squashed commit ${squashedHash}: ${error}`);
+						return [];
+					}
+				}
 			}
 
-			const commitHashes = result.text().trim().split("\n").filter(Boolean);
-
-			// Recursively parse each commit to get full details
-			const prCommits = await Promise.all(
-				commitHashes.map(async (hash) => {
-					try {
-						return await parseByHash(hash);
-					} catch (error) {
-						console.warn(`Failed to parse PR commit ${hash}: ${error}`);
-						// Fallback to basic info if parsing fails
-						return {
-							message: {
-								type: "other" as CommitType,
-								description: "Failed to parse commit",
-								isMerge: false,
-								isDependency: false,
-								isBreaking: false,
-							},
-							info: {
-								hash: hash.trim(),
-							},
-						} as ParsedCommitData;
-					}
-				}),
-			);
-
-			const validCommits = prCommits.filter(
-				(commit) => commit.info.hash && commit.message.description,
-			);
-			return validCommits;
+			// Fallback: return empty array if no commits found
+			return [];
 		} catch (_error) {
 			return [];
 		}
