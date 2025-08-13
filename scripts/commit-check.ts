@@ -56,14 +56,18 @@ export const commitCheck = createScript(scriptConfig, async (args, xConsole) => 
 	if (args["message-file"] || args.message) {
 		xConsole.log(colorify.blue("🔍 Validating commit message from file..."));
 		const commitMessage = args["message-file"]
-			? await Bun.file(args["message-file"]).text()
+			? (await Bun.file(args["message-file"]).text())
+					.trimEnd()
+					.split("\n")
+					.filter((line) => line.trim() && !line.trim().startsWith("#"))
+					.join("\n")
 			: args.message;
 		if (!commitMessage) {
 			xConsole.error(colorify.red("❌ No commit message found"));
 			throw new Error("No commit message found");
 		}
 
-		const validation = EntityCommit.validateCommitMessage(commitMessage);
+		const validation = EntityCommit.validateCommitMessage(commitMessage.trimEnd());
 		if (validation.length > 0) {
 			xConsole.error(colorify.red("❌ Commit message validation failed:"));
 			for (const error of validation) {
@@ -71,6 +75,8 @@ export const commitCheck = createScript(scriptConfig, async (args, xConsole) => 
 			}
 			throw new Error("Commit message validation failed");
 		}
+
+		xConsole.log(colorify.green("✅ Commit message validation passed"));
 	}
 
 	if (args.branch) {
