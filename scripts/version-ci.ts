@@ -13,31 +13,9 @@ const scriptConfig = {
 	examples: [
 		"bun run version-ci.ts",
 		"bun run version-ci.ts --dry-run",
-		"bun run version-ci.ts --type minor --no-push",
+		"bun run version-ci.ts --no-push",
 	],
 	options: [
-		{
-			short: "-t",
-			long: "--type",
-			description: "Force version bump type (major, minor, patch)",
-			required: false,
-			validator: (value): value is "major" | "minor" | "patch" =>
-				["major", "minor", "patch"].includes(value),
-		},
-		{
-			short: "-p",
-			long: "--package",
-			description: "Package name to version (default: root)",
-			required: false,
-			validator: validators.nonEmpty,
-		},
-		{
-			short: "-f",
-			long: "--from",
-			description: "From version/tag (default: last tag)",
-			required: false,
-			validator: validators.nonEmpty,
-		},
 		{
 			short: "-n",
 			long: "--no-push",
@@ -64,8 +42,7 @@ export const versionCI = createScript(scriptConfig, async function main(args, xC
 
 	xConsole.info("\n🔧 Preparing versions...");
 	await versionPrepare({
-		package: args.package,
-		from: args.from,
+		all: true,
 		"dry-run": args["dry-run"],
 	});
 

@@ -42,11 +42,11 @@ jobs:
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: bun install -E --no-save
 
-      - name: 🔍 - Generate changelog and bump versions
+      - name: 🔍 Generate changelog and bump versions
         id: packages-to-deploy
-        run: bun run version:commit --attach-to-output-id packages-to-deploy
+        run: bun run version:ci
 
-      - name: 📋 - Display deployment info
+      - name: 📋 Display deployment info
         run: |
           echo "::group::📋 Version Summary"
           echo "Packages to deploy: ${{ steps.packages-to-deploy.outputs.packages-to-deploy }}"
