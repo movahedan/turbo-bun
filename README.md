@@ -98,16 +98,6 @@ Everything you need to build rock-solid applications is right here! We've kept i
 
 <div align="center">
 
-## � **What's Inside**
-
-**🏢 Admin** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite" style="vertical-align: middle;" /></a> - **Port 3001** - Admin dashboard interface
-
-**🛍️ Storefront** <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15-000000?style=flat&logo=next.js&logoColor=white" alt="Next.js" style="vertical-align: middle;" /></a> - **Port 3002** - E-commerce frontend
-
-**🔌 API** <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.18-000000?style=flat&logo=express&logoColor=white" alt="Express" style="vertical-align: middle;" /></a> + <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript" style="vertical-align: middle;" /></a> - **Port 3003** - Backend API server
-
-**🎨 UI Package** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://storybook.js.org/"><img src="https://img.shields.io/badge/Storybook-7.0-FF4785?style=flat&logo=storybook&logoColor=white" alt="Storybook" style="vertical-align: middle;" /></a> - **Port 3004** - Shared components
-
 ## 📚 Documentation
 
 ### **🚀 Getting Started**
@@ -131,6 +121,16 @@ Everything you need to build rock-solid applications is right here! We've kept i
 [![Component Structure](https://img.shields.io/badge/⚛️%20Component%20Structure-495057?style=for-the-badge)](./.cursor/rules/component-structure.mdc)
 [![Testing Conventions](https://img.shields.io/badge/🧪%20Testing%20Conventions-495057?style=for-the-badge)](./.cursor/rules/testing-conventions.mdc)
 [![Security Guidelines](https://img.shields.io/badge/🔒%20Security%20Guidelines-495057?style=for-the-badge)](./.cursor/rules/security-guidelines.mdc)
+
+## � **What's Inside**
+
+**🏢 Admin** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite" style="vertical-align: middle;" /></a> - **Port 3001** - Admin dashboard interface
+
+**🛍️ Storefront** <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-15-000000?style=flat&logo=next.js&logoColor=white" alt="Next.js" style="vertical-align: middle;" /></a> - **Port 3002** - E-commerce frontend
+
+**🔌 API** <a href="https://expressjs.com/"><img src="https://img.shields.io/badge/Express-4.18-000000?style=flat&logo=express&logoColor=white" alt="Express" style="vertical-align: middle;" /></a> + <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=flat&logo=typescript&logoColor=white" alt="TypeScript" style="vertical-align: middle;" /></a> - **Port 3003** - Backend API server
+
+**🎨 UI Package** <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white" alt="React" style="vertical-align: middle;" /></a> + <a href="https://storybook.js.org/"><img src="https://img.shields.io/badge/Storybook-7.0-FF4785?style=flat&logo=storybook&logoColor=white" alt="Storybook" style="vertical-align: middle;" /></a> - **Port 3004** - Shared components
 
 </div>
 
