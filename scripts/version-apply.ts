@@ -39,7 +39,7 @@ const scriptConfig = {
 } as const satisfies ScriptConfig;
 
 export const versionApply = createScript(scriptConfig, async function main(args, xConsole) {
-	const version = await EntityPackageJson.getVersion("root");
+	const version = EntityPackageJson.getVersion("root");
 
 	if (args["dry-run"]) {
 		xConsole.log(colorify.yellow("🔍 Dry run mode - would execute:"));

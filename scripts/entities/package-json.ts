@@ -1,4 +1,6 @@
 /** biome-ignore-all lint/complexity/noUselessConstructor: it's a simple util class */
+
+import { readFileSync } from "node:fs";
 import { $ } from "bun";
 import type { PackageJson } from "type-fest";
 
@@ -22,10 +24,10 @@ export class EntityPackageJson {
 		return `apps/${packageName}/CHANGELOG.md`;
 	}
 
-	static async getPackageJson(packageName: string): Promise<PackageJson> {
+	static getPackageJson(packageName: string): PackageJson {
 		const jsonPath = EntityPackageJson.getJsonPath(packageName);
-		const jsonFile = Bun.file(jsonPath);
-		return await jsonFile.json();
+		const jsonFile = readFileSync(jsonPath, "utf8");
+		return JSON.parse(jsonFile);
 	}
 
 	static async writePackageJson(packageName: string, content: PackageJson): Promise<void> {
@@ -36,13 +38,13 @@ export class EntityPackageJson {
 	}
 
 	static async bumpVersion(packageName: string, newVersion: string): Promise<void> {
-		const content = await EntityPackageJson.getPackageJson(packageName);
+		const content = EntityPackageJson.getPackageJson(packageName);
 		content.version = newVersion;
 		await EntityPackageJson.writePackageJson(packageName, content);
 	}
 
-	static async getVersion(packageName: string): Promise<string> {
-		const content = await EntityPackageJson.getPackageJson(packageName);
+	static getVersion(packageName: string): string {
+		const content = EntityPackageJson.getPackageJson(packageName);
 		return content.version ?? "0.0.0";
 	}
 
@@ -52,15 +54,14 @@ export class EntityPackageJson {
 		return path;
 	}
 
-	static async getChangelog(packageName: string): Promise<string> {
+	static getChangelog(packageName: string): string {
 		const path = EntityPackageJson.getChangelogPath(packageName);
-		const file = Bun.file(path);
-		const exists = await file.exists();
 
-		if (!exists) {
+		try {
+			return readFileSync(path, "utf8");
+		} catch (error) {
+			console.warn(`Failed to read changelog for ${packageName}: ${error}`);
 			return "";
 		}
-
-		return await file.text();
 	}
 }
