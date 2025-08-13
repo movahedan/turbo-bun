@@ -6,23 +6,24 @@ export interface CLIConfig {
 	exitOnCtrlC?: boolean;
 }
 
-export interface SelectConfig extends CLIConfig {
+// Base interface for common CLI operations
+interface BaseCLIOperation extends CLIConfig {
+	onLeft?: () => void;
+	quickActions?: QuickAction[];
+}
+
+export interface SelectConfig extends BaseCLIOperation {
 	allowMultiple?: boolean;
 	allowEmpty?: boolean;
-	onLeft?: () => void;
-	quickActions?: QuickAction[];
 }
 
-export interface PromptConfig extends CLIConfig {
+export interface PromptConfig extends BaseCLIOperation {
 	allowEmpty?: boolean;
-	onLeft?: () => void;
-	quickActions?: QuickAction[];
 }
 
-export interface ConfirmConfig extends CLIConfig {
+export interface ConfirmConfig extends BaseCLIOperation {
 	defaultValue?: boolean;
 	message?: string; // For showing additional content above confirmation
-	quickActions?: QuickAction[];
 }
 
 interface KeyPress {
@@ -73,28 +74,28 @@ export class InteractiveCLI {
 		}
 	}
 
+	// Common key mappings to reduce duplication
+	private static readonly KEY_MAPPINGS = new Map([
+		["\u0003", { name: "c", ctrl: true }],
+		["\r", { name: "return" }],
+		["\n", { name: "return" }],
+		["\u001b[A", { name: "up" }],
+		["\u001b[B", { name: "down" }],
+		["\u001b[D", { name: "left" }],
+		["\u001b[C", { name: "right" }],
+		[" ", { name: "space" }],
+		["\u0020", { name: "space" }],
+		["\u007f", { name: "backspace" }],
+		["\u0008", { name: "backspace" }],
+		["\u001b", { name: "escape" }],
+	]);
+
 	private parseKey(data: string): KeyPress {
 		const key: KeyPress = { sequence: data };
+		const mapping = InteractiveCLI.KEY_MAPPINGS.get(data);
 
-		if (data === "\u0003") {
-			key.name = "c";
-			key.ctrl = true;
-		} else if (data === "\r" || data === "\n") {
-			key.name = "return";
-		} else if (data === "\u001b[A") {
-			key.name = "up";
-		} else if (data === "\u001b[B") {
-			key.name = "down";
-		} else if (data === "\u001b[D") {
-			key.name = "left";
-		} else if (data === "\u001b[C") {
-			key.name = "right";
-		} else if (data === " " || data === "\u0020") {
-			key.name = "space";
-		} else if (data === "\u007f" || data === "\u0008") {
-			key.name = "backspace";
-		} else if (data === "\u001b") {
-			key.name = "escape";
+		if (mapping) {
+			Object.assign(key, mapping);
 		} else {
 			key.name = data;
 		}
@@ -188,6 +189,33 @@ export class InteractiveCLI {
 		}
 	}
 
+	// Common rendering utilities to reduce duplication
+	private renderQuickActions(quickActions: QuickAction[]): void {
+		if (quickActions.length > 0) {
+			this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
+			quickActions.forEach((action) => {
+				const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
+				this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
+			});
+		}
+	}
+
+	private renderInstructions(allowMultiple: boolean): void {
+		const instructions = allowMultiple
+			? "\n  ↑/↓ Navigate • ← Back • Space Toggle • Enter Continue • Ctrl+C Exit"
+			: "\n  ↑/↓ Navigate • ← Back • Enter Select • Ctrl+C Exit";
+		this.xConsole.log(colorify.gray(instructions));
+	}
+
+	private renderSelectionCount(selected: Set<number>): void {
+		if (selected.size > 0) {
+			this.xConsole.log(
+				colorify.blue(`  Selected: ${selected.size} item${selected.size > 1 ? "s" : ""}`),
+				this.xConsole,
+			);
+		}
+	}
+
 	// async waitForErrorAcknowledgment(): Promise<void> {
 	// 	if (!this.currentError) return;
 
@@ -252,27 +280,9 @@ export class InteractiveCLI {
 			}
 
 			this.renderErrorSection();
-
-			// Show quick actions if available
-			if (quickActions.length > 0) {
-				this.xConsole.log(colorify.cyan("\n⚡ Quick Actions:"));
-				quickActions.forEach((action) => {
-					const shortcut = action.shortcut ? ` (${action.shortcut})` : "";
-					this.xConsole.log(colorify.cyan(`  • ${action.label}${shortcut}`));
-				});
-			}
-
-			const instructions = allowMultiple
-				? "\n  ↑/↓ Navigate • ← Back • Space Toggle • Enter Continue • Ctrl+C Exit"
-				: "\n  ↑/↓ Navigate • ← Back • Enter Select • Ctrl+C Exit";
-			this.xConsole.log(colorify.gray(instructions));
-
-			if (allowMultiple && selected.size > 0) {
-				this.xConsole.log(
-					colorify.blue(`  Selected: ${selected.size} item${selected.size > 1 ? "s" : ""}`),
-					this.xConsole,
-				);
-			}
+			this.renderQuickActions(quickActions);
+			this.renderInstructions(allowMultiple);
+			this.renderSelectionCount(selected);
 		};
 
 		return new Promise((resolve) => {

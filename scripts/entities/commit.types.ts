@@ -124,7 +124,6 @@ type CommitRules = Record<
 
 const validScopes = [...(await EntityWorkspace.getAllPackages()), "deps", "scripts"];
 
-// Factory function to create commit type objects and reduce duplication
 const createCommitType = (
 	type: CommitType,
 	label: string,

@@ -1,6 +1,53 @@
 import { colorify } from "./colorify";
 import type { InteractiveCLI } from "./interactive-cli";
 
+// Common quick actions to reduce duplication
+const commonQuickActions = {
+	back: (): QuickAction => ({
+		key: "back",
+		label: "Back to Step",
+		description: "Return to the main step",
+		shortcut: "b",
+		action: () => {
+			// This will be set when the page is created
+		},
+	}),
+	help: (context: PageContext): QuickAction => ({
+		key: "help",
+		label: "Show Help",
+		description: "Display help for this step",
+		shortcut: "h",
+		action: () => context.renderPage("help"),
+	}),
+	preview: (context: PageContext): QuickAction => ({
+		key: "preview",
+		label: "Preview Commit",
+		description: "Show what the final commit will look like",
+		shortcut: "p",
+		action: () => context.renderPage("preview"),
+	}),
+	goBack: (context: PageContext): QuickAction => ({
+		key: "back",
+		label: "Go Back",
+		description: "Return to previous step",
+		shortcut: "←",
+		action: () => context.goBack(),
+	}),
+};
+
+// Common key handling logic to reduce duplication
+const createKeyHandler = (context: PageContext, targetPage: string) => async () => {
+	console.log(colorify.gray("\nPress any key to return to the step..."));
+	await new Promise((resolve) => {
+		const onKey = () => {
+			process.stdin.removeListener("data", onKey);
+			resolve(undefined);
+		};
+		process.stdin.on("data", onKey);
+	});
+	context.renderPage(targetPage);
+};
+
 // Page-aware step system
 export interface Page {
 	id: string;
@@ -92,28 +139,9 @@ export const cliUtils = {
 				options.forEach((option) => console.log(`  • ${option}`));
 			}
 
-			console.log(colorify.gray("\nPress any key to return to the step..."));
-			await new Promise((resolve) => {
-				const onKey = () => {
-					process.stdin.removeListener("data", onKey);
-					resolve(undefined);
-				};
-				process.stdin.on("data", onKey);
-			});
-
-			context.renderPage("main");
+			await createKeyHandler(context, "main")();
 		},
-		quickActions: [
-			{
-				key: "back",
-				label: "Back to Step",
-				description: "Return to the main step",
-				shortcut: "b",
-				action: () => {
-					// This will be set when the page is created
-				},
-			},
-		],
+		quickActions: [commonQuickActions.back()],
 	}),
 
 	// Create a preview page
@@ -128,58 +156,21 @@ export const cliUtils = {
 			console.log(context.commitMessage);
 			console.log(colorify.cyan("─".repeat(50)));
 
-			console.log(colorify.gray("\nPress any key to return to the step..."));
-			await new Promise((resolve) => {
-				const onKey = () => {
-					process.stdin.removeListener("data", onKey);
-					resolve(undefined);
-				};
-				process.stdin.on("data", onKey);
-			});
-
-			context.renderPage("main");
+			await createKeyHandler(context, "main")();
 		},
-		quickActions: [
-			{
-				key: "back",
-				label: "Back to Step",
-				description: "Return to the main step",
-				shortcut: "b",
-				action: () => {
-					// This will be set when the page is created
-				},
-			},
-		],
+		quickActions: [commonQuickActions.back()],
 	}),
 
 	// Create standard quick actions for a step
 	createStandardQuickActions: (stepIndex: number, context: PageContext): QuickAction[] => {
 		const actions: QuickAction[] = [
-			{
-				key: "help",
-				label: "Show Help",
-				description: "Display help for this step",
-				shortcut: "h",
-				action: () => context.renderPage("help"),
-			},
-			{
-				key: "preview",
-				label: "Preview Commit",
-				description: "Show what the final commit will look like",
-				shortcut: "p",
-				action: () => context.renderPage("preview"),
-			},
+			commonQuickActions.help(context),
+			commonQuickActions.preview(context),
 		];
 
 		// Add back action if not first step
 		if (stepIndex > 0) {
-			actions.push({
-				key: "back",
-				label: "Go Back",
-				description: "Return to previous step",
-				shortcut: "←",
-				action: () => context.goBack(),
-			});
+			actions.push(commonQuickActions.goBack(context));
 		}
 
 		return actions;
