@@ -2,8 +2,6 @@
 
 # 🏎️ Monobun
 
-
-
 <div align="center">
 <img src="https://pbs.twimg.com/media/F6GHgqBWYAAOwUX?format=jpg&name=4096x4096" alt="Monobun Banner" width="600" />
 
@@ -14,61 +12,64 @@
 
 <div align="center">
 
-### 🐳 **Zero-Config DevContainers**
+### 🐚 **Advanced Monorepo Control & Scripting**
 
-<img src="https://www.devteds.com/assets/images/post/2023/2023-11-15-devops-local-setup-with-docker-and-devcontainers-vscode.png" alt="Bun Logo" width="400">
+<img src="https://bun.com/og/blog/the-bun-shell.png" alt="The Bun Shell" width="400">
+<br />
+<img src="https://img.shields.io/badge/Entity%20Driven-Advanced%20Control-00D4AA?style=for-the-badge&logo=turborepo&logoColor=white" alt="Entity Driven" />
+<img src="https://img.shields.io/badge/Smart%20Scripting-Optimized%20Workflows-8B5CF6?style=for-the-badge&logo=turborepo&logoColor=white" alt="Smart Scripting" />
 
+> **Full monorepo control** with **entity-driven architecture** and **intelligent automation**
+
+Take complete command of your monorepo! We've built powerful entity classes and smart scripting that just works. From lint-staged hooks and commit linters to interactive CLI tools, automated version management, and changelog generation - everything is custom-built and optimized. No more fighting with tools and configs - you're in control, and everything is optimized for speed and simplicity.
+
+</div>
+
+<div align="center">
+
+### 🐳 **Docker-First Development**
+
+<img src="https://www.devteds.com/assets/images/post/2023/2023-11-15-devops-local-setup-with-docker-and-devcontainers-vscode.png" alt="Docker first development" width="400">
+<br />
 <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready" />
-<img src="https://img.shields.io/badge/DevContainer-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="DevContainer" />
+<img src="https://img.shields.io/badge/DevContainer-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="DevContainer Ready" />
 
-> **DevContainer isolated customized dev environment**
+> **Production-ready containers** with **zero-config DevContainer** setup
 
-Say goodbye to "it works on my machine" headaches! DevContainers give everyone the exact same development environment, so new team members can start coding in minutes instead of hours. Plus, you'll never have to debug environment-specific bugs again.
-
-</div>
-
-<div align="center">
-
-### ⚡ **Bun + Turbo + Vite = Lightning Speed**
-
-<img src="https://miro.medium.com/v2/resize:fit:960/1*o4ZajeN_bDPama0XfYFU7Q.jpeg" alt="Bun + Turbo + Vite Stack" width="400">
-
-<img src="https://img.shields.io/badge/Speed-10x%20Faster-00D4AA?style=for-the-badge" alt="Speed" />
-<img src="https://img.shields.io/badge/Hot%20Reload-Real%20Time-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Hot Reload" />
-
-> **Ultra-fast package management** and **instant updates** across fullstack apps simultaneously.
-
-Watch your builds go from minutes to seconds! Bun's lightning-fast package management combined with Turbo's smart caching and Vite's instant hot reload means you can iterate faster than ever. Your development feedback loop just got a major speed boost.
+Docker isn't just an afterthought - it's the foundation! Our DevContainer setup gives you the exact same environment as production, so you can catch issues early and deploy with confidence. New team members are coding in minutes, not debugging environment differences for hours. We know VSCode DevContainer maintenance can be challenging, so we've done the heavy lifting for you. While it's not optimal for localhost development, the production parity and team consistency benefits make it worthwhile.
 
 </div>
 
 <div align="center">
 
-### 🐚 **Advanced Automation with Bun $**
+### ⚡ **Homogeneous Framework Stack**
 
-<img src="https://bun.com/og/blog/the-bun-shell.png" alt="The bun shell" width="400">
+<img src="https://miro.medium.com/v2/resize:fit:960/1*o4ZajeN_bDPama0XfYFU7Q.jpeg" alt="Vite+Svelte+Astro" width="400">
+<br>
+<img src="https://img.shields.io/badge/Vite%20Svelte%20Astro-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite Svelte Astro" />
+<img src="https://img.shields.io/badge/Bun%20Optimized-Perfect%20Fit-000000?style=for-the-badge&logo=bun&logoColor=white" alt="Bun Optimized" />
 
-<img src="https://img.shields.io/badge/Bun%20Shell-Type%20Safe%20Shell%20Scripts-000000?style=for-the-badge&logo=bun&logoColor=white" alt="Bun Shell" />
-<img src="https://img.shields.io/badge/Interactive%20CLI-Enhanced%20UX-8B5CF6?style=for-the-badge" alt="Interactive CLI" />
+> **Curated frameworks** that **naturally align** with Bun's philosophy and performance
 
-> **Sophisticated automation** from **local development** to **cloud deployment** using Bun's powerful `$` shell runtime
-
-From your local machine to production in one smooth pipeline! Bun's shell scripts automate all the boring stuff like building, testing, and deploying, so you can focus on writing great code. No more manual deployment headaches.
+We've curated the ultimate framework stack that just works! Vite, Astro, and Svelte aren't random choices - they're handpicked because they share Bun's core values: blazing speed, elegant simplicity, and developer experience that makes you smile. And that's not all! There's also a Next.js app with a stunning UI component library built on shadcn and Storybook. Choose your weapon - every framework here is battle-tested and optimized. No conflicts, no complexity, just pure development joy!
 
 </div>
 
 <div align="center">
 
-### 🤖 **AI-Ready Development**
+### 📚 **Comprehensive Documentation & AI-Ready**
 
-<img src="https://a.storyblok.com/f/316774/1600x900/b5ec7e9cd3/cursor-pro-tips-1.jpg" alt="Cursor - AI ready development" width="400">
+<img src="https://a.storyblok.com/f/316774/1600x900/b5ec7e9cd3/cursor-pro-tips-1.jpg" alt="Documentation & AI" width="400">
 
-<img src="https://img.shields.io/badge/AI%20Ready-Cursor%20Optimized-00D4AA?style=for-the-badge" alt="AI Ready" />
-<img src="https://img.shields.io/badge/AI%20Ready-Extensive%20Tests-00D4AA?style=for-the-badge" alt="Extensive Tests" />
+<br>
 
-> **Cursor-optimized** with **comprehensive documentation** and **AI assistant ready** development environment
+<img src="https://img.shields.io/badge/Docs%20Astro-Dedicated%20Site-FF6B35?style=for-the-badge&logo=astro&logoColor=white" alt="Docs Astro" />
 
-Your AI coding buddy will love this setup! With comprehensive documentation and well-structured code, AI tools like Cursor can understand your project instantly and help you write better code faster. It's like having a super-smart pair programming partner.
+<img src="https://img.shields.io/badge/AI%20Optimized-Cursor%20Ready-00D4AA?style=for-the-badge&logo=turborepo&logoColor=white" alt="AI Optimized" />
+
+> **Developer-first documentation** with **dedicated docs site** and **AI assistant optimization**
+
+We don't just write docs - we build them! Our dedicated docs-astro site makes learning effortless, while our AI-optimized code structure means Cursor and other AI tools instantly understand your project. It's like having a brilliant pair programming partner who never gets confused. And the automation doesn't stop there - Renovate bot keeps your dependencies fresh and secure, while SonarQube ensures your code quality stays top-notch. Every tool here works in perfect harmony!
 
 </div>
 
@@ -77,15 +78,17 @@ Your AI coding buddy will love this setup! With comprehensive documentation and 
 ### 🛠️ **Complete Tech Stack**
 
 [![Turborepo](https://img.shields.io/badge/Turborepo-Build%20System-EF4444?style=for-the-badge&logo=turborepo&logoColor=white)](https://turbo.build/)
-[![Bun](https://img.shields.io/badge/Bun-Package%20Manager-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/docs/runtime/bunfig#package-manager)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Type%20Safety-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Biome](https://img.shields.io/badge/Biome-Linting%20%26%20Formatting-60a5fa?style=for-the-badge&logo=biome&logoColor=white)](https://biomejs.dev/)
+[![Bun](https://img.shields.io/badge/Bun-Runtime%20%26%20Tools-000000?style=for-the-badge&logo=bun&logoColor=white)](https://bun.sh/docs/runtime/bunfig#package-manager)
+
+[![Biome](https://img.shields.io/badge/Biome-Linting-60a5fa?style=for-the-badge&logo=biome&logoColor=white)](https://biomejs.dev/)
 [![Renovate](https://img.shields.io/badge/Renovate-Auto%20Updates-1A1F36?style=for-the-badge&logo=renovate&logoColor=white)](https://docs.renovatebot.com/)
-[![SonarQube](https://img.shields.io/badge/SonarQube-Code%20Quality-4E9BCD?style=for-the-badge&logo=sonarqube&logoColor=white)](https://docs.sonarsource.com/sonarqube-cloud)
+[![Lefthook](https://img.shields.io/badge/Lefthook-Git%20Hooks-00D4AA?style=for-the-badge&logo=git&logoColor=white)](https://github.com/evilmartians/lefthook)
 
-> **Production-ready toolchain** with **build system**, **code quality**, and **automation** tools
+> **Minimal, powerful toolchain** with just **5 core tools** for **everything**
 
-Everything you need to build rock-solid applications is right here! From linting and testing to automated deployments, this toolchain keeps your code quality high and your development process smooth. It's like having a personal QA team built into your workflow.
+Everything you need to build rock-solid applications is right here! We've kept it minimal - just 5 essential tools that handle build system, code quality, and version automation. No bloat, no complexity, just a lean toolchain that keeps your development process smooth and your code quality high. Plus, the solid structure we've built means you can easily create your own rules and workflows.
+
+
 
 </div>
 
@@ -114,6 +117,7 @@ Everything you need to build rock-solid applications is right here! From linting
 
 ### **🛠️ Development Tools**
 [![Scripting Guide](https://img.shields.io/badge/🐚%20Scripting%20Guide-495057?style=for-the-badge)](./docs/4_SCRIPTING.md)
+[![Repository Scripts](https://img.shields.io/badge/🛠️%20Repository%20Scripts-495057?style=for-the-badge)](./scripts/README.md)
 [![Docker & DevContainer](https://img.shields.io/badge/🐳%20Docker%20%26%20DevContainer-495057?style=for-the-badge)](./docs/5_DOCKER.md)
 [![Auto Versioning](https://img.shields.io/badge/🏷️%20Auto%20Versioning-495057?style=for-the-badge)](./docs/7_AUTO_VERSIONING.md)
 
