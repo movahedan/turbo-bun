@@ -34,85 +34,60 @@ export class EntityAffected {
 			const prodServices = await EntityCompose.parse("prod");
 			const allPackages = await EntityWorkspace.getAllPackages();
 
-			const affectedServices: AffectedService[] = [];
+			const serviceMap = new Map<string, AffectedService>();
+			const affectedServices = new Set<string>();
 
-			const services = devServices.exposedServices();
-			if (composeMode === "all") {
-				services.push(...devServices.exposedServices(), ...prodServices.exposedServices());
-			} else if (composeMode === "dev") {
-				services.push(...devServices.exposedServices());
-			} else if (composeMode === "prod") {
-				services.push(...prodServices.exposedServices());
-			}
+			const services =
+				composeMode === "all"
+					? [...devServices.exposedServices(), ...prodServices.exposedServices()]
+					: composeMode === "dev"
+						? devServices.exposedServices()
+						: prodServices.exposedServices();
 
 			for (const service of services) {
 				const serviceKey = allPackages.find((p) => p.includes(service.name));
 				if (keys.some((k: string) => k === serviceKey)) {
-					affectedServices.push({
+					affectedServices.add(service.name);
+					const environment = composeMode === "all" || composeMode === "dev" ? "dev" : "prod";
+					serviceMap.set(service.name, {
 						name: service.name,
-						environment: "dev",
+						environment,
 						port: service.port,
 					});
-				}
-			}
 
-			return affectedServices;
-		} catch (error) {
-			throw new Error(`Failed to get affected services: ${error}`);
-		}
-	}
-
-	static async getAffectedServicesWithDependencies(
-		baseSha?: string,
-		to = "HEAD",
-		composeMode: "dev" | "prod" | "all" = "prod",
-	): Promise<AffectedService[]> {
-		try {
-			const affectedServices = await EntityAffected.getAffectedServices(baseSha, to, composeMode);
-			const devServices = await EntityCompose.parse("dev");
-			const prodServices = await EntityCompose.parse("prod");
-
-			const allServicesWithDeps = new Set<string>();
-
-			for (const service of affectedServices) {
-				allServicesWithDeps.add(service.name);
-
-				const serviceList =
-					service.environment === "dev"
-						? devServices.exposedServices()
-						: prodServices.exposedServices();
-				const serviceInfo = serviceList.find((s) => s.name === service.name);
-				if (serviceInfo?.dependencies) {
-					for (const dep of serviceInfo.dependencies) {
-						allServicesWithDeps.add(dep);
+					if (service.dependencies) {
+						for (const dep of service.dependencies) {
+							affectedServices.add(dep);
+						}
 					}
 				}
 			}
 
-			const result: AffectedService[] = [];
-			for (const serviceName of allServicesWithDeps) {
-				const devService = devServices.exposedServices().find((s) => s.name === serviceName);
-				if (devService) {
-					result.push({
-						name: devService.name,
-						environment: "dev",
-						port: devService.port,
-					});
-				}
+			for (const serviceName of affectedServices) {
+				if (!serviceMap.has(serviceName)) {
+					const devService = devServices.exposedServices().find((s) => s.name === serviceName);
+					if (devService) {
+						serviceMap.set(serviceName, {
+							name: devService.name,
+							environment: "dev",
+							port: devService.port,
+						});
+					}
 
-				const prodService = prodServices.exposedServices().find((s) => s.name === serviceName);
-				if (prodService) {
-					result.push({
-						name: prodService.name,
-						environment: "prod",
-						port: prodService.port,
-					});
+					const prodService = prodServices.exposedServices().find((s) => s.name === serviceName);
+					if (prodService) {
+						serviceMap.set(serviceName, {
+							name: prodService.name,
+							environment: "prod",
+							port: prodService.port,
+						});
+					}
 				}
 			}
 
-			return result;
+			return Array.from(serviceMap.values());
 		} catch (error) {
-			throw new Error(`Failed to get affected services with dependencies: ${error}`);
+			throw new Error(`Failed to get affected services: ${error}`);
 		}
 	}
 }
