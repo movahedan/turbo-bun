@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun";
+import { EntityTag } from "./entities/tag";
 import { colorify } from "./shell/colorify";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 import { versionApply } from "./version-apply";
@@ -40,10 +41,16 @@ export const versionCI = createScript(scriptConfig, async function main(args, xC
 
 	await configureGitAuth(args, xConsole);
 
+	// Get the latest version tag to use as the base for changelog generation
+	const latestTag = await EntityTag.getBaseTag();
+	const fromCommit = latestTag || (await EntityTag.getFirstCommit());
+
+	xConsole.info(`📝 Using base commit: ${colorify.blue(fromCommit)}`);
+
 	xConsole.info("\n🔧 Preparing versions...");
 	await versionPrepare({
-		all: true,
 		"dry-run": args["dry-run"],
+		from: fromCommit,
 	});
 
 	xConsole.info("\n🚀 Applying version changes...");

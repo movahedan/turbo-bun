@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { ChangelogManager, EntityPackageJson, EntityWorkspace } from "./entities";
+import { ChangelogManager, EntityPackageJson, EntityTag, EntityWorkspace } from "./entities";
 import { colorify } from "./shell/colorify";
 import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
@@ -39,7 +39,7 @@ const scriptConfig = {
 } as const satisfies ScriptConfig;
 
 export const versionPrepare = createScript(scriptConfig, async function main(args, xConsole) {
-	const fromCommit = args.from || "HEAD~1";
+	const fromCommit = await EntityTag.getBaseTagSha(args.from);
 	const toCommit = args.to || "HEAD";
 	const processAll = !args.package;
 
@@ -48,8 +48,10 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		`📝 Generating changelog from ${colorify.blue(fromCommit)} to ${colorify.blue(toCommit)}`,
 	);
 
+	let versionCommitMessage = `release: ${EntityTag.toTag(EntityPackageJson.getVersion("root"))}\n`;
+
 	try {
-		let packagesToProcess: string[];
+		let packagesToProcess: string[] = [];
 
 		if (processAll) {
 			xConsole.info("📦 Processing all packages in workspace...");
@@ -122,7 +124,10 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 
 					// Actually bump the version in package.json
 					await EntityPackageJson.bumpVersion(packageName, targetVersion);
-					xConsole.log(`✅ Package.json updated to version ${colorify.green(targetVersion)}`);
+
+					const log = `Bumped: ${packageName}: ${currentVersion} -> ${targetVersion} (${bumpType})`;
+					versionCommitMessage += `\n${log}`;
+					xConsole.log(colorify.green(log));
 				} else {
 					xConsole.log(
 						`✅ ${colorify.green("No version bump needed")}\n` +
@@ -132,11 +137,14 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 					);
 				}
 
-				// Always generate changelog if there are commits
 				if (commitCount > 0) {
 					xConsole.info(`📚 Generating changelog for ${packageName}...`);
 					await changelogManager.generateChangelog();
-					xConsole.info(`✅ Changelog generated for ${packageName}`);
+
+					const log = `Changelog generated for ${packageName}`;
+					versionCommitMessage += `\n${log}`;
+					xConsole.log(colorify.green(log));
+
 					totalCommits += commitCount;
 				}
 			} catch (error) {
@@ -146,10 +154,18 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		}
 
 		// Summary
-		xConsole.log(colorify.green("\n📊 Version Preparation Summary:"));
-		xConsole.log(`📦 Total packages processed: ${packagesToProcess.length}`);
-		xConsole.log(`🚀 Packages needing version bumps: ${totalBumps}`);
-		xConsole.log(`📝 Total commits processed: ${totalCommits}`);
+		const summaryLog = "Version Preparation Summary:";
+		versionCommitMessage += `\n${summaryLog}`;
+		xConsole.log(colorify.green(summaryLog));
+		const totalPackagesLog = `📦 Total packages processed: ${packagesToProcess.length}`;
+		versionCommitMessage += `\n${totalPackagesLog}`;
+		xConsole.log(colorify.green(totalPackagesLog));
+		const totalBumpsLog = `🚀 Packages needing version bumps: ${totalBumps}`;
+		versionCommitMessage += `\n${totalBumpsLog}`;
+		xConsole.log(colorify.green(totalBumpsLog));
+		const totalCommitsLog = `📝 Total commits processed: ${totalCommits}`;
+		versionCommitMessage += `\n${totalCommitsLog}`;
+		xConsole.log(colorify.green(totalCommitsLog));
 
 		if (totalBumps > 0) {
 			xConsole.log(
@@ -159,6 +175,8 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 					`3. Push the changes: ${colorify.blue("git push && git push --tags")}`,
 			);
 		}
+
+		await Bun.write(".git/COMMIT_EDITMSG", versionCommitMessage);
 
 		// Output packages that need deployment (for CI)
 		const packagesToDeploy = results
