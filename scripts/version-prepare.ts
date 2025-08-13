@@ -11,7 +11,6 @@ const scriptConfig = {
 	examples: [
 		"bun run version-prepare.ts",
 		"bun run version-prepare.ts --package root",
-		"bun run version-prepare.ts --all",
 		"bun run version-prepare.ts --from v1.0.0 --to HEAD",
 	],
 	options: [
@@ -21,14 +20,6 @@ const scriptConfig = {
 			description: "Package name to process (default: all packages)",
 			required: false,
 			validator: validators.nonEmpty,
-		},
-		{
-			short: "-a",
-			long: "--all",
-			description: "Process all packages in workspace",
-			required: false,
-			defaultValue: false,
-			validator: validators.boolean,
 		},
 		{
 			short: "-f",
@@ -50,7 +41,7 @@ const scriptConfig = {
 export const versionPrepare = createScript(scriptConfig, async function main(args, xConsole) {
 	const fromCommit = args.from || "HEAD~1";
 	const toCommit = args.to || "HEAD";
-	const processAll = args.all || !args.package;
+	const processAll = !args.package;
 
 	xConsole.info("🚀 Starting version preparation");
 	xConsole.info(
