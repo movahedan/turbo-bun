@@ -1,373 +1,442 @@
-# 🔧 In-Depth Setup Flows
+# ⚡ Setup Flows
 
-> **Advanced technical details and workflows for development environment setup**
-
-This document provides detailed technical information about the setup flows, configuration options, and advanced usage patterns. For basic installation, see the [Installation Guide](./1_INSTALLATION_GUIDE.md).
+> **Comprehensive setup workflows with enhanced automation, interactive CLI, and sophisticated environment management**
 
 ## 📋 Table of Contents
 
-- [Architecture Overview](#-architecture-overview)
-- [Environment Configuration Strategy](#-environment-configuration-strategy)
-- [CI/CD Integration](#-cicd-integration)
+- [Overview](#-overview)
+- [Quick Setup](#-quick-setup)
+- [Enhanced Setup System](#-enhanced-setup-system)
+- [Local Development Setup](#-local-development-setup)
+- [DevContainer Setup](#-devcontainer-setup)
+- [VS Code Setup](#-vs-code-setup)
+- [Environment Verification](#-environment-verification)
 - [Troubleshooting](#-troubleshooting)
 
-## 🏗️ Architecture Overview
+## 🎯 Overview
 
-### **Setup Flow Architecture**
+The Turboobun monorepo provides sophisticated setup workflows built on:
 
-The project implements a layered setup architecture:
+- **🎮 Interactive CLI**: Step-by-step setup wizards with validation
+- **🏗️ Entity Architecture**: Modular, reusable components for environment setup
+- **🔧 Enhanced Scripts**: Type-safe automation with comprehensive error handling
+- **🐳 Docker Integration**: Seamless containerized development environments
+- **🚀 CI/CD Ready**: Production-ready development environments
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Development Environment                  │
-├─────────────────────────────────────────────────────────────┤
-│  🔧 Local Development Layer (Required)                      │
-│  ├── Dependencies (bun install)                             │
-│  ├── Code Quality (biome, typescript)                       │
-│  ├── Testing (bun test, turbo)                              │
-│  └── Build System (turbo, vite)                             │
-├─────────────────────────────────────────────────────────────┤
-│  🐳 DevContainer Layer (Optional)                           │
-│  ├── Docker Services (admin, storefront, api, ui)          │
-│  ├── Development Tools (act, docker-compose)                │
-│  └── Health Monitoring & Logging                            │
-├─────────────────────────────────────────────────────────────┤
-│  🎯 CI/CD Layer (Optional)                                  │
-│  ├── GitHub Actions Testing (act)                           │
-│  ├── Branch Validation (commitlint)                         │
-│  └── Quality Gates (sonarqube)                              │
-└─────────────────────────────────────────────────────────────┘
-```
+## 🚀 Quick Setup
 
-### **Command Hierarchy**
+### **Option 1: DevContainer (Recommended)**
 
 ```bash
-# Core Setup Commands
-bun run local:setup      # Foundation layer (always required - from host)
-# Go to the DevContainer and `bun run local:setup` again (;
-bun run dev:setup        # Container layer (optional)
+# Clone repository
+git clone https://github.com/movahedan/turbo-bun.git
+cd turbo-bun
 
-# Development Commands
-bun run dev:up --build <app-name>
-bun run dev:logs <app-name>
-bun run dev:health <app-name>
+# Open in VS Code DevContainer
+# Ctrl+Shift+P → Dev Containers: Reopen in Container
 
-# Verification Commands
-bun run check:quick      # Quick verification
-bun run dev:check        # Health verification
-bun run ci:check         # CI layer (optional)
+# Setup DevContainer environment
+bun run dev:setup
 
-# Cleanup Commands
-bun run dev:cleanup      # Container cleanup
-bun run local:cleanup    # Complete cleanup
-bun run dev:rm          # Container removal (from host)
+# Start services
+bun run dev:up
+
+# Verify setup
+bun run dev:check
 ```
 
-#### **Performance Characteristics**
-- **Dependency Installation**: ~5-10 seconds
-- **Code Quality Checks**: ~10-20 seconds
-- **Test Execution**: ~20-40 seconds
-- **Build Process**: ~30-60 seconds
-- **Total Runtime**: ~2-3 minutes (cold), ~1 minute (warm)
-
-## 🔧 Environment Configuration Strategy
-
-### **Docker Compose Environment Management**
-
-**Root Environment Files**: Docker Compose uses root-level environment files with passed arguments:
-
-```yaml
-# docker-compose.yml (Production)
-services:
-  prod-admin:
-    build:
-      context: .
-      dockerfile: apps/admin/Dockerfile
-    ports:
-      - "5001:80"
-    environment:
-      - VITE_API_URL=http://api:5003
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-
-# .devcontainer/docker-compose.dev.yml (Development)
-services:
-  admin:
-    extends:
-      service: apps
-    ports:
-      - "3001:3001"
-    environment:
-      PORT: "3001"
-      HOST: "0.0.0.0"
-      NODE_ENV: "development"
-    command: bun run dev --filter=admin -- --host 0.0.0.0 --port 3001
-```
-
-**Key Configuration Points**:
-- **Root `.env` file**: Used by Docker Compose for shared environment variables
-- **Service-specific environment**: Each service defines its own PORT and HOST
-- **HOST must be `0.0.0.0`**: Ensures container accessibility
-- **PORT must be unique**: Prevents conflicts between services
-
-### **Local Development Environment**
-
-**Package-Level Environment Files**: Local development uses package-specific environment files:
+### **Option 2: Local Development**
 
 ```bash
-# Local development structure
-apps/admin/.env          # Admin app environment variables
-apps/storefront/.env     # Storefront app environment variables  
-apps/api/.env           # API app environment variables
-packages/ui/.env        # UI package environment variables
+# Clone repository
+git clone https://github.com/movahedan/turbo-bun.git
+cd turbo-bun
+
+# Setup local environment
+bun run local:setup
+
+# Install dependencies
+bun install
+
+# Verify setup
+bun run check:quick
 ```
 
-**Local Development Configuration**:
-- **HOST**: `0.0.0.0` (required for container accessibility)
-- **PORT**: Unique per service (3001, 3002, 3003, 3004)
-- **No hardcoded ports**: Docker Compose handles port mapping
-- **Package-specific configs**: Each app manages its own environment
+## 🎮 Enhanced Setup System
 
-### **Port Configuration Strategy**
+### **Interactive Setup Features**
 
-**Development Ports** (Docker Compose):
-- **Admin**: 3001
-- **Storefront**: 3002  
-- **API**: 3003
-- **UI (Storybook)**: 3004
+The new setup system provides sophisticated user experience:
 
-**Production Ports** (Docker Compose):
-- **Admin**: 5001
-- **Storefront**: 5002
-- **API**: 5003
-- **UI**: 5006
+#### **Step-by-Step Wizards**
+- Guided environment setup with validation
+- Progress tracking and completion status
+- Smart dependency detection and resolution
+- Conditional setup steps based on environment
 
-**Conflict Prevention**:
-- **Development**: 3001-3004 range
-- **Production**: 5001-5006 range
-- **No overlapping**: Clear separation between environments
+#### **Automated Environment Detection**
+- Automatic OS and architecture detection
+- Dependency version compatibility checking
+- Environment-specific configuration
+- Error handling and recovery
 
-## 🔄 CI/CD Integration
+#### **Setup Validation**
+- Comprehensive environment verification
+- Health checks for all services
+- Dependency validation
+- Performance benchmarking
 
-### **`bun run ci:check` - Local GitHub Actions Testing**
+### **Entity-Based Architecture**
 
-#### **Act Configuration**
+The setup system uses modular, reusable components:
+
+```
+📁 scripts/entities/
+├── compose.ts           # 🐳 Docker Compose parsing and validation
+├── workspace.ts         # 🗂️ Workspace package discovery
+├── package-json.ts      # 📦 Package.json operations
+└── affected.ts          # 🔍 Affected package detection
+```
+
+## 🔧 Local Development Setup
+
+### **1. Prerequisites**
+
 ```bash
-# .act/actrc configuration
---image-size micro
---platform ubuntu-latest
---quiet
---secret-file .env
---reuse
---artifact-server-path /tmp/artifacts
+# Install Bun (if not already installed)
+# macOS/Linux:
+curl -fsSL https://bun.com/install | bash
+
+# Windows (PowerShell):
+# powershell -c "irm bun.sh/install.ps1|iex"
+
+# Verify installation
+bun --version
 ```
 
-#### **Workflow Testing Patterns**
+### **2. Repository Setup**
+
 ```bash
-# Test specific workflows
-bun run ci:check -e pull_request -w .github/workflows/Check.yml
-bun run ci:check -e push -w .github/workflows/Build.yml
-bun run ci:check -e release -w .github/workflows/Deploy.yml
+# Clone repository
+git clone https://github.com/movahedan/turbo-bun.git
+cd turbo-bun
 
-# Test with custom secrets
-bun run ci:check -e pull_request -w .github/workflows/Check.yml --secret-file .env.local
-
-# Test with verbose output
-bun run ci:check -e pull_request -w .github/workflows/Check.yml --verbose
+# Setup local environment
+bun run local:setup
 ```
 
-### **`bun run ci:branchname` - Branch Validation**
+### **3. Dependencies Installation**
 
-#### **Branch Naming Patterns**
 ```bash
-# Supported patterns
-feature/user-authentication               # ✅ Valid
-bugfix/login-validation                  # ✅ Valid
-hotfix/security-patch                    # ✅ Valid
-release/v1.2.0                          # ✅ Valid
+# Install all dependencies
+bun install
 
-# Invalid patterns
-feature/UserAuth                         # ❌ Invalid (uppercase)
-bugfix/login validation                  # ❌ Invalid (space)
-hotfix/security_patch                    # ❌ Invalid (underscore)
+# Verify installation
+bun run check:types
 ```
 
-### **Staged File Validation**
+### **4. Environment Verification**
 
-#### **`bun run check:staged` - Pre-commit Validation**
 ```bash
-# Automatic validation of staged files
-bun run check:staged                    # Check for common issues
+# Quick quality check
+bun run check:quick
 
-# Validations include:
-# - No manual version changes in package.json
-# - No manual CHANGELOG.md entries
-# - No development files committed
-# - Proper file structure compliance
+# Full quality check
+bun run check
+
+# Run tests
+bun test
 ```
 
-#### **Validation Patterns**
+## 🐳 DevContainer Setup
+
+### **1. Prerequisites**
+
 ```bash
-# Valid staged files
-package.json                            # ✅ Auto-generated versions only
-CHANGELOG.md                           # ✅ Auto-generated entries only
-src/components/Button.tsx              # ✅ Source code files
+# Install Docker Desktop
+# https://www.docker.com/products/docker-desktop/
 
-# Invalid staged files
-package.json with manual version        # ❌ Should be auto-generated
-CHANGELOG.md with manual entries       # ❌ Should be auto-generated
-.env files                             # ❌ Should not be committed
+# Install VS Code
+# https://code.visualstudio.com/
+
+# Install Dev Containers extension
+# Extensions → Dev Containers
 ```
 
-## 🛠️ Troubleshooting
+### **2. Repository Setup**
 
-### **Setup Debugging**
 ```bash
-# Verbose setup with debugging
-bun run local:setup --verbose --debug
-bun run dev:setup --verbose --debug
+# Clone repository
+git clone https://github.com/movahedan/turbo-bun.git
+cd turbo-bun
 
-# Health checks
-bun run dev:check                      # Comprehensive health check
-bun run dev:health                     # Quick container status
-bun run check:quick                    # Quality verification
+# Open in VS Code
+code .
 ```
 
-### **Common Issues and Solutions**
+### **3. DevContainer Setup**
+
+```bash
+# Press Ctrl+Shift+P (or Cmd+Shift+P on macOS)
+# Type: Dev Containers: Reopen in Container
+# Select the command and wait for container to build
+```
+
+### **4. Environment Setup**
+
+```bash
+# Setup DevContainer environment
+bun run dev:setup
+
+# Start all services
+bun run dev:up
+
+# Verify setup
+bun run dev:check
+```
+
+### **5. Service Management**
+
+```bash
+# View service status
+bun run dev:health
+
+# View service logs
+bun run dev:logs
+
+# Restart services
+bun run dev:restart
+
+# Clean up resources
+bun run dev:cleanup
+```
+
+## 💻 VS Code Setup
+
+### **1. Extensions Installation**
+
+The setup automatically installs recommended extensions:
+
+- **Dev Containers**: Containerized development environments
+- **TypeScript**: TypeScript language support
+- **ESLint**: JavaScript linting
+- **Prettier**: Code formatting
+- **GitLens**: Git integration
+- **Thunder Client**: API testing
+
+### **2. Workspace Configuration**
+
+```json
+// .vscode/settings.json
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
+```
+
+### **3. Task Configuration**
+
+```json
+// .vscode/tasks.json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Setup DevContainer",
+      "type": "shell",
+      "command": "bun run dev:setup",
+      "group": "build"
+    },
+    {
+      "label": "Start Services",
+      "type": "shell",
+      "command": "bun run dev:up",
+      "group": "build"
+    }
+  ]
+}
+```
+
+## 🔍 Environment Verification
+
+### **1. Health Checks**
+
+```bash
+# DevContainer health check
+bun run dev:check
+
+# Local environment check
+bun run check:quick
+
+# Full system check
+bun run check
+```
+
+### **2. Service Verification**
+
+```bash
+# Check service status
+bun run dev:health
+
+# Verify ports
+netstat -tulpn | grep :300
+
+# Test connectivity
+curl http://localhost:3001  # Admin
+curl http://localhost:3002  # Storefront
+curl http://localhost:3003  # API
+curl http://localhost:3004  # UI Storybook
+```
+
+### **3. Dependency Verification**
+
+```bash
+# Check package versions
+bun run check:types
+
+# Verify workspace packages
+bun run build --affected
+
+# Test package functionality
+bun test
+```
+
+## 🚀 Advanced Setup Options
+
+### **1. Custom Environment Configuration**
+
+```bash
+# Skip specific steps
+bun run local:setup --skip-vscode --skip-tests
+
+# Skip health checks
+bun run dev:setup --skip-health-check
+```
+
+### **2. Selective Service Setup**
+
+```bash
+# Skip health checks
+bun run dev:setup --skip-health-check
+
+# Skip specific steps
+bun run local:setup --skip-vscode --skip-tests
+```
+
+### **3. Performance Optimization**
+
+```bash
+# Skip specific steps
+bun run local:setup --skip-vscode --skip-tests
+
+# Skip health checks
+bun run dev:setup --skip-health-check
+```
+
+## 🔧 Troubleshooting
+
+### **Common Issues**
 
 #### **DevContainer Issues**
 ```bash
 # Container won't start
-bun run dev:cleanup                    # Clean up containers
-bun run dev:build                      # Rebuild containers
-bun run dev:check                      # Check container health
+bun run dev:cleanup
+bun run dev:setup
 
 # Port conflicts
-bun run dev:health                     # Check port usage
-# Manually change ports in docker-compose.dev.yml
+bun run dev:health
+# Check docker-compose.dev.yml for port mappings
+
+# Build failures
+bun run dev:build
+docker system prune -f
 ```
 
-#### **Dependency Issues**
+#### **Local Setup Issues**
 ```bash
-# Clear dependency cache
-rm -rf node_modules
-rm bun.lock
+# Dependency issues
+bun install --force
+rm -rf node_modules bun.lockb
 bun install
 
-# Update dependencies
-bun update
-
-# Check for conflicts
-bun run check:types                    # TypeScript issues
-bun run check                          # Biome issues
-```
-
-#### **Build Issues**
-```bash
-# Clear build cache
-turbo run build --clearCache
-turbo run test --clearCache
-
-# Force rebuild
-bun run build --force
-bun run test --force
-```
-
-### **Performance Optimization**
-
-#### **Development Performance**
-```bash
-# Fast development workflow
-bun run check:quick                    # Quick quality check (~30s)
-bun run test --affected                # Test only affected packages (~20s)
-bun run build --affected               # Build only affected packages (~30s)
-
-# Parallel operations
-turbo run test --parallel              # Parallel test execution
-turbo run build --parallel             # Parallel build execution
-```
-
-#### **Caching Strategy**
-```bash
-# Turbo caching
-turbo run build                        # Uses Turbo cache for faster builds
-turbo run test                         # Uses Turbo cache for faster tests
-
-# Cache management
-turbo run build --clearCache           # Clear build cache
-turbo run test --clearCache            # Clear test cache
-```
-
-### **Environment-Specific Issues**
-
-#### **macOS Issues**
-```bash
-# Docker Desktop issues
-docker system prune -a                 # Clean Docker system
-docker volume prune                    # Clean volumes
-
 # Permission issues
-sudo chown -R $(whoami) .             # Fix file permissions
+sudo chown -R $USER:$USER .
+chmod +x scripts/*.ts
+
+# Cache issues
+bun run check:fix && bun run check:types --affected
 ```
 
-#### **Linux Issues**
+#### **VS Code Issues**
 ```bash
-# Docker permissions
-sudo usermod -aG docker $USER         # Add user to docker group
-newgrp docker                         # Apply group changes
+# Extension problems
+# Reload VS Code window
+# Ctrl+Shift+P → Developer: Reload Window
 
-# File watching
-echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
-sudo sysctl -p                        # Apply changes
+# DevContainer issues
+# Ctrl+Shift+P → Dev Containers: Rebuild Container
 ```
 
-#### **Windows Issues**
+### **Debug Mode**
+
 ```bash
-# WSL2 issues
-wsl --shutdown                         # Restart WSL
-wsl --update                          # Update WSL
+# Skip specific steps
+bun run local:setup --skip-vscode --skip-tests
+bun run dev:setup --skip-health-check
 
-# Docker Desktop issues
-# Restart Docker Desktop
-# Check WSL2 integration in Docker Desktop settings
+# Skip specific steps
+bun run local:setup --skip-vscode --skip-tests
+bun run dev:setup --skip-health-check
 ```
 
-## 📊 Monitoring and Health Checks
+### **Reset & Recovery**
 
-### **Health Check Commands**
 ```bash
-# Comprehensive health check
-bun run dev:check                      # Full DevContainer health check
+# Reset DevContainer
+bun run dev:cleanup
+bun run dev:setup
 
-# Quick status check
-bun run dev:health                     # Container status overview
+# Reset local environment
+bun run local:cleanup
+bun run local:setup
 
-# Quality verification
-bun run check:quick                    # Quick quality check
-bun run check:staged                   # Staged file validation
+# Reset VS Code
+# Ctrl+Shift+P → Dev Containers: Rebuild Container
 ```
 
-### **Health Check Components**
-- **Container Status**: Verify all containers are running
-- **Port Availability**: Check if ports are accessible
-- **Service Connectivity**: Test inter-service communication
-- **Volume Mounts**: Verify file system mounts
-- **Environment Variables**: Check configuration
-- **Dependencies**: Verify package installations
+## 📋 Best Practices
 
-### **Logging and Debugging**
-```bash
-# View service logs
-bun run dev:logs                       # All service logs
-bun run dev:logs admin                 # Admin service logs
-bun run dev:logs storefront            # Storefront service logs
-bun run dev:logs api                   # API service logs
+### **1. Environment Setup**
 
-# Follow logs in real-time
-bun run dev:logs -f                    # Follow all logs
-bun run dev:logs -f admin              # Follow admin logs
-```
+- Use DevContainer for consistent development environments
+- Run setup verification after environment changes
+- Keep dependencies up to date
+- Use environment-specific configurations
+
+### **2. Service Management**
+
+- Start with minimal services and add as needed
+- Monitor service health regularly
+- Use cleanup commands to free resources
+- Restart services when configuration changes
+
+### **3. Troubleshooting**
+
+- Check logs first for error details
+- Use health check commands for diagnostics
+- Reset environments when problems persist
+- Document custom configurations
+
+### **4. Performance**
+
+- Use affected package detection for efficiency
+- Optimize Docker resource allocation
+- Cache dependencies appropriately
+- Monitor resource usage
 
 ---
 
-**Ready to set up your development environment?** Follow this guide for a robust, scalable development setup! 🚀 
+*This enhanced setup system provides a robust, automated approach to environment configuration with sophisticated CLI interaction and comprehensive validation.* 

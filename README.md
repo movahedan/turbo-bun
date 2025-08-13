@@ -48,11 +48,11 @@ Watch your builds go from minutes to seconds! Bun's lightning-fast package manag
 <img src="https://bun.com/og/blog/the-bun-shell.png" alt="The bun shell">
 </div>
 
-### 🐚 **Automated cloud and local with Bun $**
+### 🐚 **Advanced Automation with Bun $**
 <img src="https://img.shields.io/badge/Bun%20Shell-Type%20Safe%20Shell%20Scripts-000000?style=for-the-badge&logo=bun&logoColor=white" alt="Bun Shell" />
-<img src="https://img.shields.io/badge/Changesets-Automation-8B5CF6?style=for-the-badge" alt="Changesets" />
+<img src="https://img.shields.io/badge/Interactive%20CLI-Enhanced%20UX-8B5CF6?style=for-the-badge" alt="Interactive CLI" />
 
-> **Seamless automation** from **local development** to **cloud deployment** using Bun's powerful `$` shell runtime
+> **Sophisticated automation** from **local development** to **cloud deployment** using Bun's powerful `$` shell runtime
 
 From your local machine to production in one smooth pipeline! Bun's shell scripts automate all the boring stuff like building, testing, and deploying, so you can focus on writing great code. No more manual deployment headaches.
 
@@ -129,7 +129,7 @@ Everything you need to build rock-solid applications is right here! From linting
 ### **🚀 Getting Started**
 [![Installation Guide](https://img.shields.io/badge/📖%20Installation%20Guide-495057?style=for-the-badge)](./docs/1_INSTALLATION_GUIDE.md)
 [![Setup Flows](https://img.shields.io/badge/⚡%20Setup%20Flows-495057?style=for-the-badge)](./docs/2_SETUP_FLOWS.md)
-[![Development Flows](https://img.shields.io/badge/��%20Development%20Flows-495057?style=for-the-badge)](./docs/3_DEV_FLOWS.md)
+[![Development Flows](https://img.shields.io/badge/🔧%20Development%20Flows-495057?style=for-the-badge)](./docs/3_DEV_FLOWS.md)
 
 ### **🛠️ Development Tools**
 [![Scripting Guide](https://img.shields.io/badge/🐚%20Scripting%20Guide-495057?style=for-the-badge)](./docs/4_SCRIPTING.md)
@@ -138,7 +138,7 @@ Everything you need to build rock-solid applications is right here! From linting
 
 ### **🤖 AI & Automation**
 [![AI Prompt](https://img.shields.io/badge/🤖%20AI%20Prompt-495057?style=for-the-badge)](./docs/AI_Prompt.md)
-[![Renovate Configuration](https://img.shields.io/badge/��%20Renovate-495057?style=for-the-badge)](./docs/6_RENOVATE.md)
+[![Renovate Configuration](https://img.shields.io/badge/🔄%20Renovate-495057?style=for-the-badge)](./docs/6_RENOVATE.md)
 [![Quality Checklist](https://img.shields.io/badge/✅%20Quality%20Checklist-495057?style=for-the-badge)](./docs/0_QUALITY_CHECKLIST.md)
 
 ### **📋 Development Rules**
@@ -159,7 +159,7 @@ curl -fsSL https://bun.com/install | bash
 # Windows (PowerShell):
 # powershell -c "irm bun.sh/install.ps1|iex"
 
-# Clone and go! ��‍♂️
+# Clone and go! 🏃‍♂️
 git clone https://github.com/movahedan/turbo-bun.git && cd turbo-bun
 
 # Open in Dev Container (VS Code)

@@ -1,468 +1,278 @@
-# 🛠️ Scripting Guide
+# 🐚 Scripting Guide
 
-> Quick guide to writing modular, type-safe scripts using our utility system
+> **Advanced automation system with interactive CLI, entity-based architecture, and sophisticated script management**
 
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Quick Start](#-quick-start)
+- [Script Architecture](#-script-architecture)
+- [Enhanced Interactive CLI](#-enhanced-interactive-cli)
+- [Entity System](#-entity-system)
 - [Script Development](#-script-development)
-- [Validators & Console](#-validators--console)
-- [Best Practices](#-best-practices)
-- [Examples](#-examples)
-- [API Reference](#-api-reference)
+- [Available Scripts](#-available-scripts)
+- [Testing Scripts](#-testing-scripts)
 
 ## 🎯 Overview
 
-Our script system provides type-safe command-line tools with automatic argument parsing, validation, and error handling. Built on Bun's performance and TypeScript's type safety.
+The Turboobun monorepo features a sophisticated scripting system built on Bun's shell runtime that provides:
 
-### Key Features
+- **🎯 Interactive CLI**: Step-by-step wizards with navigation and validation
+- **🏗️ Entity Architecture**: Modular, reusable components for common operations
+- **🔧 Type Safety**: Full TypeScript support with strict validation
+- **🧪 Testing**: Comprehensive test coverage with mocking support
+- **📚 Documentation**: Self-documenting code with JSDoc comments
 
-- ✅ **Type-safe argument parsing** with automatic validation
-- ✅ **Automatic error handling** with consistent messaging
-- ✅ **Built-in help system** with usage examples
-- ✅ **Console output management** with verbosity controls
-- ✅ **Custom colorify utility** for terminal output styling
+## 🏗️ Script Architecture
 
-## 🚀 Quick Start
+### Core Components
 
-### Basic Template
-
-```typescript
-#!/usr/bin/env bun
-
-import { validators } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
-import { colorify } from "./shell/colorify";
-
-const scriptConfig = {
-  name: "My Script",
-  description: "What this script does",
-  usage: "bun run my-script [options]",
-  examples: [
-    "bun run my-script --input file.txt",
-    "bun run my-script --input data.json --verbose",
-  ],
-  options: [
-    {
-      short: "-i",
-      long: "--input",
-      description: "Input file to process",
-      required: true,
-      validator: validators.fileExists,
-    },
-  ],
-} as const;
-
-export const myScript = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    xConsole.log("📁 Processing:", args.input);
-    
-    // Your script logic here
-    xConsole.log(colorify.green("✅ Script completed successfully!"));
-  },
-);
-
-if (import.meta.main) {
-  myScript();
-}
+```
+📁 scripts/
+├── shell/                    # 🎮 CLI and interaction utilities
+│   ├── create-scripts.ts     # Script creation framework
+│   ├── interactive-cli.ts    # Interactive prompt system
+│   ├── colorify.ts          # Terminal color utilities
+│   └── cli-tools.ts         # CLI navigation and state management
+├── entities/                 # 🏛️ Core business logic
+│   ├── commit.ts            # Commit parsing and validation
+│   ├── changelog.ts         # Changelog generation
+│   ├── package-json.ts      # Package.json operations
+│   ├── workspace.ts         # Workspace management
+│   ├── compose.ts           # Docker Compose parsing
+│   ├── affected.ts          # Affected package detection
+│   ├── tag.ts               # Git tag operations
+│   └── changelog-manager.ts # Changelog orchestration
+└── *.ts                     # 🚀 Individual script implementations
 ```
 
-### Running Scripts
+### Design Principles
+
+1. **Modularity**: Each script has a single responsibility
+2. **Type Safety**: Full TypeScript support with strict types
+3. **Testability**: Comprehensive test coverage with mocking
+4. **Consistency**: Shared utilities and patterns across scripts
+5. **Documentation**: Self-documenting code with JSDoc comments
+
+## 🎮 Enhanced Interactive CLI
+
+The new interactive CLI system provides sophisticated user experience with:
+
+### ✨ Features
+
+- **🎯 Step-by-Step Wizard**: Guided workflows with validation
+- **📊 Progress Tracking**: Visual progress bars and completion status
+- **⚡ Quick Actions**: Keyboard shortcuts for common operations
+- **🔄 Smart Navigation**: Go back/forward between steps with arrow keys
+- **🚫 Conditional Skipping**: Automatically skip irrelevant steps
+- **📋 Preview Mode**: See final results before confirming
+- **❌ Validation**: Real-time validation with helpful error messages
+
+### 🎮 Usage Examples
 
 ```bash
-# Run with help
-bun run my-script --help
+# Interactive commit creation
+bun run commit
 
-# Run with arguments
-bun run my-script --input data.txt --verbose
+# Direct message commit
+bun run commit -m "feat: add new feature"
 
-# Run with short flags
-bun run my-script -i data.txt -v
+# Stage all files and commit
+bun run commit -a -m "fix: resolve bug"
+
+# Skip git hooks
+bun run commit -m "docs: update readme" --no-verify
 ```
 
-## 📝 Script Development
+### ⌨️ Keyboard Shortcuts
 
-### Script Structure
+- **↑/↓**: Navigate between options
+- **←**: Go back to previous step
+- **→**: Go to next step (if validation passes)
+- **Enter**: Confirm selection/input
+- **Space**: Toggle multi-select options
+- **ESC**: Clear input or go back
+- **Ctrl+C**: Exit wizard
 
-Every script follows this pattern:
+### ⚡ Quick Actions
+
+Each step shows available quick actions:
+
+- **h**: Show help for current step
+- **s**: Skip current step (if allowed)
+- **p**: Preview final result
+- **←**: Go back to previous step
+
+## 🏛️ Entity System
+
+The entity system provides reusable, type-safe components for common operations:
+
+### Core Entities
+
+#### `EntityCommit`
+- Commit parsing, validation, and analysis
+- Conventional commit format support
+- PR categorization and metadata extraction
+
+#### `EntityChangelog`
+- Changelog generation and merging
+- Keep a Changelog format compliance
+- Version-aware content management
+
+#### `EntityPackageJson`
+- Package.json operations and version management
+- Automated version bumping
+- Changelog file management
+
+#### `EntityWorkspace`
+- Workspace package discovery and validation
+- Package path resolution
+- Dependency graph analysis
+
+#### `EntityCompose`
+- Docker Compose parsing and service health
+- Service port mapping
+- Health check monitoring
+
+#### `EntityAffected`
+- Affected package detection with dependencies
+- Change impact analysis
+- CI/CD integration support
+
+#### `EntityTag`
+- Git tag operations and management
+- Version tag creation and deletion
+- Remote tag synchronization
+
+#### `ChangelogManager`
+- Stateful changelog orchestration
+- Version bump determination
+- Commit range analysis
+
+## 🔧 Script Development
+
+### Creating New Scripts
+
+1. **Use the Template**: Follow `example-script.ts` structure
+2. **Use `createScript` Utility**: Ensures consistent CLI handling
+3. **Add JSDoc Comments**: Document purpose and usage
+4. **Include Examples**: Provide practical usage examples
+
+### Script Configuration
 
 ```typescript
-#!/usr/bin/env bun
-
-// 1. Imports
-import { validators } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
-import { colorify } from "./shell/colorify";
-
-// 2. Configuration
 const scriptConfig = {
   name: "Script Name",
-  description: "What the script does",
+  description: "What this script does",
   usage: "bun run script-name [options]",
   examples: [
-    "bun run script-name --option value",
+    "bun run script-name",
+    "bun run script-name --option value"
   ],
   options: [
     {
       short: "-o",
       long: "--option",
       description: "Option description",
-      required: false,
-      defaultValue: "default",
-      validator: validators.string,
-    },
-  ],
-} as const;
-
-// 3. Main function
-export const myScript = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    // Script logic here
-    xConsole.log(colorify.blue("Processing..."));
-    
-    // Use colorify for colored output
-    xConsole.log(colorify.green("Success!"));
-    xConsole.log(colorify.red("Error!"));
-    xConsole.log(colorify.yellow("Warning!"));
-  },
-);
-
-// 4. Main execution
-if (import.meta.main) {
-  myScript();
-}
-```
-
-### Available Utilities
-
-#### **Colorify Utility**
-```typescript
-import { colorify } from "./shell/colorify";
-
-// Available colors
-colorify.red("Error message");
-colorify.green("Success message");
-colorify.yellow("Warning message");
-colorify.blue("Info message");
-colorify.cyan("Debug message");
-colorify.gray("Muted message");
-
-// Color support detection
-if (colorify.supportsColor()) {
-  // Terminal supports colors
-}
-
-// Disable colors
-colorify.disable();
-
-// Re-enable colors
-colorify.enable();
-```
-
-#### **Directory Utilities**
-```typescript
-import { getAllDirectories, getAllDirectoryNames } from "./shell/get-all-directories";
-
-// Get all package directories
-const directories = await getAllDirectories();
-
-// Get directory names for commitlint scopes
-const scopes = await getAllDirectoryNames();
-```
-
-#### **Docker Compose Parser**
-```typescript
-import { parseDockerCompose } from "./shell/docker-compose-parser";
-
-// Parse docker-compose.yml
-const services = await parseDockerCompose("docker-compose.yml");
-```
-
-#### **Changeset Parser**
-```typescript
-import { parseChangesets } from "./shell/changeset-parser";
-
-// Parse changeset files
-const changesets = await parseChangesets();
-```
-
-## 🔧 Validators & Console
-
-### Built-in Validators
-
-```typescript
-import { validators } from "./shell/create-scripts";
-
-// String validation
-validators.string("input")           // Validates string input
-validators.boolean("true")           // Validates boolean input
-validators.number("123")             // Validates number input
-validators.fileExists("./file.txt")  // Validates file exists
-validators.directoryExists("./dir")  // Validates directory exists
-```
-
-### Console Output
-
-```typescript
-// Console methods available in main function
-xConsole.log("Info message");
-xConsole.info("Info message");
-xConsole.warn("Warning message");
-xConsole.error("Error message");
-xConsole.debug("Debug message"); // Only shown with --verbose
-```
-
-## 📋 Best Practices
-
-### 1. **Error Handling**
-```typescript
-export const myScript = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    try {
-      // Your logic here
-      xConsole.log(colorify.green("✅ Success!"));
-    } catch (error) {
-      xConsole.error(colorify.red(`❌ Error: ${error.message}`));
-      process.exit(1);
-    }
-  },
-);
-```
-
-### 2. **Progress Reporting**
-```typescript
-export const myScript = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    xConsole.info("🚀 Starting process...");
-    
-    // Process items
-    for (const item of items) {
-      xConsole.log(`Processing: ${item}`);
-      // ... processing logic
-    }
-    
-    xConsole.log(colorify.green("✅ All items processed!"));
-  },
-);
-```
-
-### 3. **Verbose Output**
-```typescript
-export const myScript = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    xConsole.log("Basic output");
-    
-    if (args.verbose) {
-      xConsole.debug("Detailed debug information");
-      xConsole.log("Additional verbose output");
-    }
-  },
-);
-```
-
-## 📚 Examples
-
-### **File Processing Script**
-```typescript
-#!/usr/bin/env bun
-
-import { validators } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
-import { colorify } from "./shell/colorify";
-import { readFileSync, writeFileSync } from "node:fs";
-
-const scriptConfig = {
-  name: "File Processor",
-  description: "Process files with custom logic",
-  usage: "bun run process-files --input file.txt --output result.txt",
-  examples: [
-    "bun run process-files --input data.txt --output processed.txt",
-    "bun run process-files --input data.txt --output processed.txt --verbose",
-  ],
-  options: [
-    {
-      short: "-i",
-      long: "--input",
-      description: "Input file path",
       required: true,
-      validator: validators.fileExists,
-    },
-    {
-      short: "-o",
-      long: "--output",
-      description: "Output file path",
-      required: true,
-    },
-    {
-      short: "-v",
-      long: "--verbose",
-      description: "Enable verbose output",
-      required: false,
-      defaultValue: false,
-      validator: validators.boolean,
-    },
-  ],
-} as const;
-
-export const processFiles = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    xConsole.info("📁 Processing file...");
-    
-    try {
-      const content = readFileSync(args.input, "utf-8");
-      xConsole.log(`Read ${content.length} characters`);
-      
-      // Process content
-      const processed = content.toUpperCase();
-      
-      writeFileSync(args.output, processed);
-      xConsole.log(colorify.green(`✅ File processed and saved to ${args.output}`));
-      
-      if (args.verbose) {
-        xConsole.debug(`Input: ${args.input}`);
-        xConsole.debug(`Output: ${args.output}`);
-        xConsole.debug(`Processed content length: ${processed.length}`);
-      }
-    } catch (error) {
-      xConsole.error(colorify.red(`❌ Error processing file: ${error.message}`));
-      process.exit(1);
+      validator: validators.nonEmpty
     }
-  },
-);
-
-if (import.meta.main) {
-  processFiles();
-}
+  ]
+} as const satisfies ScriptConfig;
 ```
 
-### **Directory Analysis Script**
+### Code Quality
+
+```bash
+# Run type checking
+bun run check:types
+
+# Run linting
+bun run check:fix
+
+# Run tests
+bun test scripts/
+```
+
+## 🚀 Available Scripts
+
+### Development Scripts
+
+- **`dev-setup`**: Set up development environment
+- **`dev-cleanup`**: Clean up development resources
+- **`dev-check`**: Verify DevContainer health
+- **`local-setup`**: Local environment setup
+- **`local-cleanup`**: Local environment cleanup
+- **`local-vscode`**: VS Code-specific setup
+
+### CI/CD Scripts
+
+- **`ci-act`**: Test GitHub Actions locally
+- **`ci-attach-affected`**: Attach affected packages to GitHub output
+- **`ci-attach-service-ports`**: Attach service ports to GitHub output
+
+### Version Management
+
+- **`version-prepare`**: Prepare version bumps and changelogs
+- **`version-apply`**: Apply version changes and create tags
+- **`version-ci`**: Complete CI version workflow
+
+### Git Operations
+
+- **`commit`**: Interactive commit creation with validation
+- **`commit-check`**: Comprehensive commit validation
+- **`update-package-json`**: Update package.json exports
+
+## 🧪 Testing Scripts
+
+### Test Coverage
+
+```bash
+# Run all tests
+bun test
+
+# Run tests in watch mode
+bun test --watch
+
+# Run with coverage
+bun test --coverage
+
+# Run specific test file
+bun test shell/version-utils.test.ts
+```
+
+### Test Structure
+
+- **`shell/version-utils.test.ts`**: Core version management utilities
+- **`shell/changelog-generator.test.ts`**: Changelog generation logic
+- **`entities/*.test.ts`**: Entity system tests
+
+### Testing Utilities
+
 ```typescript
-#!/usr/bin/env bun
+// Create mock data
+export const createMockUser = (overrides: Partial<User> = {}): User => ({
+  id: 1,
+  name: 'Test User',
+  email: 'test@example.com',
+  ...overrides
+});
 
-import { validators } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
-import { colorify } from "./shell/colorify";
-import { getAllDirectories } from "./shell/get-all-directories";
-
-const scriptConfig = {
-  name: "Directory Analyzer",
-  description: "Analyze project directory structure",
-  usage: "bun run analyze-dirs [options]",
-  examples: [
-    "bun run analyze-dirs",
-    "bun run analyze-dirs --verbose",
-  ],
-  options: [
-    {
-      short: "-v",
-      long: "--verbose",
-      description: "Enable verbose output",
-      required: false,
-      defaultValue: false,
-      validator: validators.boolean,
-    },
-  ],
-} as const;
-
-export const analyzeDirs = createScript(
-  scriptConfig,
-  async function main(args, xConsole) {
-    xConsole.info("🔍 Analyzing project directories...");
-    
-    try {
-      const directories = await getAllDirectories();
-      
-      xConsole.log(colorify.blue(`Found ${directories.length} directories:`));
-      
-      for (const dir of directories) {
-        xConsole.log(`  📁 ${dir}`);
-        
-        if (args.verbose) {
-          // Additional analysis for verbose mode
-          xConsole.debug(`    Path: ${dir}`);
-        }
-      }
-      
-      xConsole.log(colorify.green("✅ Directory analysis complete!"));
-    } catch (error) {
-      xConsole.error(colorify.red(`❌ Error analyzing directories: ${error.message}`));
-      process.exit(1);
-    }
-  },
-);
-
-if (import.meta.main) {
-  analyzeDirs();
-}
+// Test script execution
+describe('Script Name', () => {
+  it('should execute successfully', async () => {
+    const result = await scriptFunction();
+    expect(result).toBeDefined();
+  });
+});
 ```
 
-## 📖 API Reference
+## 🔗 Dependencies
 
-### **createScript Function**
-```typescript
-function createScript<T extends ScriptConfig>(
-  config: T,
-  mainFunction: (args: InferArgs<T>, console: XConsole) => Promise<void>
-): () => Promise<void>
-```
-
-### **ScriptConfig Interface**
-```typescript
-interface ScriptConfig {
-  name: string;
-  description: string;
-  usage: string;
-  examples: string[];
-  options: Option[];
-}
-```
-
-### **Option Interface**
-```typescript
-interface Option {
-  short: string;
-  long: string;
-  description: string;
-  required: boolean;
-  defaultValue?: any;
-  validator?: (value: any) => boolean | string;
-}
-```
-
-### **XConsole Interface**
-```typescript
-interface XConsole {
-  log(message: string): void;
-  info(message: string): void;
-  warn(message: string): void;
-  error(message: string): void;
-  debug(message: string): void;
-}
-```
-
-### **Colorify Interface**
-```typescript
-interface Colorify {
-  red(text: string): string;
-  green(text: string): string;
-  yellow(text: string): string;
-  blue(text: string): string;
-  cyan(text: string): string;
-  gray(text: string): string;
-  reset: string;
-  supportsColor(): boolean;
-  disable(): void;
-  enable(): void;
-}
-```
+- **Runtime**: Bun for JavaScript execution and package management
+- **Types**: TypeScript for type safety
+- **Utilities**: Custom shell utilities for git, Docker, and file operations
+- **Testing**: Bun's built-in test runner with mocking support
 
 ---
 
-**Ready to build powerful, type-safe scripts?** Start with the examples above and explore the utility functions in `scripts/shell/` for more advanced features! 
+*This scripting system provides a robust foundation for automation, CI/CD, and development workflows. For more information, see the individual script files and the main project documentation.* 

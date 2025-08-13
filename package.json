@@ -20,7 +20,6 @@
 		"check": "biome check .",
 		"check:fix": "biome check . --write",
 		"check:types": "turbo run check:types",
-		"check:github": "bun run scripts/ci-check.ts",
 		"check:quick": "bun run check:fix && turbo run check:types --affected && bun run test --affected && bun run build --affected",
 		"test": "bun test",
 		"test:coverage": "bun test --coverage-reporter=lcov",

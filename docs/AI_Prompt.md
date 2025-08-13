@@ -1,189 +1,381 @@
-# 🤖 AI Development Assistant Guidelines
+# 🤖 AI Prompt
 
-## 🎯 Core Principle
-**You are an AI development assistant working within a DevContainer-first, documentation-driven development environment. You MUST follow these strict guidelines for all interactions.**
+> **Comprehensive guide for AI assistants working with the Turboobun monorepo**
 
-## 🚨 CRITICAL: Pre-Implementation Requirements
+## 📋 Table of Contents
 
-### **MANDATORY Documentation Review**
-**BEFORE implementing ANY changes, you MUST:**
+- [Overview](#-overview)
+- [Project Architecture](#-project-architecture)
+- [Enhanced Script System](#-enhanced-script-system)
+- [Development Workflows](#-development-workflows)
+- [Code Standards](#-code-standards)
+- [Common Tasks](#-common-tasks)
+- [Troubleshooting](#-troubleshooting)
 
-1. **ALWAYS** read `docs/AI_Prompt.md` first (this file)
-2. **ALWAYS** review `docs/0_QUALITY_CHECKLIST.md` for structural requirements
-3. **ALWAYS** examine `.cursor/rules/` directory for coding standards
-4. **ALWAYS** check `docs/3_DEV_FLOWS.md` for development workflows
-5. **ALWAYS** verify DevContainer implications in `docs/5_DOCKER.md`
+## 🎯 Overview
 
-### **Repository State Verification**
-**NEVER assume anything not present in the repository:**
-- **ALWAYS** examine actual files, scripts, and configurations
-- **ALWAYS** verify file paths and script names exist
-- **ALWAYS** check `package.json` scripts and `turbo.json` configuration
-- **ALWAYS** ensure documentation matches current implementation exactly
+The Turboobun monorepo is a sophisticated development environment built on modern technologies with enhanced automation and interactive CLI systems. This guide helps AI assistants understand the project structure, workflows, and best practices.
 
-## 🐳 DevContainer-First Development
+### **Key Technologies**
 
-### **CRITICAL DevContainer Rules:**
-- **ALWAYS** remember that you are being run in a Docker container
-- **ALWAYS** test implementations within DevContainer environment
-- **ALWAYS** use DevContainer-specific commands: `bun run dev:*`
-- **ALWAYS** verify DevContainer health: `bun run dev:check`
-- **ALWAYS** ensure Docker/container compatibility for all changes
-- **ALWAYS** test in isolated DevContainer environment before suggesting changes
+- **🏗️ Monorepo**: Turborepo for build system orchestration
+- **⚡ Runtime**: Bun for JavaScript execution and package management
+- **🔷 Language**: TypeScript with strict type safety
+- **🎨 Styling**: Tailwind CSS with CSS Modules
+- **🐳 Containers**: Docker and DevContainer for development
+- **🚀 CI/CD**: GitHub Actions with automated workflows
 
-## 📋 AI-Specific Implementation Process
+## 🏗️ Project Architecture
 
-### **Step 1: Documentation Analysis**
-```bash
-# Search for relevant documentation
-find docs/ -name "*.md" -exec grep -l "keyword" {} \;
-grep -r "feature_name" docs/
+### **Repository Structure**
+
+```
+turbo/
+├── apps/                    # 🚀 Application packages
+│   ├── admin/              # React + Vite admin dashboard
+│   ├── storefront/         # Next.js e-commerce frontend
+│   ├── api/                # Express.js backend API
+│   └── docs-astro/         # Astro documentation site
+├── packages/                # 📦 Shared packages
+│   ├── ui/                 # React component library
+│   ├── utils/              # Utility functions
+│   ├── typescript-config/  # TypeScript configurations
+│   └── test-preset/        # Testing configurations
+├── scripts/                 # 🐚 Automation scripts
+│   ├── entities/           # Core business logic
+│   ├── shell/              # CLI and interaction utilities
+│   └── *.ts                # Individual script implementations
+└── docs/                    # 📚 Project documentation
 ```
 
-### **Step 2: Repository State Verification**
-- Examine actual file structure and configurations
-- Verify all referenced files, scripts, and paths exist
-- Check current implementation against documentation
+### **Package Management**
 
-### **Step 3: Implementation Planning**
-- Identify affected components and services
-- Plan testing strategy based on `docs/TESTING.md`
-- Consider impact on existing functionality
-- Plan documentation updates
+- **Root**: `package.json` with workspace definitions
+- **Workspaces**: `apps/*` and `packages/*` as separate packages
+- **Dependencies**: Bun for fast package management
+- **Scripts**: Centralized script management with `bun run`
 
-### **Step 4: Implementation Execution**
-- Follow established patterns from `.cursor/rules/`
-- Use DevContainer-specific commands and workflows
-- Implement with strict adherence to quality standards
-- Test thoroughly using established patterns
+## 🎮 Enhanced Script System
 
-### **Step 5: Post-Implementation Validation**
-- Run quality checks: `bun run check:quick`
-- Test DevContainer setup: `bun run dev:setup`
-- Test DevContainer health: `bun run dev:check`
-- Update relevant documentation
-- Follow conventional commit standards
+### **Interactive CLI Features**
 
-## 🔍 Documentation Priority Order
+The project features a sophisticated interactive CLI system:
 
-1. **`docs/AI_Prompt.md`** - AI-specific guidelines (MANDATORY FIRST READ)
-2. **`docs/0_QUALITY_CHECKLIST.md`** - Structural change requirements
-3. **`.cursor/rules/`** - Development conventions and coding standards
-4. **`docs/3_DEV_FLOWS.md`** - Development workflow and commands
-5. **`docs/2_SETUP_FLOWS.md`** - Organized setup flows
-6. **`docs/planning/`** - Architectural decisions and planning
-7. **`README.md`** - Project overview and quick start
+#### **Step-by-Step Wizards**
+- Guided workflows with validation
+- Progress tracking and completion status
+- Smart navigation between steps
+- Conditional step skipping
 
-## 🚫 STRICT AI Behavior Rules
+#### **Quick Actions**
+- Keyboard shortcuts for common operations
+- Context-aware help and preview
+- Real-time validation feedback
+- Error handling and recovery
 
-### **Documentation Update Process**
-When updating documentation:
-- **ALWAYS** compare documented flows with actual repository state
-- **NEVER** assume anything not present in the repository
-- **ALWAYS** examine actual files, scripts, and configurations
-- **ALWAYS** update the document as a complete, legitimate summary
-- **ALWAYS** link to actual repository files instead of explaining everything
-- **ALWAYS** verify file paths and script names exist in the repository
-- **ALWAYS** check `package.json` scripts, `turbo.json` config, and actual file structure
-- **ALWAYS** ensure documentation matches the current implementation exactly
-- **ALWAYS** check `.cursor/rules/` directory and update rules if needed
-- **ALWAYS** verify that `.cursor/rules/` reflects current development patterns
-- **ALWAYS** apply this process to ALL documentation in the `docs/` folder
-- **ALWAYS** pay special attention to `README.md` as the primary entry point
+### **Entity-Based Architecture**
 
-### **Implementation Rules**
-- **ALWAYS** read relevant documentation before implementing
-- **ALWAYS** understand current architecture and patterns
-- **ALWAYS** check for existing similar implementations
-- **ALWAYS** review related planning documents
-- **ALWAYS** understand the development workflow
-- **ALWAYS** review DevContainer configuration and implications
+The script system uses modular, reusable components:
 
-### **Quality Assurance Rules**
-- **ALWAYS** follow quality checklist requirements
-- **ALWAYS** use established testing patterns
-- **ALWAYS** ensure CI/CD pipeline compatibility
-- **ALWAYS** follow conventional commit standards
-- **ALWAYS** update documentation as part of implementation
+```
+📁 scripts/entities/
+├── commit.ts            # 📝 Commit parsing and validation
+├── changelog.ts         # 📋 Changelog generation
+├── package-json.ts      # 📦 Package.json operations
+├── workspace.ts         # 🗂️ Workspace package discovery
+├── compose.ts           # 🐳 Docker Compose parsing
+├── affected.ts          # 🔍 Affected package detection
+├── tag.ts               # 🏷️ Git tag operations
+└── changelog-manager.ts # 🎯 Changelog orchestration
+```
 
-## 🎯 AI Prompting Best Practices
+### **Available Scripts**
 
-### **Clear Instructions**
-- Provide specific, actionable instructions
-- Use numbered lists for sequential tasks
-- Include expected outputs and formats
-- Specify error handling requirements
+```bash
+# Development
+bun run dev:setup        # Setup DevContainer
+bun run dev:up           # Start services
+bun run dev:check        # Check service health
+bun run local:setup      # Setup local environment
 
-### **Context Awareness**
-- Reference specific files and line numbers
-- Include relevant code snippets
-- Provide background context when needed
-- Explain the "why" behind requirements
+# Quality Assurance
+bun run check            # Full quality check
+bun run check:quick      # Quick quality check
+bun run check:fix        # Fix linting issues
+bun run check:types      # Type checking
 
-### **Iterative Refinement**
-- Start with high-level requirements
-- Refine based on initial outputs
-- Provide feedback for improvements
-- Maintain consistency across iterations
+# Version Management
+bun run version:commit   # Interactive versioning
+bun run version:prepare  # Prepare versions
+bun run version:apply    # Apply versions
 
-### **Error Prevention**
-- Anticipate common failure points
-- Include validation steps
-- Provide fallback options
-- Specify debugging approaches
+# Git Operations
+bun run commit           # Interactive commit creation
+bun run commit:check     # Commit validation
+```
 
-## 📝 Implementation Checklist
+## 🔧 Development Workflows
 
-### ✅ **Pre-Implementation**
-- [ ] Read all relevant documentation files
-- [ ] Understand current architecture and patterns
-- [ ] Check for existing similar implementations
-- [ ] Review related planning documents
-- [ ] Understand development workflow
-- [ ] Review DevContainer configuration
+### **1. Local Development**
 
-### ✅ **Implementation**
-- [ ] Follow established patterns from `.cursor/rules/`
-- [ ] Use DevContainer-specific commands
-- [ ] Implement with strict quality standards
-- [ ] Test thoroughly using established patterns
-- [ ] Update relevant documentation
+```bash
+# Setup local environment
+bun run local:setup
 
-### ✅ **Post-Implementation**
-- [ ] Run quality checks: `bun run check:quick`
-- [ ] Test DevContainer setup: `bun run dev:setup`
-- [ ] Test DevContainer health: `bun run dev:check`
-- [ ] Update documentation
-- [ ] Follow conventional commit standards
+# Install dependencies
+bun install
 
-## 🚫 Common AI Mistakes to Avoid
+# Start development
+bun run dev
 
-1. **Skipping Documentation Review** - Always read relevant docs first
-2. **Making Assumptions** - Never assume anything not in repository
-3. **Ignoring DevContainer Context** - Always consider container implications
-4. **Not Following Quality Standards** - Always check structural requirements
-5. **Missing Documentation Updates** - Always keep docs in sync
-6. **Not Testing Thoroughly** - Always test in DevContainer environment
+# Quality checks
+bun run check:quick
+```
 
-## 💡 AI Best Practices
+### **2. DevContainer Development**
 
-1. **Start with AI_Prompt.md** for AI-specific guidance
-2. **Use the quality checklist** for structural changes
-3. **Follow the development workflow** for consistency
-4. **Search documentation** before implementing similar features
-5. **Update documentation** as part of implementation
-6. **Test thoroughly** using established patterns
-7. **Follow conventional commits** for version control
+```bash
+# Setup DevContainer
+bun run dev:setup
 
-## 🔄 Continuous Improvement
+# Start services
+bun run dev:up
 
-- **Before each implementation**: Review relevant documentation
-- **During implementation**: Check documentation for patterns and standards
-- **After implementation**: Update documentation to reflect changes
-- **For new features**: Create or update planning documentation
+# Verify health
+bun run dev:check
+
+# View logs
+bun run dev:logs
+```
+
+### **3. Package Development**
+
+```bash
+# Work on specific package
+cd packages/my-package
+
+# Install dependencies
+bun install
+
+# Run tests
+bun test
+
+# Build package
+bun run build
+```
+
+### **4. Version Management**
+
+```bash
+# Interactive versioning
+bun run version:commit
+
+# Preview changes
+bun run version:commit --dry-run
+
+# Manual operations
+bun run scripts/version-prepare.ts --package root
+bun run scripts/version-apply.ts
+```
+
+## 📋 Code Standards
+
+### **TypeScript Standards**
+
+- **Strict Mode**: Use strict TypeScript configuration
+- **Type Safety**: Prefer explicit types over `any`
+- **Interfaces**: Use interfaces for object shapes
+- **Generics**: Use generics for reusable components
+- **Return Types**: Declare return types for functions
+
+### **React Standards**
+
+- **Functional Components**: Use functional components with hooks
+- **Props Interface**: Define clear props interfaces
+- **Custom Hooks**: Extract reusable logic into custom hooks
+- **CSS Modules**: Use CSS Modules with Tailwind `@apply`
+
+### **Script Standards**
+
+- **createScript**: Use `createScript` utility for all scripts
+- **Validation**: Include proper argument validation
+- **Error Handling**: Use try-catch with proper error messages
+- **Documentation**: Include JSDoc comments for complex logic
+
+### **Naming Conventions**
+
+- **Files**: Use kebab-case for file names
+- **Variables**: Use camelCase for variables and functions
+- **Types**: Use PascalCase for types and interfaces
+- **Constants**: Use UPPER_SNAKE_CASE for constants
+
+## 🚀 Common Tasks
+
+### **Adding New Packages**
+
+```bash
+# Create package directory
+mkdir packages/my-package
+cd packages/my-package
+
+# Initialize package
+bun init
+
+# Add to workspace
+# Update root package.json workspaces array
+
+# Install dependencies
+bun install
+
+# Add to Turbo configuration
+# Update turbo.json
+```
+
+### **Adding New Scripts**
+
+```bash
+# Create script file
+touch scripts/my-script.ts
+
+# Use createScript utility
+import { createScript, type ScriptConfig } from "./shell/create-scripts";
+
+const scriptConfig = {
+  name: "My Script",
+  description: "What this script does",
+  usage: "bun run my-script [options]",
+  examples: ["bun run my-script"],
+  options: []
+} as const satisfies ScriptConfig;
+
+export const myScript = createScript(scriptConfig, async function main(args, xConsole) {
+  // Script logic here
+});
+
+if (import.meta.main) {
+  myScript();
+}
+```
+
+### **Adding New Entities**
+
+```bash
+# Create entity file
+touch scripts/entities/my-entity.ts
+
+# Follow entity pattern
+export class EntityMyEntity {
+  constructor() {}
+
+  static async methodName(): Promise<void> {
+    // Implementation
+  }
+}
+
+# Export from index
+export { EntityMyEntity } from "./my-entity";
+```
+
+### **Testing Scripts**
+
+```bash
+# Run all tests
+bun test
+
+# Run specific test
+bun test scripts/my-script.test.ts
+
+# Run with coverage
+bun test --coverage
+
+# Run in watch mode
+bun test --watch
+```
+
+## 🔍 Troubleshooting
+
+### **Common Issues**
+
+#### **Script Execution Problems**
+```bash
+# Check script permissions
+chmod +x scripts/*.ts
+
+# Verify Bun installation
+bun --version
+
+# Check script syntax
+bun run check:types
+```
+
+#### **DevContainer Issues**
+```bash
+# Reset DevContainer
+bun run dev:cleanup
+bun run dev:setup
+
+# Check service health
+bun run dev:check
+
+# View logs
+bun run dev:logs
+```
+
+#### **Quality Check Failures**
+```bash
+# Fix linting issues
+bun run check:fix
+
+# Check types
+bun run check:types
+
+# Run tests
+bun test
+```
+
+### **Debug Mode**
+
+```bash
+# Enable verbose output
+bun run dev:setup --verbose
+
+# Dry run to preview changes
+bun run version:commit --dry-run
+
+# Check affected packages
+bun run scripts/ci-attach-affected.ts --mode turbo
+```
+
+## 📚 Best Practices
+
+### **1. Development Workflow**
+
+- Use DevContainer for consistent environments
+- Run quality checks before committing
+- Test changes locally before pushing
+- Use interactive CLI for complex operations
+
+### **2. Code Quality**
+
+- Follow TypeScript strict standards
+- Use proper error handling
+- Include comprehensive tests
+- Document complex logic
+
+### **3. Script Development**
+
+- Use `createScript` utility consistently
+- Include proper validation
+- Handle errors gracefully
+- Provide helpful error messages
+
+### **4. Package Management**
+
+- Keep dependencies up to date
+- Use exact versions for stability
+- Test package compatibility
+- Document breaking changes
 
 ---
 
-**CRITICAL REMINDER**: This project has extensive, well-organized documentation. Reading and following this documentation ensures consistency, quality, and successful implementation. The documentation is your primary source of truth for all development decisions.
-
-**ALWAYS** read the docs and apply solutions according to your findings. The docs are inside `docs/*`.
+*This enhanced development system provides a robust, automated approach to development workflows with sophisticated CLI interaction and comprehensive CI/CD integration. AI assistants should follow these guidelines to provide accurate and helpful assistance.*

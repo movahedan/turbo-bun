@@ -1,404 +1,464 @@
-# 🔄 Development Workflow
+# 🔧 Development Flows
 
-> **Daily development commands and processes for the Turboobun monorepo**
-
-This document covers the essential commands and workflows for day-to-day development. For setup and cleanup, see the [Installation Guide](./1_INSTALLATION_GUIDE.md) and the [Setup Flows](./2_SETUP_FLOWS.md).
+> **Comprehensive development workflows with enhanced automation, interactive CLI, and sophisticated script management**
 
 ## 📋 Table of Contents
 
+- [Overview](#-overview)
 - [Quick Start](#-quick-start)
-- [Testing Workflow](#-testing-workflow)
-- [Development Commands](#-development-commands)
-- [Code Quality](#-code-quality)
-- [Build Commands](#-build-commands)
-- [DevContainer Management](#-devcontainer-management)
-- [Contribution Workflow](#-contribution-workflow)
-- [Version Management](#-version-management)
+- [Enhanced Script System](#-enhanced-script-system)
+- [Development Workflows](#-development-workflows)
+- [CI/CD Integration](#-cicd-integration)
+- [Testing & Quality](#-testing--quality)
+- [Troubleshooting](#-troubleshooting)
+
+## 🎯 Overview
+
+The Turboobun monorepo provides sophisticated development workflows built on:
+
+- **🎮 Interactive CLI**: Step-by-step wizards with navigation and validation
+- **🏗️ Entity Architecture**: Modular, reusable components for common operations
+- **🔧 Enhanced Scripts**: Type-safe automation with comprehensive error handling
+- **🧪 Automated Testing**: Comprehensive test coverage and quality checks
+- **🚀 CI/CD Integration**: Seamless GitHub Actions integration
 
 ## 🚀 Quick Start
 
-### **Daily Development Flow**
+### **1. Setup Development Environment**
+
 ```bash
-# 1. Start your development session
-bun run dev                    # Start all applications in development mode
+# Local development setup
+bun run local:setup
 
-# 2. Make your changes and run quality checks
-bun run check:quick           # Quick verification of your changes
-
-# 3. Test your changes
-bun run test --affected       # Test only affected packages
-
-# 4. Build your changes
-bun run build --affected      # Build only affected packages
+# DevContainer setup (recommended)
+bun run dev:setup
 ```
 
-## 🧪 Testing Workflow
+### **2. Start Development Services**
 
-### **Test Execution**
 ```bash
-# Run all tests
-bun run test                 # Run all tests across all packages
+# Start all services
+bun run dev:up
 
-# Run tests for specific packages
-turbo run test --filter=@repo/ui        # Test UI package only
-turbo run test --filter=@repo/utils     # Test utils package only
-turbo run test --filter=admin           # Test admin app only
+# Check service health
+bun run dev:check
 
-# Run tests for affected packages only
-bun run test --affected      # Test only packages affected by changes
+# View service logs
+bun run dev:logs
 ```
 
-### **Test Options**
-```bash
-# Coverage and reporting
-bun run test:coverage        # Run tests with coverage
-bun run test:coverage --affected  # Coverage for affected packages only
+### **3. Run Quality Checks**
 
-# Parallel testing
-turbo run test --parallel    # Turbo parallel testing
-```
-
-### **Test Utilities**
-```bash
-# Clear test cache
-bun run test --clearCache    # Clear test cache
-turbo run test --clearCache  # Clear Turbo test cache
-```
-
-## 🔧 Development Commands
-
-### **Application Development**
-
-#### **Local Mode (Host Machine)**
-```bash
-# Start all applications locally
-bun run dev                   # Start all apps in development mode
-
-# Start specific applications locally
-turbo run dev --filter=admin      # Start admin app only
-turbo run dev --filter=storefront # Start storefront app only
-turbo run dev --filter=api        # Start API only
-```
-
-#### **DevContainer Mode (Containerized)**
-```bash
-# Start all applications in DevContainer
-bun run dev:up               # Start all DevContainer services
-
-# Start specific applications in DevContainer
-bun run dev:up admin         # Start admin service only
-bun run dev:up storefront    # Start storefront service only
-bun run dev:up api           # Start API service only
-bun run dev:up ui            # Start UI package with Storybook only
-```
-
-#### **Development Options**
-```bash
-# Health monitoring
-bun run dev:health           # Check DevContainer health status
-bun run dev:logs             # View DevContainer logs
-bun run dev:logs admin       # View specific service logs
-
-# Container management
-bun run dev:restart          # Restart all services
-bun run dev:down             # Stop all services
-bun run dev:cleanup          # Clean up containers and volumes
-```
-
-### **Package Development**
-
-#### **UI Package with Storybook**
-```bash
-# Start Storybook development server
-turbo run dev --filter=@repo/ui        # Start UI package dev
-bun run build:storybook                # Build Storybook for production
-
-# Storybook commands
-cd packages/ui
-bun run dev:storybook                  # Start Storybook dev server
-bun run start                          # Serve built Storybook
-```
-
-#### **Utility Package Development**
-```bash
-# Work on utility packages
-turbo run dev --filter=@repo/utils     # Start utils package dev
-turbo run build --filter=@repo/utils   # Build utils package
-```
-
-## 🔍 Code Quality
-
-### **Quality Checks**
 ```bash
 # Quick quality check
-bun run check:quick          # Run all quality checks on affected packages
+bun run check:quick
 
-# Individual quality checks
-bun run check                # Biome linting and formatting
-bun run check:fix            # Auto-fix Biome issues
-bun run check:types          # TypeScript type checking
-bun run check:staged         # Check staged files for issues
+# Full quality check
+bun run check
 ```
 
-### **Staged File Validation**
+## 🎮 Enhanced Script System
+
+### **Interactive CLI Features**
+
+The new interactive CLI system provides sophisticated user experience:
+
+#### **Step-by-Step Wizards**
+- Guided workflows with validation
+- Progress tracking and completion status
+- Smart navigation between steps
+- Conditional step skipping
+
+#### **Quick Actions**
+- Keyboard shortcuts for common operations
+- Context-aware help and preview
+- Real-time validation feedback
+- Error handling and recovery
+
+#### **Usage Examples**
+
 ```bash
-# Check staged files for common issues
-bun run check:staged         # Validate staged files
+# Interactive commit creation
+bun run commit
 
-# Common validations:
-# - No manual version changes in package.json
-# - No manual CHANGELOG.md entries
-# - No development files committed
+# Interactive versioning workflow
+bun run version:commit
+
+# Guided development setup
+bun run dev:setup
 ```
 
-### **Git Hooks**
+### **Entity-Based Architecture**
+
+The script system uses modular, reusable components:
+
+```
+📁 scripts/entities/
+├── commit.ts            # 📝 Commit parsing and validation
+├── changelog.ts         # 📋 Changelog generation
+├── package-json.ts      # 📦 Package.json operations
+├── workspace.ts         # 🗂️ Workspace management
+├── compose.ts           # 🐳 Docker Compose parsing
+├── affected.ts          # 🔍 Affected package detection
+├── tag.ts               # 🏷️ Git tag operations
+└── changelog-manager.ts # 🎯 Changelog orchestration
+```
+
+## 🔧 Development Workflows
+
+### **1. Local Development Workflow**
+
 ```bash
-# Pre-commit hooks (automatic)
-# - Staged file validation
-# - Code formatting
-# - Type checking
+# Setup local environment
+bun run local:setup
 
-# Pre-push hooks (automatic)
-# - Branch name validation
-# - Quality checks
-# - Tests
-# - Build verification
+# Install dependencies
+bun install
+
+# Run quality checks
+bun run check:quick
+
+# Start development
+bun run dev
 ```
 
-## 🏗️ Build Commands
+### **2. DevContainer Development Workflow**
 
-### **Build System**
+```bash
+# Setup DevContainer
+bun run dev:setup
+
+# Start services
+bun run dev:up
+
+# Verify health
+bun run dev:check
+
+# Development commands
+bun run dev:logs      # View logs
+bun run dev:restart   # Restart services
+bun run dev:cleanup   # Clean up resources
+```
+
+### **3. Package Development Workflow**
+
+```bash
+# Work on specific package
+cd packages/my-package
+
+# Install dependencies
+bun install
+
+# Run tests
+bun test
+
+# Build package
+bun run build
+
+# Check types
+bun run check:types
+```
+
+### **4. Version Management Workflow**
+
+```bash
+# Interactive versioning
+bun run version:commit
+
+# Preview changes
+bun run version:commit --dry-run
+
+# Manual version preparation
+bun run scripts/version-prepare.ts --package root
+
+# Apply version changes
+bun run scripts/version-apply.ts
+```
+
+## 🚀 CI/CD Integration
+
+### **GitHub Actions Workflows**
+
+#### **Check Workflow**
+Automatically validates changes and determines affected packages:
+
+```yaml
+- name: 🔍 - Get affected packages
+  id: affected-packages
+  run: |
+    bun run scripts/ci-attach-affected.ts --mode turbo --output-id affected-packages
+
+- name: 🔍 - Get affected services
+  id: affected-services
+  run: |
+    bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
+```
+
+#### **Version Workflow**
+Handles automated versioning and deployment:
+
+```yaml
+- name: 🔍 Generate changelog and bump versions
+  id: packages-to-deploy
+  run: bun run version:ci
+```
+
+### **Affected Package Detection**
+
+The system automatically detects which packages are affected by changes:
+
+```bash
+# Get affected packages (Turbo mode)
+bun run scripts/ci-attach-affected.ts --mode turbo --output-id affected-packages
+
+# Get affected services (Docker mode)
+bun run scripts/ci-attach-affected.ts --mode docker --output-id affected-services
+```
+
+### **Service Port Management**
+
+Automatically attaches service ports to GitHub Actions:
+
+```bash
+# Attach service ports
+bun run scripts/ci-attach-service-ports.ts --output-id service-ports
+```
+
+## 🧪 Testing & Quality
+
+### **Quality Checks**
+
+```bash
+# Quick quality check (affected packages only)
+bun run check:quick
+
+# Full quality check
+bun run check
+
+# Fix linting issues
+bun run check:fix
+
+# Type checking
+bun run check:types
+```
+
+### **Testing**
+
+```bash
+# Run all tests
+bun test
+
+# Run tests with coverage
+bun test --coverage
+
+# Run tests in watch mode
+bun test --watch
+
+# Test specific package
+bun test packages/my-package
+```
+
+### **Build Verification**
+
 ```bash
 # Build all packages
-bun run build               # Build all packages and applications
-
-# Build specific packages
-turbo run build --filter=@repo/ui        # Build UI package
-turbo run build --filter=@repo/utils     # Build utils package
-turbo run build --filter=admin           # Build admin app
+bun run build
 
 # Build affected packages only
-bun run build --affected     # Build only affected packages
+bun run build --affected
+
+# Build specific package
+bun run build --filter=my-package
 ```
 
-### **Storybook Build**
+## 🔍 Development Commands
+
+### **Core Development Commands**
+
 ```bash
-# Build Storybook for production
-bun run build:storybook      # Build all Storybook instances
-turbo run build:storybook --filter=@repo/ui  # Build UI Storybook
+# Development setup
+bun run dev:setup      # Setup DevContainer
+bun run dev:up         # Start services
+bun run dev:check      # Check service health
+bun run dev:logs       # View service logs
+bun run dev:restart    # Restart services
+bun run dev:cleanup    # Clean up resources
+
+# Local development
+bun run local:setup    # Setup local environment
+bun run local:cleanup  # Clean local resources
+bun run local:vscode   # Setup VS Code
+
+# Quality assurance
+bun run check          # Full quality check
+bun run check:quick    # Quick quality check
+bun run check:fix      # Fix linting issues
+bun run check:types    # Type checking
 ```
 
-### **Start Production Builds**
+### **Advanced Scripts**
+
 ```bash
-# Start production builds
-bun run start               # Start all production builds
-turbo run start --filter=admin           # Start admin app
-turbo run start --filter=storefront      # Start storefront app
-turbo run start --filter=api             # Start API server
+# Interactive commit creation
+bun run commit
+
+# Commit validation
+bun run commit:check --staged
+bun run commit:check --branch
+
+# Version management
+bun run version:prepare
+bun run version:apply
+bun run version:ci
+
+# CI utilities
+bun run ci:act
+bun run scripts/ci-attach-affected.ts
+bun run scripts/ci-attach-service-ports.ts
 ```
 
-## 🐳 DevContainer Management
+## 🐳 Docker & DevContainer
 
-### **Container Health**
+### **DevContainer Management**
+
 ```bash
-# Health monitoring
-bun run dev:check            # Comprehensive DevContainer health check
-bun run dev:health           # Quick container status overview
+# Setup DevContainer
+bun run dev:setup
 
-# Health check includes:
-# - Container status verification
-# - Port availability
-# - Service connectivity
-# - Volume mount verification
+# Start services
+bun run dev:up
+
+# Check health
+bun run dev:check
+
+# View logs
+bun run dev:logs
+
+# Restart services
+bun run dev:restart
+
+# Cleanup
+bun run dev:cleanup
 ```
 
-### **Container Operations**
+### **Production Container Management**
+
 ```bash
-# Container lifecycle
-bun run dev:setup            # Setup DevContainer environment
-bun run dev:up               # Start all containers
-bun run dev:down             # Stop all containers
-bun run dev:restart          # Restart all containers
+# Start production services
+bun run prod:up
 
-# Container maintenance
-bun run dev:cleanup          # Clean containers and volumes
-bun run dev:rm               # Remove containers completely
-bun run dev:build            # Rebuild containers
+# Check production health
+bun run prod:health
+
+# Build production images
+bun run prod:build
+
+# Stop production services
+bun run prod:down
 ```
 
-### **Service-Specific Operations**
-```bash
-# Individual service management
-bun run dev:up admin         # Start admin service only
-bun run dev:up storefront    # Start storefront service only
-bun run dev:up api           # Start API service only
-bun run dev:up ui            # Start UI service only
-
-# Service logs
-bun run dev:logs admin       # View admin service logs
-bun run dev:logs storefront  # View storefront service logs
-bun run dev:logs api         # View API service logs
-```
-
-## 📝 Contribution Workflow
-
-### **Development Process**
-```bash
-# 1. Setup development environment
-bun run local:setup          # Setup local environment
-bun run dev:setup            # Setup DevContainer (optional)
-
-# 2. Create feature branch
-git checkout -b feature/your-feature
-
-# 3. Make changes and test
-# ... make your changes ...
-bun run check:quick          # Verify changes
-bun run test --affected      # Test affected packages
-
-# 4. Commit with conventional commits
-git add .
-git commit -m "feat(scope): description of changes"
-
-# 5. Push and create PR
-git push origin feature/your-feature
-```
-
-### **Conventional Commits**
-```bash
-# Commit format: type(scope): description
-git commit -m "feat(admin): add user management interface"
-git commit -m "fix(ui): resolve button styling issue"
-git commit -m "docs(readme): update installation instructions"
-git commit -m "refactor(utils): optimize string processing"
-
-# Available scopes (auto-generated):
-# - root, admin, storefront, api, @repo/ui, @repo/utils, @repo/typescript-config, @repo/test-preset
-```
-
-### **Quality Gates**
-```bash
-# Pre-commit (automatic)
-# - Code formatting (Biome)
-# - Type checking
-# - Staged file validation
-
-# Pre-push (automatic)
-# - Branch name validation
-# - Quality checks
-# - Test execution
-# - Build verification
-```
-
-## 🔄 Version Management
-
-### **Automated Versioning**
-```bash
-# Complete version management workflow (recommended)
-bun run scripts/version-ci.ts --dry-run # Preview version changes
-bun run scripts/version-ci.ts           # Apply version changes and create release
-
-# Alternative: Use individual steps
-bun run scripts/version-prepare.ts      # Prepare versions and changelogs
-bun run scripts/version-apply.ts        # Apply version changes
-
-# Version workflow includes:
-# - Dynamic scope detection from affected packages
-# - Automated changelog generation from git history
-# - Package version updates based on conventional commits
-# - Git tag creation and management
-# - GitHub Actions integration
-```
-
-### **Individual Version Scripts**
-```bash
-# Individual version management operations
-bun run scripts/version-prepare.ts --package root     # Prepare version bump and changelog
-bun run scripts/version-apply.ts --no-push            # Apply changes without pushing
-bun run scripts/version-ci.ts --type minor            # Complete CI workflow
-
-# Manual version operations
-bun run scripts/version-prepare.ts --package admin --from v1.0.0
-bun run scripts/version-apply.ts --dry-run
-
-# Validation scripts
-bun run scripts/ci-act.ts              # CI environment validation
-```
-
-## 🚨 Troubleshooting
+## 🔧 Troubleshooting
 
 ### **Common Issues**
 
-#### **DevContainer Issues**
+#### **Service Health Problems**
 ```bash
-# Container won't start
-bun run dev:cleanup          # Clean up containers
-bun run dev:build            # Rebuild containers
-bun run dev:check            # Check container health
+# Check service status
+bun run dev:health
 
-# Port conflicts
-bun run dev:health           # Check port usage
-# Manually change ports in docker-compose.dev.yml
+# View detailed logs
+bun run dev:logs
+
+# Restart services
+bun run dev:restart
+
+# Clean up and restart
+bun run dev:cleanup && bun run dev:setup
 ```
 
-#### **Build Issues**
+#### **Quality Check Failures**
 ```bash
-# Build failures
-bun run check:types          # Check for type errors
-bun run check:fix            # Fix formatting issues
-bun run test                 # Run tests to identify issues
+# Fix linting issues
+bun run check:fix
 
-# Cache issues
-turbo run build --clearCache # Clear build cache
-bun run test --clearCache    # Clear test cache
+# Check specific issues
+bun run check:types
+bun run check
+
+# Run tests to identify problems
+bun test
 ```
 
-#### **Test Issues**
+#### **Build Failures**
 ```bash
-# Test failures
-bun run test --affected      # Run tests on affected packages
-bun run test --clearCache    # Clear test cache
-turbo run test --filter=@repo/test-preset  # Test test preset package
+# Clean build artifacts
+bun run build --force
+
+# Check specific package
+bun run build --filter=problematic-package
+
+# Verify dependencies
+bun install
 ```
 
-### **Debug Commands**
-```bash
-# Debug development environment
-bun run dev:check            # Comprehensive health check
-bun run check:quick          # Quick quality verification
-bun run test                 # Full test suite
+### **Debug Mode**
 
-# Debug specific areas
-bun run check:types          # TypeScript issues
-bun run check:staged         # Staged file issues
-bun run dev:health           # Container issues
+```bash
+# Skip health checks
+bun run dev:setup --skip-health-check
+
+# Dry run to preview changes
+bun run version:commit --dry-run
+
+# Check affected packages
+bun run scripts/ci-attach-affected.ts --mode turbo
 ```
 
-## 📊 Performance Optimization
+### **Reset & Recovery**
 
-### **Development Performance**
 ```bash
-# Fast development workflow
-bun run check:quick          # Quick quality check (~30s)
-bun run test --affected      # Test only affected packages (~20s)
-bun run build --affected     # Build only affected packages (~30s)
+# Reset DevContainer
+bun run dev:cleanup
+bun run dev:setup
 
-# Parallel operations
-turbo run test --parallel    # Parallel test execution
-turbo run build --parallel   # Parallel build execution
+# Reset local environment
+bun run local:cleanup
+bun run local:setup
+
+# Reset specific service
+bun run dev:compose restart service-name
 ```
 
-### **Caching Strategy**
-```bash
-# Turbo caching
-turbo run build              # Uses Turbo cache for faster builds
-turbo run test               # Uses Turbo cache for faster tests
+## 📋 Best Practices
 
-# Cache management
-turbo run build --clearCache # Clear build cache
-turbo run test --clearCache  # Clear test cache
-```
+### **1. Development Workflow**
+
+- Use DevContainer for consistent environments
+- Run quality checks before committing
+- Test changes locally before pushing
+- Use interactive CLI for complex operations
+
+### **2. Version Management**
+
+- Let the system determine version bumps automatically
+- Review changelogs before applying versions
+- Use dry-run mode to preview changes
+- Test version workflows in CI
+
+### **3. Quality Assurance**
+
+- Run quality checks frequently
+- Fix linting issues immediately
+- Maintain good test coverage
+- Use affected package detection for efficiency
+
+### **4. CI/CD Integration**
+
+- Test workflows locally with `ci:act`
+- Use affected package detection
+- Monitor workflow success
+- Automate repetitive tasks
 
 ---
 
-**Ready to start developing?** Follow this workflow for efficient, quality-focused development in the Turboobun monorepo! 🚀 
+*This enhanced development system provides a robust, automated approach to development workflows with sophisticated CLI interaction and comprehensive CI/CD integration.* 
