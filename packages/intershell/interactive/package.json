@@ -1,0 +1,78 @@
+{
+  "name": "@intershell/interactive",
+  "version": "0.1.0",
+  "description": "Interactive CLI framework with page-based navigation and state management",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./framework": {
+      "import": "./dist/framework.js",
+      "types": "./dist/framework.d.ts"
+    },
+    "./pages": {
+      "import": "./dist/pages.js",
+      "types": "./dist/pages.d.ts"
+    },
+    "./navigation": {
+      "import": "./dist/navigation.js",
+      "types": "./dist/navigation.d.ts"
+    },
+    "./state": {
+      "import": "./dist/state.js",
+      "types": "./dist/state.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events.js",
+      "types": "./dist/events.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli.js",
+      "types": "./dist/cli.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "cli",
+    "interactive",
+    "terminal",
+    "framework",
+    "pages",
+    "navigation",
+    "state-management"
+  ],
+  "author": "Monobun",
+  "license": "MIT",
+  "dependencies": {
+    "@intershell/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  }
+}
