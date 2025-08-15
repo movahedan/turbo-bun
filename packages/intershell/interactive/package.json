@@ -1,0 +1,59 @@
+{
+  "name": "@intershell/interactive",
+  "version": "0.1.0",
+  "description": "Interactive CLI framework for InterShell",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./framework": {
+      "import": "./dist/framework.js",
+      "require": "./dist/framework.js",
+      "types": "./dist/framework.d.ts"
+    },
+    "./pages": {
+      "import": "./dist/pages.js",
+      "require": "./dist/pages.js",
+      "types": "./dist/pages.d.ts"
+    },
+    "./navigation": {
+      "import": "./dist/navigation.js",
+      "require": "./dist/navigation.js",
+      "types": "./dist/navigation.d.ts"
+    },
+    "./events": {
+      "import": "./dist/events.js",
+      "require": "./dist/events.js",
+      "types": "./dist/events.d.ts"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@intershell/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
