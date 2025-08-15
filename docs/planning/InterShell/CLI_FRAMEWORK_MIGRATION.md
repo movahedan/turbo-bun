@@ -1,6 +1,6 @@
-# 🔄 CLI Framework Migration Plan
+# 🎮 InterShell: CLI Framework Migration Plan
 
-> Comprehensive plan to refactor the interactive CLI system into a generic, reusable framework
+> **Comprehensive plan to refactor the interactive CLI system into a generic, reusable framework**
 
 ## 📋 Table of Contents
 
@@ -10,6 +10,7 @@
 - [New CLI Architecture](#-new-cli-architecture)
 - [Implementation Phases](#-implementation-phases)
 - [Testing Strategy](#-testing-strategy)
+- [CLI Framework Landscape](#cli-framework-landscape)
 
 ## 🎯 Overview
 
@@ -219,6 +220,107 @@ graph TD
 - Test framework reusability
 - Test performance and resource usage
 
+## 🌐 CLI Framework Landscape
+
+Based on research into existing CLI frameworks, here are the key patterns and approaches we can learn from:
+
+### **Popular CLI Frameworks**
+
+#### **JavaScript/Node.js**
+- **Commander.js**: Complete solution for Node.js CLI interfaces
+- **Yargs**: Interactive command-line tools with argument parsing
+- **Oclif**: Heroku's CLI framework with plugin architecture
+- **Gluegun**: Toolkit for building command-line interfaces
+
+#### **Go**
+- **Cobra**: Powerful CLI framework used by Kubernetes and Hugo
+- **cli**: Simple, fast package for building CLI apps
+- **urfave/cli**: Simple, fast, and fun package for building CLI apps
+
+#### **Python**
+- **Click**: Package for creating command-line interfaces
+- **Typer**: Modern Python library for building CLI applications
+- **argparse**: Standard library module for argument parsing
+
+#### **Rust**
+- **clap**: Feature-rich command line argument parser
+- **structopt**: Parse command line arguments by defining a struct
+
+### **Key Design Patterns**
+
+#### **1. Command Structure**
+```typescript
+// Commander.js pattern
+program
+  .command('commit')
+  .description('Create a new commit')
+  .option('-m, --message <message>', 'commit message')
+  .option('-a, --all', 'stage all files')
+  .action(async (options) => {
+    // Command logic
+  });
+```
+
+#### **2. Interactive Prompts**
+```typescript
+// Inquirer.js pattern
+const answers = await inquirer.prompt([
+  {
+    type: 'input',
+    name: 'message',
+    message: 'What is your commit message?',
+    validate: (input) => input.length > 0 ? true : 'Message is required'
+  }
+]);
+```
+
+#### **3. State Management**
+```typescript
+// Redux-like pattern
+interface CLIState {
+  currentPage: string;
+  userInput: Record<string, any>;
+  navigation: NavigationState;
+}
+
+type CLIAction = 
+  | { type: 'NAVIGATE'; payload: string }
+  | { type: 'UPDATE_INPUT'; payload: { key: string; value: any } }
+  | { type: 'RESET' };
+```
+
+#### **4. Plugin Architecture**
+```typescript
+// Oclif pattern
+export class MyCLI extends Command {
+  static description = 'My CLI command';
+  static flags = {
+    help: flags.help({ char: 'h' }),
+    version: flags.version({ char: 'v' })
+  };
+  
+  async run() {
+    // Command implementation
+  }
+}
+```
+
+### **Lessons for Our Framework**
+
+#### **Strengths to Adopt**
+1. **Command Structure**: Clear separation of commands and options
+2. **Interactive Prompts**: User-friendly input collection
+3. **Plugin System**: Extensible architecture for commands
+4. **Help System**: Comprehensive help and documentation
+5. **Validation**: Input validation and error handling
+
+#### **Innovations to Implement**
+1. **Page-Based Navigation**: Visual page system for complex workflows
+2. **State Machine**: Predictable state transitions
+3. **Event-Driven Architecture**: Clean separation of concerns
+4. **Bun Optimization**: Leverage Bun's performance benefits
+5. **TypeScript First**: Full type safety from the ground up
+
 ## 🚀 Next Steps
 
 1. **Start Phase 1**: Refactor `InteractiveCLI` to event-based architecture
@@ -229,4 +331,4 @@ graph TD
 
 ---
 
-**Status**: 🎯 **READY TO START** - CLI Framework Migration Phase 1 
+**Status**: 🎯 **READY TO START** - InterShell CLI Framework Migration Phase 1
