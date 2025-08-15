@@ -1,0 +1,57 @@
+{
+  "name": "@intershell/core",
+  "version": "0.1.0",
+  "description": "Core utilities for InterShell CLI framework",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./colorify": {
+      "import": "./dist/colorify.js",
+      "require": "./dist/colorify.js",
+      "types": "./dist/colorify.d.ts"
+    },
+    "./wrapshell": {
+      "import": "./dist/wrapshell.js",
+      "require": "./dist/wrapshell.js",
+      "types": "./dist/wrapshell.d.ts"
+    },
+    "./cli-tools": {
+      "import": "./dist/cli-tools.js",
+      "require": "./dist/cli-tools.js",
+      "types": "./dist/cli-tools.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.js",
+      "require": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    }
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "lint": "biome check src",
+    "lint:fix": "biome check --write src",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
