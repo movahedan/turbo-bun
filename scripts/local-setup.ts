@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { colorify } from "./shell/colorify";
-import { createScript, validators } from "./shell/create-scripts";
 
 const setupLocalConfig = {
 	name: "Local Development Setup",
@@ -20,17 +19,19 @@ const setupLocalConfig = {
 			long: "--skip-vscode",
 			description: "Skip VS Code configuration sync",
 			required: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 		{
 			short: "-t",
 			long: "--skip-tests",
 			description: "Skip running tests",
 			required: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 const setupLocal = createScript(setupLocalConfig, async function main(args, xConsole) {
 	xConsole.log(colorify.blue("🚀 Starting local development setup..."));
@@ -72,5 +73,5 @@ const setupLocal = createScript(setupLocalConfig, async function main(args, xCon
 });
 
 if (import.meta.main) {
-	setupLocal();
+	setupLocal.run();
 }

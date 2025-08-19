@@ -1,0 +1,45 @@
+{
+	"name": "@repo/intershell",
+	"version": "0.0.0",
+	"description": "Core utilities and types for the InterShell CLI framework",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		"./core": "./src/core/index.ts",
+		"./entities": "./src/entities/index.ts",
+		"./interactive": "./src/interactive/index.ts"
+	},
+	"files": [
+		"dist",
+		"src",
+		"README.md"
+	],
+	"scripts": {
+		"check:types": "tsc --noEmit",
+		"build": "tsc",
+		"prebuild": "bun run ../../scripts/update-package-json.ts"
+	},
+	"keywords": [
+		"cli",
+		"interactive",
+		"terminal",
+		"framework",
+		"pages",
+		"navigation",
+		"state-management",
+		"command-parser",
+		"plugin-system",
+		"entities",
+		"commit-management",
+		"branch-validation"
+	],
+	"author": "Monobun",
+	"license": "MIT",
+	"devDependencies": {
+		"@repo/test-preset": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"yaml": "2.8.1"
+	}
+}

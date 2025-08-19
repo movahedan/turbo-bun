@@ -1,8 +1,13 @@
 #!/usr/bin/env bun
 
-import { ChangelogManager, EntityPackageJson, EntityTag, EntityWorkspace } from "./entities";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import {
+	DefaultChangelogTemplate,
+	EntityChangelog,
+	EntityPackages,
+	EntityTag,
+	type VersionData,
+} from "@repo/intershell/entities";
 
 const scriptConfig = {
 	name: "Version Prepare",
@@ -19,21 +24,24 @@ const scriptConfig = {
 			long: "--package",
 			description: "Package name to process (default: all packages)",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-f",
 			long: "--from",
 			description: "Start commit/tag for changelog generation",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-t",
 			long: "--to",
 			description: "End commit/tag for changelog generation (default: HEAD)",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -48,14 +56,14 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		`📝 Generating changelog from ${colorify.blue(fromCommit)} to ${colorify.blue(toCommit)}`,
 	);
 
-	let versionCommitMessage = `release: ${EntityTag.toTag(EntityPackageJson.getVersion("root"))}\n`;
+	let versionCommitMessage = "";
 
 	try {
 		let packagesToProcess: string[] = [];
 
 		if (processAll) {
 			xConsole.info("📦 Processing all packages in workspace...");
-			packagesToProcess = await EntityWorkspace.getAllPackages();
+			packagesToProcess = await EntityPackages.getAllPackages();
 			xConsole.info(`Found ${packagesToProcess.length} packages: ${packagesToProcess.join(", ")}`);
 		} else {
 			const packageName = args.package;
@@ -66,14 +74,12 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 			xConsole.info(`📦 Processing single package: ${colorify.blue(packageName)}`);
 		}
 
-		const results: Array<{
-			packageName: string;
-			needsBump: boolean;
-			currentVersion: string;
-			targetVersion: string;
-			bumpType: string;
-			commitCount: number;
-		}> = [];
+		const results: Array<
+			{
+				packageName: string;
+				commitCount: number;
+			} & VersionData
+		> = [];
 
 		let totalBumps = 0;
 		let totalCommits = 0;
@@ -82,64 +88,58 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 			xConsole.info(`\n🔍 Processing package: ${colorify.blue(packageName)}`);
 
 			try {
-				const changelogManager = new ChangelogManager(packageName);
-				await changelogManager.setRange(fromCommit, toCommit);
+				const packageJson = new EntityPackages(packageName);
+				const template = new DefaultChangelogTemplate(packageName);
+				const changelog = new EntityChangelog(packageName, template);
+				await changelog.setRange(fromCommit, toCommit);
+				const commitCount = changelog.getCommitCount();
+				const versionData = changelog.getVersionData();
 
-				if (!changelogManager.hasCommits()) {
+				if (commitCount === 0) {
 					xConsole.log(colorify.yellow(`⚠️ No commits found for ${packageName}`));
 					results.push({
 						packageName,
-						needsBump: false,
-						currentVersion: EntityPackageJson.getVersion(packageName),
-						targetVersion: EntityPackageJson.getVersion(packageName),
-						bumpType: "none",
-						commitCount: 0,
+						commitCount,
+						...versionData,
 					});
 					continue;
 				}
 
-				const snapshot = await changelogManager.snapshot();
-				const { currentVersion, targetVersion, bumpType } = snapshot.versionData;
-				const commitCount = changelogManager.getCommitCount();
-				const needsBump = targetVersion !== currentVersion;
-
 				results.push({
 					packageName,
-					needsBump,
-					currentVersion,
-					targetVersion,
-					bumpType,
 					commitCount,
+					...versionData,
 				});
 
-				if (needsBump) {
+				if (versionData.shouldBump) {
 					totalBumps++;
 					xConsole.log(
 						`🎯 ${colorify.green("Version bump needed!")}\n` +
 							`📦 Package: ${colorify.blue(packageName)}\n` +
-							`🔄 Current: ${colorify.yellow(currentVersion)} → ${colorify.green(targetVersion)}\n` +
-							`📈 Type: ${colorify.blue(bumpType)}\n` +
-							`💡 Reason: New ${bumpType} version bump to ${targetVersion}\n`,
+							`🔄 Current: ${colorify.yellow(versionData.currentVersion)} → ${colorify.green(versionData.targetVersion)}\n` +
+							`📈 Type: ${colorify.blue(versionData.bumpType)}\n` +
+							`💡 Reason: New ${versionData.bumpType} version bump to ${versionData.targetVersion}\n`,
 					);
 
-					// Actually bump the version in package.json
-					await EntityPackageJson.bumpVersion(packageName, targetVersion);
+					await packageJson.writeVersion(versionData.targetVersion);
 
-					const log = `Bumped: ${packageName}: ${currentVersion} -> ${targetVersion} (${bumpType})`;
+					const log = `Bumped: ${packageName}: ${versionData.currentVersion} -> ${versionData.targetVersion} (${versionData.bumpType})`;
+					versionCommitMessage += `release: ${EntityTag.toTag(versionData.targetVersion)}\n`;
 					versionCommitMessage += `\n${log}`;
 					xConsole.log(colorify.green(log));
 				} else {
 					xConsole.log(
 						`✅ ${colorify.green("No version bump needed")}\n` +
 							`📦 Package: ${colorify.blue(packageName)}\n` +
-							`🔄 Current: ${colorify.yellow(currentVersion)}\n` +
+							`🔄 Current: ${colorify.yellow(versionData.currentVersion)}\n` +
 							"💡 Reason: Versions are the same\n",
 					);
 				}
 
 				if (commitCount > 0) {
 					xConsole.info(`📚 Generating changelog for ${packageName}...`);
-					await changelogManager.generateChangelog();
+					const changelogContent = await changelog.generateMergedChangelog();
+					await packageJson.writeChangelog(changelogContent);
 
 					const log = `Changelog generated for ${packageName}`;
 					versionCommitMessage += `\n${log}`;
@@ -180,7 +180,7 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 
 		// Output packages that need deployment (for CI)
 		const packagesToDeploy = results
-			.filter((r) => r.needsBump)
+			.filter((r) => r.shouldBump)
 			.map((r) => r.packageName)
 			.join(",");
 
@@ -209,5 +209,5 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 });
 
 if (import.meta.main) {
-	versionPrepare();
+	versionPrepare.run();
 }

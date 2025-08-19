@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityTag } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityTag } from "./entities/tag";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 import { versionApply } from "./version-apply";
 import { versionPrepare } from "./version-prepare";
 
@@ -23,7 +22,8 @@ const scriptConfig = {
 			description: "Don't push tag to remote after creation",
 			required: false,
 			defaultValue: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 		{
 			short: "-d",
@@ -31,7 +31,8 @@ const scriptConfig = {
 			description: "Show planned changes without applying them",
 			required: false,
 			defaultValue: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -41,20 +42,17 @@ export const versionCI = createScript(scriptConfig, async function main(args, xC
 
 	await configureGitAuth(args, xConsole);
 
-	// Get the latest version tag to use as the base for changelog generation
-	const latestTag = await EntityTag.getBaseTag();
-	const fromCommit = latestTag || (await EntityTag.getFirstCommit());
-
-	xConsole.info(`📝 Using base commit: ${colorify.blue(fromCommit)}`);
+	const fromTag = await EntityTag.getBaseTagSha();
+	xConsole.info(`📝 Using base commit: ${colorify.blue(fromTag)}`);
 
 	xConsole.info("\n🔧 Preparing versions...");
-	await versionPrepare({
+	await versionPrepare.run({
 		"dry-run": args["dry-run"],
-		from: fromCommit,
+		from: fromTag,
 	});
 
 	xConsole.info("\n🚀 Applying version changes...");
-	await versionApply({
+	await versionApply.run({
 		"no-push": args["no-push"],
 		"dry-run": args["dry-run"],
 	});
@@ -99,5 +97,5 @@ async function configureGitAuth(
 }
 
 if (import.meta.main) {
-	versionCI();
+	versionCI.run();
 }

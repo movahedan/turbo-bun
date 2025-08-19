@@ -1,9 +1,7 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { colorify } from "./shell/colorify";
-import type { ScriptConfig } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
 
 const devCleanupConfig = {
 	name: "DevContainer Cleanup",
@@ -20,8 +18,8 @@ const devCleanup = createScript(devCleanupConfig, async (_, vConsole): Promise<v
 
 	async function stepDockerServices() {
 		vConsole.log(colorify.yellow("🐳 Stopping DevContainer services..."));
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes`;
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
+		await $`docker compose -f ./docker-compose.dev.yml --profile all down --volumes`;
+		await $`docker compose -f ./docker-compose.dev.yml --profile all rm -f --volumes`;
 	}
 	await stepDockerServices();
 
@@ -32,5 +30,5 @@ const devCleanup = createScript(devCleanupConfig, async (_, vConsole): Promise<v
 });
 
 if (import.meta.main) {
-	devCleanup();
+	devCleanup.run();
 }
