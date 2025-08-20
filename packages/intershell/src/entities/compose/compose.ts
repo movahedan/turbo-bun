@@ -68,7 +68,7 @@ export class EntityCompose {
 		const compose = await this.compose;
 
 		const services: ServiceInfo[] = [];
-		for (const [name, service] of Object.entries(compose)) {
+		for (const [name, service] of Object.entries(compose.services)) {
 			const ports = EntityCompose.parsePortMappings(service.ports || []);
 			const environment = EntityCompose.parseEnvironment(service.environment);
 
@@ -146,12 +146,13 @@ export class EntityCompose {
 
 			const services = await this.getServices();
 			for (const service of services) {
-				const serviceName = service.name.replace(/^@repo\//, "");
-				const associatedPackage = allPackages.find((p) => p === serviceName);
+				const associatedPackage = allPackages.find(
+					(p) => p.replace(/^@repo\//, "") === service.name,
+				);
 				if (keys.some((k: string) => k === associatedPackage)) {
-					affectedServices.add(serviceName);
-					serviceMap.set(serviceName, {
-						name: serviceName,
+					affectedServices.add(service.name);
+					serviceMap.set(service.name, {
+						name: service.name,
 						environment: "prod",
 						port: service.ports[1]?.host,
 					});
