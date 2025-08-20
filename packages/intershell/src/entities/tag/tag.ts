@@ -43,27 +43,33 @@ export const EntityTag = {
 	},
 
 	async getBaseTagSha(from?: string): Promise<string> {
-		const fromIsSemver = from && EntityTag.parseByName(from).format === "semver";
-		if (!fromIsSemver) {
-			const result = await $`git rev-parse ${from}`.nothrow().quiet();
-			if (result.exitCode === 0) {
-				const sha = result.text().trim();
-				if (sha) return sha;
+		if (!from) {
+			// No from specified, get the base tag
+			const tag = await EntityTag._getBaseTag(defaultPrefix);
+			if (tag) {
+				return tag;
 			}
-			throw new Error(`Invalid from tag: ${from}. Not found.`);
+			return await EntityTag._getFirstCommit();
 		}
 
-		const isExistingTag = from && (await EntityTag.tagExists(from));
-		if (isExistingTag) {
-			return from;
+		// First check if it's a semver tag
+		const fromIsSemver = EntityTag.parseByName(from).format === "semver";
+		if (fromIsSemver) {
+			const isExistingTag = await EntityTag.tagExists(from);
+			if (isExistingTag) {
+				return from;
+			}
 		}
 
-		const tag = await EntityTag._getBaseTag(defaultPrefix);
-		if (tag) {
-			return tag;
+		// Check if it's a commit hash or branch name
+		const result = await $`git rev-parse ${from}`.nothrow().quiet();
+		if (result.exitCode === 0) {
+			const sha = result.text().trim();
+			if (sha) return sha;
 		}
 
-		return await EntityTag._getFirstCommit();
+		// If we get here, the reference wasn't found
+		throw new Error(`Invalid reference: ${from}. Not found as tag, branch, or commit.`);
 	},
 	async _getBaseTag(prefix: string): Promise<string | undefined> {
 		const result = await $`git tag --sort=-version:refname --list "${prefix}*" | head -1`
