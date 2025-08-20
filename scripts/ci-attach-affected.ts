@@ -53,7 +53,7 @@ export const ciAttachAffected = createScript(
 			const isPR = eventName === "pull_request";
 
 			if (isPR) {
-				baseSha = process.env.GITHUB_BASE_REF;
+				baseSha = process.env.GITHUB_BASE_SHA;
 				xConsole.log(`🔍 PR detected, using base branch: ${baseSha}`);
 			} else {
 				baseSha = process.env.GITHUB_BEFORE_SHA || "HEAD~1";
