@@ -96,7 +96,7 @@ class BranchRules {
 						return "branch name can only contain letters, numbers, hyphens, underscores, and forward slashes";
 					if (config.name.noConsecutiveSeparators && /[-_/]{2,}/.test(branch.name))
 						return "branch name should not have consecutive separators";
-					if (config.name.noLeadingTrailingSeparators && /^[-_/]|[-_/]$/.test(branch.name))
+					if (config.name.noLeadingTrailingSeparators && /(^[-_/]|[-_/]$)/.test(branch.name))
 						return "branch name should not start or end with separators";
 
 					return true;

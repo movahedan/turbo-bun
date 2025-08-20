@@ -104,7 +104,7 @@ const validators = {
 		}
 	},
 	email: (value: string): boolean | string => {
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 		if (!emailRegex.test(value)) {
 			return "Value must be a valid email address";
 		}
