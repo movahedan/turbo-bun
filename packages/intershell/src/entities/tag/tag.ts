@@ -63,10 +63,8 @@ export const EntityTag = {
 
 		// Check if it's a commit hash or branch name
 		const result = await $`git rev-parse ${from}`.nothrow().quiet();
-		if (result.exitCode === 0) {
-			const sha = result.text().trim();
-			if (sha) return sha;
-		}
+		const sha = result.text().trim();
+		if (sha) return sha;
 
 		// If we get here, the reference wasn't found
 		throw new Error(`Invalid reference: ${from}. Not found as tag, branch, or commit.`);
