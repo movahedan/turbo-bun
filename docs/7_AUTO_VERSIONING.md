@@ -6,7 +6,7 @@
 
 - [Overview](#-overview)
 - [System Architecture](#-system-architecture)
-- [Enhanced Interactive CLI](#-enhanced-interactive-cli)
+- [Interactive CLI](#-interactive-cli)
 - [Individual Scripts](#-individual-scripts)
 - [Complete Version Flow](#-complete-version-flow)
 - [Conventional Commits](#-conventional-commits)
@@ -20,7 +20,7 @@ The Monobun monorepo uses a modern, automated versioning system that provides so
 
 ### ✨ Key Features
 
-- ✅ **Enhanced Interactive CLI** - Step-by-step wizard with navigation and validation
+- 🚧 **Interactive CLI** - Step-by-step wizard with navigation and validation (In Development)
 - ✅ **Entity-Based Architecture** - Modular, reusable components for version management
 - ✅ **Conventional Commits** - Automatically detects version bumps from commit messages
 - ✅ **Automatic Changelog Generation** - Creates beautiful Keep a Changelog format
@@ -32,14 +32,14 @@ The Monobun monorepo uses a modern, automated versioning system that provides so
 ### 🚀 Quick Start
 
 ```bash
-# Complete automated versioning flow
-bun run version:commit --dry-run  # Preview changes
-bun run version:commit            # Execute full flow
-
-# Individual operations
+# Individual operations (currently available)
 bun run scripts/version-prepare.ts --package root # Prepare version and changelog
 bun run scripts/version-apply.ts --no-push        # Apply changes without pushing
 bun run scripts/version-ci.ts --dry-run           # Preview complete workflow
+
+# Interactive versioning workflow (🚧 In Development)
+# bun run version:commit --dry-run  # Preview changes
+# bun run version:commit            # Execute full flow
 ```
 
 ## 🏗️ System Architecture
@@ -52,13 +52,12 @@ Our versioning system consists of 3 main scripts with an entity-based architectu
 ├── version-prepare.ts   # 🔧 Version preparation and changelog generation
 └── version-apply.ts     # 🚀 Version application and git operations
 
-📁 scripts/entities/
-├── changelog-manager.ts # 🏛️ Stateful changelog orchestration
-├── commit.ts            # 📝 Commit parsing and validation
-├── changelog.ts         # 📋 Changelog generation and formatting
-├── package-json.ts      # 📦 Package.json operations
-├── tag.ts               # 🏷️ Git tag management
-└── workspace.ts         # 🗂️ Workspace package discovery
+📁 packages/intershell/src/entities/
+├── changelog/           # 🏛️ Changelog generation and formatting
+├── commit/              # 📝 Commit parsing and validation
+├── package-json/        # 📦 Package.json operations
+├── tag/                 # 🏷️ Git tag management
+└── workspace/           # 🗂️ Workspace package discovery
 ```
 
 ### Core Components
@@ -81,11 +80,11 @@ Our versioning system consists of 3 main scripts with an entity-based architectu
 - Formats commits with badges and links
 - Maintains version history
 
-## 🎮 Enhanced Interactive CLI
+## 🎮 Interactive CLI (🚧 In Development)
 
-The new interactive CLI system provides sophisticated user experience:
+> **Note**: The interactive CLI system is currently in development. The features described below are planned but not yet implemented.
 
-### ✨ Features
+### ✨ Planned Features
 
 - **🎯 Step-by-Step Wizard**: Guided versioning workflow with validation
 - **📊 Progress Tracking**: Visual progress bars and completion status
@@ -95,17 +94,17 @@ The new interactive CLI system provides sophisticated user experience:
 - **📋 Preview Mode**: See final version changes before confirming
 - **❌ Validation**: Real-time validation with helpful error messages
 
-### 🎮 Usage Examples
+### 🎮 Planned Usage Examples
 
 ```bash
-# Interactive versioning workflow
-bun run version:commit
+# Interactive versioning workflow (🚧 In Development)
+# bun run version:commit
 
-# Preview changes without applying
-bun run version:commit --dry-run
+# Preview changes without applying (🚧 In Development)
+# bun run version:commit --dry-run
 ```
 
-### ⌨️ Keyboard Shortcuts
+### ⌨️ Planned Keyboard Shortcuts
 
 - **↑/↓**: Navigate between options
 - **←**: Go back to previous step
@@ -427,4 +426,4 @@ git push origin :refs/tags/v1.2.3
 
 ---
 
-*This enhanced versioning system provides a robust, automated approach to version management with sophisticated CLI interaction and comprehensive CI/CD integration.*
+*This versioning system provides a robust, automated approach to version management with entity-based architecture and comprehensive CI/CD integration. The interactive CLI features are currently in development.*

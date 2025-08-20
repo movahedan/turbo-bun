@@ -77,7 +77,7 @@ The app includes all documentation from the main project:
 - **Development Flows** (`3_DEV_FLOWS.md`)
 
 ### Technical Documentation
-- **Scripting** (`4_SCRIPTING.md`)
+- **Scripting** (`4_INTERSHELL.md`)
 - **Docker** (`5_DOCKER.md`)
 - **Renovate** (`6_RENOVATE.md`)
 - **Auto Versioning** (`7_AUTO_VERSIONING.md`)
