@@ -130,7 +130,7 @@ const defaultConfig: CommitConfig = {
 	},
 	description: {
 		minLength: 3,
-		maxLength: 72,
+		maxLength: 100,
 		shouldNotEndWithPeriod: true,
 		shouldNotStartWithType: true,
 	},
