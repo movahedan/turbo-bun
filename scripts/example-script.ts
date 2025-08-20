@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
+import { createScript, type ScriptConfig } from "@repo/intershell/core";
 
 const exampleScriptConfig = {
 	name: "Example Script",
@@ -15,21 +15,24 @@ const exampleScriptConfig = {
 			long: "--build",
 			description: "Build mode",
 			required: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 		{
 			short: "-f",
 			long: "--file",
 			description: "Input file to process",
 			required: true,
-			validator: validators.fileExists,
+			type: "string",
+			validator: createScript.validators.fileExists,
 		},
 		{
 			short: "-o",
 			long: "--output",
 			description: "Output file path",
 			required: true,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -43,5 +46,5 @@ export const exampleScript = createScript(exampleScriptConfig, async function ma
 });
 
 if (import.meta.main) {
-	exampleScript();
+	exampleScript.run();
 }

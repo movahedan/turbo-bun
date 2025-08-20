@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { EntityAffected } from "./entities";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
+import { createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityAffected, EntityCompose } from "@repo/intershell/entities";
 
 const ciAttachAffectedConfig = {
 	name: "GitHub Attach Affected",
@@ -13,21 +13,24 @@ const ciAttachAffectedConfig = {
 			long: "--output-id",
 			description: "The ID of the output to attach the affected packages to",
 			required: true,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-m",
 			long: "--mode",
 			description: "The mode to use for the affected services",
 			required: true,
-			validator: validators.enum(["docker", "turbo"]),
+			type: "string",
+			validator: createScript.validators.enum(["docker", "turbo"]),
 		},
 		{
 			short: "-b",
 			long: "--base-sha",
 			description: "The base SHA to compare against (defaults to latest tag)",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -63,7 +66,7 @@ export const ciAttachAffected = createScript(
 		xConsole.log(`🔍 Comparing changes from ${baseSha} to HEAD`);
 		const affectedList =
 			mode === "docker"
-				? await EntityAffected.getAffectedServices(baseSha)
+				? await new EntityCompose("docker-compose.yml").getAffectedServices(baseSha)
 				: await EntityAffected.getAffectedPackages(baseSha);
 		xConsole.log(`🔍 Found ${affectedList.length} affected items`);
 
@@ -81,5 +84,5 @@ export const ciAttachAffected = createScript(
 );
 
 if (import.meta.main) {
-	ciAttachAffected();
+	ciAttachAffected.run();
 }

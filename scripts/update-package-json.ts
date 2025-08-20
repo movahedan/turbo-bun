@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 import { readdir } from "node:fs/promises";
 import path from "node:path";
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const updatePackageJsonConfig = {
 	name: "update-package-json",
@@ -17,7 +16,8 @@ const updatePackageJsonConfig = {
 			description: "Are you using src directory? (default: true)",
 			required: false,
 			defaultValue: true,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -83,5 +83,5 @@ export const updatePackageJson = createScript(
 );
 
 if (import.meta.main) {
-	updatePackageJson();
+	updatePackageJson.run();
 }

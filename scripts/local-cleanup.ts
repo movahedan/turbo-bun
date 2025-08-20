@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig } from "./shell/create-scripts";
 
 const cleanupConfig = {
 	name: "Local Development Cleanup",
@@ -68,5 +67,5 @@ const cleanup = createScript(cleanupConfig, async (_, vConsole): Promise<void> =
 });
 
 if (import.meta.main) {
-	cleanup();
+	cleanup.run();
 }

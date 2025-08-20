@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
-import { EntityCompose } from "./entities";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
+import { createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityCompose } from "@repo/intershell/entities";
 
 const ciAttachServicePortsConfig = {
 	name: "GitHub Attach Service Ports",
@@ -14,7 +14,8 @@ const ciAttachServicePortsConfig = {
 			long: "--output-id",
 			description: "The ID of the output to attach the affected packages to",
 			required: true,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -24,7 +25,7 @@ export const ciAttachServicePorts = createScript(
 	async function main(options, xConsole) {
 		const outputId = options["output-id"];
 
-		const portMappings = await EntityCompose.parse("prod").then((c) => c.servicePorts());
+		const portMappings = await new EntityCompose("docker-compose.yml").getPortMappings();
 
 		// Output in GitHub Actions format
 		if (process.env.GITHUB_OUTPUT) {
@@ -36,5 +37,5 @@ export const ciAttachServicePorts = createScript(
 );
 
 if (import.meta.main) {
-	ciAttachServicePorts();
+	ciAttachServicePorts.run();
 }

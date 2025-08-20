@@ -1,6 +1,6 @@
 {
 	"name": "monobun",
-	"dockerComposeFile": ["docker-compose.dev.yml"],
+	"dockerComposeFile": ["../docker-compose.dev.yml"],
 	"service": "vscode-service",
 	"workspaceFolder": "/app",
 	"remoteUser": "runner-user",
@@ -96,6 +96,7 @@
 					"admin",
 					"api",
 					"@repo/ui",
+					"@repo/intershell",
 					"@repo/utils",
 					"@repo/typescript-config",
 					"@repo/test-preset"
