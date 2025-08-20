@@ -146,11 +146,12 @@ export class EntityCompose {
 
 			const services = await this.getServices();
 			for (const service of services) {
-				const serviceKey = allPackages.find((p) => p === service.name);
-				if (keys.some((k: string) => k === serviceKey)) {
-					affectedServices.add(service.name);
-					serviceMap.set(service.name, {
-						name: service.name,
+				const serviceName = service.name.replace(/^@repo\//, "");
+				const associatedPackage = allPackages.find((p) => p === serviceName);
+				if (keys.some((k: string) => k === associatedPackage)) {
+					affectedServices.add(serviceName);
+					serviceMap.set(serviceName, {
+						name: serviceName,
 						environment: "prod",
 						port: service.ports[1]?.host,
 					});
