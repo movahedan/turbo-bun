@@ -1,9 +1,10 @@
-import { type ParsedCommitData, type PRCategory, prCategories, validTypes } from "../commit";
+import { commitRules, type ParsedCommitData, type PRCategory, prCategories } from "../commit";
 import { EntityTag } from "../tag";
 import { ChangelogTemplate } from "./template";
 
 const DEFAULT_BADGE_COLOR = "6B7280";
 const prefix = EntityTag.getPrefix();
+const validTypes = commitRules.getConfig().type?.list ?? [];
 
 export class DefaultChangelogTemplate extends ChangelogTemplate {
 	static getChangelogHeader(packageName: string): string {
@@ -123,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 		// Use the commitTypeOrder to ensure proper ordering
 		const commitTypeOrder = validTypes
 			.map((type) => type.type)
-			.sort((a: string, b: string) => {
+			.sort((a, b) => {
 				if (a === "deps") return 1;
 				if (b === "deps") return -1;
 				return 0;

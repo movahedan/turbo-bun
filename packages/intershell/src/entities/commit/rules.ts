@@ -123,7 +123,7 @@ const defaultConfig: CommitConfig = {
 				badgeColor: "6B7280",
 				breakingAllowed: false,
 			},
-		],
+		] as const,
 	},
 	scopes: {
 		list: allPackages,
@@ -151,6 +151,10 @@ class CommitRules {
 
 	getRules(): CommitRule[] {
 		return this.rules;
+	}
+
+	getConfig(): CommitConfig {
+		return this.config;
 	}
 
 	private mergeConfig(config: Partial<CommitConfig>): CommitConfig {
@@ -294,4 +298,4 @@ class CommitRules {
 	}
 }
 
-export const commitRules = new CommitRules(defaultConfig).getRules();
+export const commitRules = new CommitRules(defaultConfig);

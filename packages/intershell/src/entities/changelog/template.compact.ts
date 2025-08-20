@@ -1,8 +1,9 @@
-import { type ParsedCommitData, validTypes } from "../commit";
+import { commitRules, type ParsedCommitData } from "../commit";
 import { EntityPackages } from "../packages";
 import { ChangelogTemplate, type TemplateEngineData } from "./template";
 
 const repoUrl = await EntityPackages.getRepoUrl();
+const validTypes = commitRules.getConfig().type?.list ?? [];
 
 export class CompactChangelogTemplate extends ChangelogTemplate {
 	static getChangelogHeader(packageName: string): string {

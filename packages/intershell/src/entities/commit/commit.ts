@@ -48,7 +48,7 @@ export const EntityCommit = {
 		const match = EntityCommit.parseByMessage(message);
 
 		const errors: string[] = [];
-		for (const rule of commitRules) {
+		for (const rule of commitRules.getRules()) {
 			const validation = rule.validator({ message: match });
 			if (typeof validation === "string") errors.push(validation);
 		}
