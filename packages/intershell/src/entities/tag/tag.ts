@@ -178,7 +178,9 @@ export const EntityTag = {
 			}
 
 			// Sort by semantic version (newest first)
-			versions.sort((a, b) => EntityTag.compareVersions(b.version, a.version));
+			versions.sort((a, b) =>
+				EntityTag.compareVersions(EntityTag.toTag(b.version), EntityTag.toTag(a.version)),
+			);
 
 			return {
 				packageName,
@@ -206,6 +208,15 @@ export const EntityTag = {
 		date: Date;
 	} | null> {
 		try {
+			if (tag === "HEAD") {
+				return {
+					tag,
+					version: await new EntityPackages(packageName).readVersion(),
+					commitHash: await EntityTag._getTagSha(tag),
+					date: new Date(),
+				};
+			}
+
 			// Get commit hash for the tag using EntityTag
 			const commitHash = await EntityTag._getTagSha(tag);
 
@@ -217,7 +228,7 @@ export const EntityTag = {
 			const packageJsonPath = new EntityPackages(packageName).getJsonPath();
 
 			// Use git show to get file content at specific tag without checking out
-			const packageJsonResult = await $`git show ${tag}:${packageJsonPath}`.quiet();
+			const packageJsonResult = await $`git show ${tag}:${packageJsonPath}`.nothrow().quiet();
 			const packageJsonContent = packageJsonResult.text().trim();
 
 			// Parse version from package.json
@@ -236,7 +247,12 @@ export const EntityTag = {
 			};
 		} catch (error) {
 			console.error(`Failed to get package version at tag ${tag}:`, error);
-			return null;
+			return {
+				tag,
+				version: EntityTag.getVersionFromTag(tag),
+				commitHash: await EntityTag._getTagSha(tag),
+				date: new Date((await EntityTag.getTagInfo(tag)).date),
+			};
 		}
 	},
 	/**
@@ -254,15 +270,15 @@ export const EntityTag = {
 		return history.versions.some((v) => v.version === version);
 	},
 
-	compareVersions(versionA: string, versionB: string): number {
-		const parseVersion = (version: string) => {
-			const match = version.match(new RegExp(`^${EntityTag.getPrefix()}?(\\d+)\\.(\\d+)\\.(\\d+)`));
+	compareVersions(tagA: string, tagB: string): number {
+		const parseVersion = (tag: string) => {
+			const match = tag.match(new RegExp(`^${EntityTag.getPrefix()}?(\\d+)\\.(\\d+)\\.(\\d+)`));
 			if (!match) return [0, 0, 0];
 			return [Number.parseInt(match[1]), Number.parseInt(match[2]), Number.parseInt(match[3])];
 		};
 
-		const [majorA, minorA, patchA] = parseVersion(versionA);
-		const [majorB, minorB, patchB] = parseVersion(versionB);
+		const [majorA, minorA, patchA] = parseVersion(tagA);
+		const [majorB, minorB, patchB] = parseVersion(tagB);
 
 		if (majorA !== majorB) return majorA - majorB;
 		if (minorA !== minorB) return minorA - minorB;
@@ -343,5 +359,13 @@ export const EntityTag = {
 		const firstPart = tagName.split(".")[0].replace(/^[0-9]+/, ""); // v1.0.0 -> v
 		if (/^[a-zA-Z]+/.test(firstPart)) return firstPart; // v1.0.0 -> v
 		return undefined; // 1.0.0 -> undefined
+	},
+
+	getVersionFromTag(tag: string): string {
+		const versionMatch = tag.match(
+			new RegExp(`^${EntityTag.getPrefix()}?(\\d+)\\.(\\d+)\\.(\\d+)`),
+		);
+		if (!versionMatch) return "";
+		return versionMatch[1];
 	},
 };

@@ -36,6 +36,7 @@ export class EntityPackages {
 	}
 	async writeJson(data: PackageJson): Promise<void> {
 		await Bun.write(this.getJsonPath(), JSON.stringify(data, null, 2));
+		await $`bun biome check --write --no-errors-on-unmatched ${this.getJsonPath()}`.quiet();
 	}
 	async readVersion(): Promise<string> {
 		return (await this.packageJson).version;
@@ -48,12 +49,16 @@ export class EntityPackages {
 	async readChangelog(): Promise<string> {
 		return Bun.file(this.getChangelogPath())
 			.text()
-			.catch(() => {
-				throw new Error(`Changelog not found ${this.packageName} at ${this.getChangelogPath()}`);
-			});
+			.catch(() => "");
 	}
 	async writeChangelog(content: string): Promise<void> {
-		await Bun.write(this.getChangelogPath(), content);
+		const isExists = await Bun.file(this.getChangelogPath()).exists();
+		if (isExists) {
+			await Bun.write(this.getChangelogPath(), content);
+		} else {
+			await Bun.write(this.getChangelogPath(), content, { createPath: true });
+		}
+		await $`bun biome check --write --no-errors-on-unmatched ${this.getJsonPath()}`.quiet();
 	}
 
 	static async getAllPackages(): Promise<string[]> {
