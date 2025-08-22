@@ -57,7 +57,7 @@ export const versionCI = createScript(scriptConfig, async function main(args, xC
 		"dry-run": args["dry-run"],
 	});
 
-	xConsole.log(colorify.green("\n🎉 CI version workflow completed successfully!"));
+	xConsole.log(colorify.green("\n✅ CI version workflow completed successfully!"));
 });
 
 async function configureGitAuth(

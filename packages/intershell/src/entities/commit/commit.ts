@@ -45,7 +45,7 @@ export const EntityCommit = {
 	},
 
 	validateCommitMessage(message: string): string[] {
-		if (!message.trim()) return ["type | commit message cannot be empty"];
+		if (!message.trim()) return ["commit message cannot be empty"];
 		const match = EntityCommit.parseByMessage(message);
 
 		const errors: string[] = [];
@@ -53,12 +53,12 @@ export const EntityCommit = {
 		if (match.isMerge) {
 			for (const rule of rules.mergeCommit || []) {
 				const validation = rule.validator({ message: match });
-				if (typeof validation === "string") errors.push(validation);
+				if (typeof validation === "string") errors.push(`${rule.section}: ${validation}`);
 			}
 		} else {
 			for (const rule of rules.conventional || []) {
 				const validation = rule.validator({ message: match });
-				if (typeof validation === "string") errors.push(validation);
+				if (typeof validation === "string") errors.push(`${rule.section}: ${validation}`);
 			}
 		}
 

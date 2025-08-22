@@ -48,6 +48,18 @@ export const versionApply = createScript(scriptConfig, async function main(args,
 		return;
 	}
 
+	xConsole.info("💾 Committing version changes...");
+
+	xConsole.log("📁 Adding all changes...");
+	await $`git add .`;
+	const statusResult = await $`git status --porcelain`.nothrow();
+	const hasChanges = statusResult.text().trim() !== "";
+
+	if (!hasChanges) {
+		xConsole.log(colorify.yellow("⚠️ No changes to commit"));
+		return;
+	}
+
 	await commitVersionChanges(xConsole);
 	await createTag(version, args, xConsole);
 	await pushChanges(args, xConsole);
@@ -100,18 +112,6 @@ async function createTag(
 }
 
 async function commitVersionChanges(xConsole: typeof console): Promise<void> {
-	xConsole.info("💾 Committing version changes...");
-
-	xConsole.log("📁 Adding all changes...");
-	await $`git add .`;
-	const statusResult = await $`git status --porcelain`.nothrow();
-	const hasChanges = statusResult.text().trim() !== "";
-
-	if (!hasChanges) {
-		xConsole.log(colorify.yellow("⚠️ No changes to commit"));
-		return;
-	}
-
 	const version = await new EntityPackages("root").readVersion();
 	const commitMessage = await Bun.file(".git/COMMIT_EDITMSG").text();
 

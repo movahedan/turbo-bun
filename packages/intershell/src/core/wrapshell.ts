@@ -296,6 +296,11 @@ class WrapShell<TConfig extends ScriptConfig> {
 							await hook({ ...context, error: error as Error });
 						}
 					}
+
+					if (!context.args.debug) {
+						process.exit(1);
+					}
+
 					throw error;
 				}
 			},

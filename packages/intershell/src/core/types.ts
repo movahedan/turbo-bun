@@ -132,6 +132,7 @@ export type InferArgs<TConfig extends ScriptConfig> = {
 	quiet?: boolean;
 	"dry-run"?: boolean;
 	help?: boolean;
+	debug?: boolean;
 };
 
 // Progress tracking types

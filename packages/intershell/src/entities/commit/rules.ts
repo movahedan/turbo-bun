@@ -130,12 +130,12 @@ const defaultConfig: CommitConfig = {
 	},
 	description: {
 		minLength: 3,
-		maxLength: 100,
+		maxLength: 72,
 		shouldNotEndWithPeriod: true,
 		shouldNotStartWithType: true,
 	},
 	bodyLines: {
-		minLength: 120,
+		minLength: 3,
 		maxLength: 120,
 	},
 };
