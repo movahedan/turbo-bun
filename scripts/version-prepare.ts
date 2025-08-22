@@ -122,9 +122,10 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 						versionCommitMessage += `release: ${EntityTag.toTag(versionData.targetVersion)}\n\n`;
 					}
 
-					const log = `📦 (${colorify.yellow(versionData.currentVersion)} => ${colorify.green(versionData.targetVersion)}) ${colorify.blue(packageName)}: ${versionData.bumpType} ${colorify.green(`(${packageJson.getChangelogPath()})`)}`;
+					const log = `📦 (${versionData.currentVersion} => ${versionData.targetVersion}) ${packageName}: ${versionData.bumpType} (${packageJson.getChangelogPath()})`;
 					packageVersionCommitMessages.push(log);
-					xConsole.log(log);
+					const coloredLog = `📦 (${colorify.yellow(versionData.currentVersion)} => ${colorify.green(versionData.targetVersion)}) ${colorify.blue(packageName)}: ${versionData.bumpType} (${colorify.green(packageJson.getChangelogPath())})`;
+					xConsole.log(coloredLog);
 				} else {
 					xConsole.log(
 						`📦 (${colorify.yellow(versionData.currentVersion)} => ${colorify.green(versionData.targetVersion)}) ${colorify.blue(packageName)}: ${versionData.bumpType === "none" ? "none" : "synced"}`,
@@ -161,9 +162,8 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		if (!args["dry-run"]) {
 			await Bun.write(".git/COMMIT_EDITMSG", versionCommitMessage);
 			xConsole.log(
-				colorify.green(
-					`📝 Commit message written in .git/COMMIT_EDITMSG: \n\t${versionCommitMessage.replace(/\n/g, "\n\t")}`,
-				),
+				`${colorify.green("📝 Commit message written in")} ${colorify.blue(".git/COMMIT_EDITMSG")}:`,
+				`\n\t${versionCommitMessage.replace(/\n/g, "\n\t")}`,
 			);
 		} else {
 			xConsole.log(
