@@ -211,7 +211,7 @@ export const EntityTag = {
 			if (tag === "HEAD") {
 				return {
 					tag,
-					version: await new EntityPackages(packageName).readVersion(),
+					version: new EntityPackages(packageName).readVersion(),
 					commitHash: await EntityTag._getTagSha(tag),
 					date: new Date(),
 				};

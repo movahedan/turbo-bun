@@ -1,8 +1,9 @@
 import { $ } from "bun";
+import { EntityBranch, type ParsedBranch } from "../branch";
 import type { PRCategory, PRStats } from "./pr.types";
 import type { ParsedCommitData } from "./types";
 
-const defaultBranchName = "main";
+const defaultBranchName = EntityBranch.getConfig().defaultBranch;
 
 export const EntityPr = {
 	async getPRInfo(
@@ -24,7 +25,7 @@ export const EntityPr = {
 				prCategory: categorizePR(prCommits, message),
 				prStats: getPRStats(prCommits),
 				prCommits: prCommits.length > 0 ? prCommits : [],
-				prBranchName: getPrBranchName({ message }),
+				prBranchName: getPrBranch({ message }),
 			};
 		} catch (error) {
 			console.warn(`Failed to get PR info for commit ${hash}: ${error}`);
@@ -202,32 +203,27 @@ function getPRStats(prCommits: ParsedCommitData[]): PRStats {
 	};
 }
 
-function getPrBranchName({ message }: ParsedCommitData): string {
+function getPrBranch({ message }: ParsedCommitData): ParsedBranch {
 	if (!message.isMerge) {
-		return defaultBranchName;
+		return {
+			name: defaultBranchName,
+		};
 	}
 
 	const mainMessage = message.bodyLines?.join("\n") || "";
 	if (!mainMessage.includes("from ")) {
-		return defaultBranchName;
+		return {
+			name: defaultBranchName,
+		};
 	}
 
 	const fromIndex = mainMessage.indexOf("from ");
 	const afterFrom = mainMessage.substring(fromIndex + 5);
-	const firstLine = afterFrom.split("\n")[0].trim();
+	let firstLine = afterFrom.split("\n")[0].trim();
 
 	if (firstLine.includes(":")) {
-		// Format: "user:branch-name"
-		const parts = firstLine.split(":");
-		return parts.length > 1 ? parts.slice(1).join(":") : defaultBranchName;
+		firstLine = firstLine.split(":").reverse()[0];
 	}
 
-	if (firstLine.includes("/")) {
-		// Format: "user/branch-name"
-		const parts = firstLine.split("/");
-		return parts.length > 1 ? parts.slice(1).join("/") : defaultBranchName;
-	}
-
-	// Fallback: use the full branch name
-	return firstLine || defaultBranchName;
+	return EntityBranch.parseByName(firstLine);
 }
