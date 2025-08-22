@@ -9,7 +9,7 @@
 		"./testing-library": "./testing-library.ts",
 		"./happydom": "./happydom.ts"
 	},
-	"dependencies": {
+	"devDependencies": {
 		"@happy-dom/global-registrator": "18.0.1",
 		"@testing-library/jest-dom": "6.6.4",
 		"@testing-library/dom": "10.4.1",
