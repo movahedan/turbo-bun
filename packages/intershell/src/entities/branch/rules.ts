@@ -1,7 +1,7 @@
 import type { BranchConfig, BranchRule } from "./types";
 
 const defaultConfig: BranchConfig = {
-	prefixes: {
+	prefix: {
 		list: [
 			"main",
 			"master",
@@ -52,9 +52,9 @@ class BranchRules {
 		return {
 			...defaultConfig,
 			...config,
-			prefixes: {
-				...defaultConfig.prefixes,
-				...config.prefixes,
+			prefix: {
+				...defaultConfig.prefix,
+				...config.prefix,
 			},
 			name: {
 				...defaultConfig.name,
@@ -68,19 +68,19 @@ class BranchRules {
 		return [
 			{
 				section: "prefix",
-				question: `🌿 What is the branch prefix?\n=> [${config.prefixes.list.join(", ")}]`,
+				question: `🌿 What is the branch prefix?\n=> [${config.prefix.list.join(", ")}]`,
 				validator: (branch): true | string => {
 					const prefix = branch.prefix;
-					if (config.prefixes.list.length === 0) return true;
-					const exists = prefix ? config.prefixes.list.includes(prefix) : true;
+					if (config.prefix.list.length === 0) return true;
+					const exists = prefix ? config.prefix.list.includes(prefix) : true;
 
 					return (
-						config.prefixes.validator?.(branch) ||
+						config.prefix.validator?.(branch) ||
 						exists ||
-						`invalid prefix: "${prefix}". valid prefixes:\n  => ${config.prefixes.list.join(", ")}`
+						`invalid prefix: "${prefix}". valid prefix:\n  => ${config.prefix.list.join(", ")}`
 					);
 				},
-				list: config.prefixes.list,
+				list: config.prefix.list,
 			},
 			{
 				section: "name",
