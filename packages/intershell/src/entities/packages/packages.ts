@@ -1,14 +1,12 @@
+import fs from "node:fs";
 import { $ } from "bun";
-import type {
-	PackageDependencyGraph,
-	PackageJson,
-	PackageValidationError,
-	PackageValidationResult,
-} from "./types";
+import type { PackageJson, PackageValidationError, PackageValidationResult } from "./types";
+
+const semanticVersionRegex = /^\d+\.\d+\.\d+$/;
 
 export class EntityPackages {
 	private readonly packageName: string;
-	private readonly packageJson: Promise<PackageJson>;
+	private packageJson: PackageJson | undefined;
 	constructor(packageName: string) {
 		this.packageName = packageName;
 		this.packageJson = this.readJson();
@@ -20,36 +18,47 @@ export class EntityPackages {
 			return `packages/${this.packageName.replace("@repo/", "")}`;
 		return `apps/${this.packageName}`;
 	}
+
 	getJsonPath(): string {
 		return `${this.getPath()}/package.json`;
 	}
-	getChangelogPath(): string {
-		return `${this.getPath()}/CHANGELOG.md`;
-	}
+	readJson(): PackageJson {
+		if (this.packageJson) {
+			return this.packageJson;
+		}
 
-	async readJson(): Promise<PackageJson> {
-		return Bun.file(this.getJsonPath())
-			.json()
-			.catch(() => {
-				throw new Error(`Package not found ${this.packageName} at ${this.getJsonPath()}`);
-			});
+		const jsonPath = this.getJsonPath();
+		try {
+			const json = fs.readFileSync(jsonPath, "utf8");
+			const packageJson = JSON.parse(json);
+			return packageJson;
+		} catch (error) {
+			throw new Error(`Package not found ${this.packageName} at ${this.getJsonPath()}: ${error}`);
+		}
 	}
 	async writeJson(data: PackageJson): Promise<void> {
 		await Bun.write(this.getJsonPath(), JSON.stringify(data, null, 2));
+		this.packageJson = data;
 		await $`bun biome check --write --no-errors-on-unmatched ${this.getJsonPath()}`.quiet();
 	}
-	async readVersion(): Promise<string> {
-		return (await this.packageJson).version;
+
+	readVersion(): string {
+		return this.readJson().version;
 	}
 	async writeVersion(version: string): Promise<void> {
-		const packageJson = await this.packageJson;
+		const packageJson = this.readJson();
 		packageJson.version = version;
+		this.packageJson = packageJson;
 		await this.writeJson(packageJson);
 	}
-	async readChangelog(): Promise<string> {
-		return Bun.file(this.getChangelogPath())
-			.text()
-			.catch(() => "");
+
+	getChangelogPath(): string {
+		return `${this.getPath()}/CHANGELOG.md`;
+	}
+	readChangelog(): string {
+		const changelogPath = this.getChangelogPath();
+		const changelog = fs.readFileSync(changelogPath, "utf8");
+		return changelog || "";
 	}
 	async writeChangelog(content: string): Promise<void> {
 		const isExists = await Bun.file(this.getChangelogPath()).exists();
@@ -61,6 +70,39 @@ export class EntityPackages {
 		await $`bun biome check --write --no-errors-on-unmatched ${this.getJsonPath()}`.quiet();
 	}
 
+	validatePackage(): PackageValidationResult {
+		const packageJson = this.readJson();
+
+		const errors: PackageValidationError[] = [];
+
+		if (!semanticVersionRegex.test(packageJson.version)) {
+			errors.push({
+				code: "INVALID_VERSION",
+				message: "Version should follow semantic versioning",
+				field: "version",
+			});
+		}
+
+		if (!packageJson.description) {
+			errors.push({
+				code: "MISSING_DESCRIPTION",
+				message: "Consider adding a description to package.json",
+				field: "description",
+			});
+		}
+
+		return {
+			isValid: errors.length === 0,
+			errors,
+		};
+	}
+
+	static getRepoUrl(): string {
+		const rootPackageJson = new EntityPackages("root").readJson();
+		return typeof rootPackageJson.repository === "string"
+			? rootPackageJson.repository
+			: rootPackageJson.repository?.url || "";
+	}
 	static async getAllPackages(): Promise<string[]> {
 		const packages: string[] = ["root"];
 
@@ -112,101 +154,5 @@ export class EntityPackages {
 		packages.push(...filteredPackages.filter((pkg): pkg is string => pkg !== null));
 
 		return packages;
-	}
-	static async validatePackage(packageName: string): Promise<PackageValidationResult> {
-		const packageInstance = new EntityPackages(packageName);
-		const packageJson = await packageInstance.readJson();
-
-		const errors: PackageValidationError[] = [];
-
-		if (!/^\d+\.\d+\.\d+/.test(packageJson.version)) {
-			errors.push({
-				code: "INVALID_VERSION",
-				message: "Version should follow semantic versioning",
-				field: "version",
-			});
-		}
-
-		if (!packageJson.description) {
-			errors.push({
-				code: "MISSING_DESCRIPTION",
-				message: "Consider adding a description to package.json",
-				field: "description",
-			});
-		}
-
-		const graph = await EntityPackages.getPackagesGraph();
-		const cycles = graph.cycles;
-		if (cycles.length > 0) {
-			errors.push({
-				code: "CYCLIC_DEPENDENCIES",
-				message: "Cyclic dependencies found",
-				field: "dependencies",
-			});
-		}
-
-		return {
-			isValid: errors.length === 0,
-			errors,
-		};
-	}
-	static async getRepoUrl(): Promise<string> {
-		const rootPackageInstance = new EntityPackages("root");
-		const rootPackageJson = await rootPackageInstance.readJson();
-		return typeof rootPackageJson.repository === "string"
-			? rootPackageJson.repository
-			: rootPackageJson.repository?.url || "";
-	}
-	private static async getPackagesGraph(): Promise<PackageDependencyGraph> {
-		const packageNames = await EntityPackages.getAllPackages();
-
-		const dependencies: Record<string, string[]> = {};
-		const devDependencies: Record<string, string[]> = {};
-		const peerDependencies: Record<string, string[]> = {};
-
-		for (const pkg of packageNames) {
-			const packageInstance = new EntityPackages(pkg);
-			const packageJson = await packageInstance.packageJson;
-
-			dependencies[pkg] = Object.keys(packageJson.dependencies || {});
-			devDependencies[pkg] = Object.keys(packageJson.devDependencies || {});
-			peerDependencies[pkg] = Object.keys(packageJson.peerDependencies || {});
-		}
-
-		return {
-			packages: packageNames,
-			dependencies,
-			devDependencies,
-			peerDependencies,
-			order: EntityPackages.topologicalSort(packageNames, dependencies),
-			cycles: [],
-		};
-	}
-	private static topologicalSort(
-		packages: string[],
-		dependencies: Record<string, string[]>,
-	): string[] {
-		const visited = new Set<string>();
-		const result: string[] = [];
-
-		const visit = (pkg: string) => {
-			if (visited.has(pkg)) return;
-			visited.add(pkg);
-
-			const deps = dependencies[pkg] || [];
-			for (const dep of deps) {
-				if (packages.includes(dep)) {
-					visit(dep);
-				}
-			}
-
-			result.push(pkg);
-		};
-
-		for (const pkg of packages) {
-			visit(pkg);
-		}
-
-		return result;
 	}
 }
