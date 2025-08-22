@@ -4,11 +4,11 @@ import { EntityCommit } from "../commit";
 import { EntityPackages } from "../packages";
 import { EntityTag } from "../tag";
 import type { TemplateEngine } from "./template";
-import type { ChangelogData, VersionAction, VersionBumpType, VersionData } from "./types";
+import type { ChangelogData, VersionBumpType, VersionData } from "./types";
 
 export class EntityChangelog {
 	private packageName: string;
-	private packagePath: string;
+	private package: EntityPackages;
 	private fromSha?: string;
 	private toSha?: string;
 
@@ -19,16 +19,16 @@ export class EntityChangelog {
 
 	constructor(packageName: string, templateEngine: TemplateEngine, versionMode = true) {
 		this.packageName = packageName;
+		this.package = new EntityPackages(this.packageName);
 		this.templateEngine = templateEngine;
 		this.versionMode = versionMode;
-		this.packagePath = new EntityPackages(this.packageName).getPath();
 	}
 
-	async setRange(from: string, to?: string): Promise<void> {
+	async calculateRange(from: string, to?: string): Promise<void> {
 		this.fromSha = from;
 		this.toSha = to || "HEAD";
 		if (!this.fromSha || !this.toSha) {
-			throw new Error("Range not set. Call setRange() first.");
+			throw new Error(`Range not set: from=${this.fromSha}, to=${this.toSha}`);
 		}
 
 		const unreleasedCommits = await this.getCommitsInRange(
@@ -47,14 +47,15 @@ export class EntityChangelog {
 			);
 		}
 
-		const versionAction = await this.determineVersionAction(currentVersion, unreleasedCommits);
+		const versionData = await this.calculateVersionData(currentVersion, unreleasedCommits);
+		const versionOnDisk = this.package.readVersion();
 
 		const changelogData: ChangelogData = new Map();
 
 		const tagsInRange = await EntityTag.getTagsInRange(this.fromSha, this.toSha);
 
 		const versionTags = tagsInRange;
-		if (versionAction.shouldBump) {
+		if (versionData.shouldBump) {
 			versionTags.push({
 				tag: this.toSha,
 				previousTag: await EntityTag.getBaseTagSha(),
@@ -87,52 +88,27 @@ export class EntityChangelog {
 			changelogData.set(this.versionMode ? packageVersion.version : "[Unreleased]", sortedCommits);
 		}
 
-		const versionOnDisk = await new EntityPackages(this.packageName).readVersion();
-
 		this.changelogData = changelogData;
 		this.versionData = {
-			currentVersion: versionAction.currentVersion,
-			bumpType: versionOnDisk === versionAction.targetVersion ? "synced" : versionAction.bumpType,
-			shouldBump: versionOnDisk === versionAction.targetVersion ? false : versionAction.shouldBump,
-			targetVersion: versionAction.targetVersion,
-			reason: versionAction.reason,
+			...versionData,
+			bumpType: versionOnDisk === versionData.targetVersion ? "synced" : versionData.bumpType,
+			shouldBump: versionOnDisk === versionData.targetVersion ? false : versionData.shouldBump,
 		};
 	}
 
 	getVersionData(): VersionData {
 		if (!this.versionData) {
-			throw new Error("Version data not determined. Call setRange() first.");
+			throw new Error("Version data not determined. Call calculateRange() first.");
 		}
 		return this.versionData;
 	}
 
-	async mergeWithExisting(): Promise<ChangelogData> {
+	generateChangelog(): string {
 		if (!this.changelogData) {
-			throw new Error("Data not analyzed. Call setRange() first.");
-		}
-
-		const packageInstance = new EntityPackages(this.packageName);
-		const mergedChangelogData: ChangelogData = new Map();
-
-		const existingChangelog = await packageInstance.readChangelog();
-		const existingChangelogData = this.templateEngine.parseVersions(existingChangelog);
-
-		for (const [version, content] of existingChangelogData) {
-			mergedChangelogData.set(version, content);
-		}
-		for (const [version, content] of this.changelogData) {
-			mergedChangelogData.set(version, content);
-		}
-
-		return mergedChangelogData;
-	}
-
-	async generateChangelog(): Promise<string> {
-		if (!this.changelogData) {
-			throw new Error("Data not analyzed. Call setRange() first.");
+			throw new Error("Data not analyzed. Call calculateRange() first.");
 		}
 		if (!this.versionData) {
-			throw new Error("Version data not determined. Call setRange() first.");
+			throw new Error("Version data not determined. Call calculateRange() first.");
 		}
 		if (!this.templateEngine) {
 			throw new Error("Template engine not set.");
@@ -142,24 +118,36 @@ export class EntityChangelog {
 		return changelog;
 	}
 
-	async generateMergedChangelog(): Promise<string> {
+	generateMergedChangelog(): string {
 		if (!this.changelogData) {
-			throw new Error("Data not analyzed. Call setRange() first.");
+			throw new Error("Data not analyzed. Call calculateRange() first.");
 		}
 		if (!this.versionData) {
-			throw new Error("Version data not determined. Call setRange() first.");
+			throw new Error("Version data not determined. Call calculateRange() first.");
 		}
 		if (!this.templateEngine) {
 			throw new Error("Template engine not set.");
 		}
 
-		const mergedChangelog = await this.mergeWithExisting();
-		return this.templateEngine.generateContent(mergedChangelog);
+		const mergedChangelogData: ChangelogData = new Map();
+
+		const existingChangelog = this.package.readChangelog();
+		const existingChangelogData = this.templateEngine.parseVersions(existingChangelog);
+
+		for (const [version, content] of existingChangelogData) {
+			mergedChangelogData.set(version, content);
+		}
+		for (const [version, content] of this.changelogData) {
+			mergedChangelogData.set(version, content);
+		}
+
+		const mergedChangelog = this.templateEngine.generateContent(mergedChangelogData);
+		return mergedChangelog;
 	}
 
 	getCommitCount(): number {
 		if (!this.changelogData) {
-			throw new Error("Data not analyzed. Call setRange() first.");
+			throw new Error("Data not analyzed. Call calculateRange() first.");
 		}
 		return this.changelogData.values().reduce((acc, curr) => {
 			return (
@@ -171,10 +159,10 @@ export class EntityChangelog {
 		}, 0);
 	}
 
-	private async determineVersionAction(
+	private async calculateVersionData(
 		currentVersion: string,
 		commits: ParsedCommitData[],
-	): Promise<VersionAction> {
+	): Promise<VersionData> {
 		// If no commits, no version change needed
 		if (commits.length === 0) {
 			return {
@@ -298,7 +286,7 @@ export class EntityChangelog {
 				commitHashes = [...new Set([...allHashes, ...mergeHashes])];
 			} else {
 				const packageHashes = await this.getGitLogLines(gitRange, {
-					path: this.packagePath,
+					path: this.package.getPath(),
 				});
 				const mergeHashes = await this.getGitLogLines(gitRange, {
 					merges: true,
@@ -307,7 +295,7 @@ export class EntityChangelog {
 				const relevantMergeHashes: string[] = [];
 				for (const hash of mergeHashes) {
 					const prCommitsResult = await this.getGitLogLines(`${hash}^..${hash}^2`, {
-						path: this.packagePath,
+						path: this.package.getPath(),
 					});
 
 					if (prCommitsResult.length > 0) {

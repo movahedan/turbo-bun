@@ -11,7 +11,7 @@ export interface TemplateEngine {
 export type TemplateEngineData = ChangelogData;
 
 const prefix = EntityTag.getPrefix();
-const repoUrl = await EntityPackages.getRepoUrl();
+const repoUrl = EntityPackages.getRepoUrl();
 
 export class ChangelogTemplate implements TemplateEngine {
 	readonly packageName: string;

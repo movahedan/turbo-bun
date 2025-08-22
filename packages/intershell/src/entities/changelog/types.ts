@@ -17,14 +17,6 @@ export interface ChangelogSnapshot {
 	readonly changelogData: ChangelogData;
 }
 
-export interface VersionAction {
-	readonly currentVersion: string;
-	readonly shouldBump: boolean;
-	readonly targetVersion: string;
-	readonly bumpType: VersionBumpType;
-	readonly reason: string;
-}
-
 export interface GitTagVersion {
 	readonly tag: string;
 	readonly version: string;
