@@ -6,22 +6,10 @@ export * from "./types";
 
 export const EntityBranch = {
 	parseByName(branchName: string): ParsedBranch {
-		const prefix = EntityBranch.extractPrefix(branchName);
-		const name = prefix ? branchName.replace(prefix, "") : branchName;
-
-		const rules = branchRules;
-		const errors = [];
-
-		for (const rule of rules) {
-			const result = rule.validator({ name, prefix });
-			if (result !== true) {
-				errors.push(result);
-			}
-		}
-
+		const [prefix, ...name] = branchName.split("/");
 		return {
 			prefix,
-			name,
+			name: name.join("/"),
 		};
 	},
 
@@ -43,12 +31,5 @@ export const EntityBranch = {
 	async getCurrentBranch(): Promise<string> {
 		const result = await $`git branch --show-current`;
 		return result.stdout.toString().trim();
-	},
-
-	extractPrefix(name: string): string | undefined {
-		if (!name) return undefined;
-
-		const parts = name.split("/");
-		return parts[0];
 	},
 };
