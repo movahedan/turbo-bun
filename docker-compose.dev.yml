@@ -15,33 +15,6 @@ volumes:
     driver: local
 
 services:
-  vscode-service:
-    build:
-      context: ./
-      dockerfile: .devcontainer/Dockerfile.vscode
-    env_file:
-      - path: ./.env
-        required: true
-    volumes:
-      - ${PROJECT_ROOT:-./}:/app:cached
-      # Override volumes
-      - node_modules:/app/node_modules:delegated
-      - turbo_cache:/app/.turbo:delegated
-      - bun_cache:/root/.bun:delegated
-      - vscode_cache:/app/.vscode:delegated
-    command: sleep infinity
-    # Use init for better signal handling
-    init: true
-    networks:
-      - dev-network
-    profiles: ["vscode-service"]
-    healthcheck:
-      test: ["CMD", "ps", "aux"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-
   # Apps runtime environment - shared container for all applications
   apps:
     build:
@@ -190,3 +163,30 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  vscode-service:
+    build:
+      context: ./
+      dockerfile: .devcontainer/Dockerfile.vscode
+    env_file:
+      - path: ./.env
+        required: true
+    volumes:
+      - ${PROJECT_ROOT:-./}:/app:cached
+      # Override volumes
+      - node_modules:/app/node_modules:delegated
+      - turbo_cache:/app/.turbo:delegated
+      - bun_cache:/root/.bun:delegated
+      - vscode_cache:/app/.vscode:delegated
+    command: sleep infinity
+    # Use init for better signal handling
+    init: true
+    networks:
+      - dev-network
+    profiles: ["vscode-service"]
+    healthcheck:
+      test: ["CMD", "ps", "aux"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
