@@ -30,12 +30,10 @@ Our Docker setup provides a complete development and production environment with
 ```
 📁 Project Root
 ├── docker-compose.yml              # Production services
+├── docker-compose.dev.yml          # Development services
+├── Dockerfile.dev                  # Development base image
 ├── .devcontainer/
-│   ├── docker-compose.dev.yml      # Development overrides
-│   ├── devcontainer.json           # VS Code DevContainer config
-│   ├── Dockerfile.vscode           # VS Code container
-│   ├── Dockerfile.dev              # Development base image
-│   └── setup-docker.sh            # Docker setup script
+│   └── devcontainer.json           # VS Code DevContainer config
 └── apps/
     ├── admin/Dockerfile            # Multi-stage production build
     ├── storefront/Dockerfile       # Multi-stage production build

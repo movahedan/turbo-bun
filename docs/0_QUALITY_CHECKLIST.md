@@ -11,6 +11,8 @@
 - [Testing Standards](#testing-standards)
 - [CI/CD Standards](#cicd-standards)
 - [Performance Standards](#performance-standards)
+- [InterShell Standards](#intershell-standards)
+- [Related Documentation](#related-documentation)
 
 ## 🎯 Overview
 
@@ -19,6 +21,7 @@ This checklist ensures consistent quality across all aspects of the Monobun mono
 - **🔷 TypeScript**: Strict type safety and modern patterns
 - **🎮 Interactive CLI**: Sophisticated user experience with validation
 - **🏗️ Entity Architecture**: Modular, reusable components
+- **🚀 InterShell**: Next-generation CLI framework with page-based navigation
 - **🧪 Testing**: Comprehensive test coverage and quality assurance
 - **📚 Documentation**: Clear, comprehensive, and up-to-date
 - **🚀 CI/CD**: Automated workflows and quality gates
@@ -65,8 +68,8 @@ This checklist ensures consistent quality across all aspects of the Monobun mono
 
 ### **Script Architecture Standards**
 
-- [ ] **createScript Utility**: Use `createScript` for all scripts
-- [ ] **Entity System**: Leverage entity-based architecture for common operations
+- [ ] **WrapShell Utility**: Use `WrapShell.createScript` for all scripts
+- [ ] **Entity System**: Leverage entity-based architecture from `@repo/intershell`
 - [ ] **Type Safety**: Ensure full TypeScript support with strict types
 - [ ] **Error Handling**: Implement comprehensive error handling
 - [ ] **Validation**: Include proper argument and input validation
@@ -75,7 +78,7 @@ This checklist ensures consistent quality across all aspects of the Monobun mono
 ### **Script Organization Standards**
 
 - [ ] **Single Responsibility**: Each script has one clear purpose
-- [ ] **Modularity**: Scripts are composed of reusable components
+- [ ] **Modularity**: Scripts are composed of reusable components from `@repo/intershell`
 - [ ] **Consistency**: Follow established patterns across all scripts
 - [ ] **Testing**: Include comprehensive test coverage
 - [ ] **Examples**: Provide practical usage examples
@@ -139,6 +142,24 @@ This checklist ensures consistent quality across all aspects of the Monobun mono
 - [ ] **Quality Gates**: Include comprehensive quality checks
 - [ ] **Error Handling**: Implement proper error handling and reporting
 - **Performance**: Optimize workflow execution time
+
+## 🚀 InterShell Standards
+
+### **CLI Framework Standards**
+
+- [ ] **Page-Based Navigation**: Use page system for complex workflows (🚧 In Development)
+- [ ] **State Management**: Implement proper state management with reducers (🚧 In Development)
+- [ ] **Promise-Based Architecture**: Use promise-based system for extensibility
+- [ ] **Type Safety**: Ensure full TypeScript support throughout
+- [ ] **Testing**: Test pages and reducers independently
+
+### **Interactive CLI Standards**
+
+- [ ] **User Experience**: Provide clear navigation and feedback
+- [ ] **Error Handling**: Graceful error handling with recovery options
+- [ ] **Accessibility**: Support keyboard navigation and screen readers
+- [ ] **Performance**: Optimize rendering and state updates
+- [ ] **Documentation**: Document page flows and user interactions
 
 ### **Automation Standards**
 
@@ -224,6 +245,13 @@ This checklist ensures consistent quality across all aspects of the Monobun mono
 - **Accuracy**: Zero outdated information
 - **Examples**: At least one example per major feature
 - **Maintenance**: Updated within 24 hours of code changes
+
+## 🔗 Related Documentation
+
+- [Installation Guide](./1_INSTALLATION_GUIDE.md) - Initial setup
+- [Setup Flows](./2_SETUP_FLOWS.md) - Development workflow
+- [Dev Flows](./3_DEV_FLOWS.md) - Development commands
+- [InterShell Framework](./9_INTERSHELL.md) - CLI framework documentation
 
 ---
 

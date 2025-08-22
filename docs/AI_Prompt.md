@@ -59,7 +59,7 @@ turbo/
 
 ### **Interactive CLI Features**
 
-The project features a sophisticated interactive CLI system:
+The project features an interactive CLI system (currently in development) built on the new `@repo/intershell` package:
 
 #### **Step-by-Step Wizards**
 - Guided workflows with validation
@@ -75,18 +75,18 @@ The project features a sophisticated interactive CLI system:
 
 ### **Entity-Based Architecture**
 
-The script system uses modular, reusable components:
+The script system uses modular, reusable components from the `@repo/intershell` package:
 
 ```
-📁 scripts/entities/
-├── commit.ts            # 📝 Commit parsing and validation
-├── changelog.ts         # 📋 Changelog generation
-├── package-json.ts      # 📦 Package.json operations
-├── workspace.ts         # 🗂️ Workspace package discovery
-├── compose.ts           # 🐳 Docker Compose parsing
-├── affected.ts          # 🔍 Affected package detection
-├── tag.ts               # 🏷️ Git tag operations
-└── changelog-manager.ts # 🎯 Changelog orchestration
+📁 packages/intershell/src/entities/
+├── commit/              # 📝 Commit parsing and validation
+├── changelog/           # 📋 Changelog generation
+├── package-json/        # 📦 Package.json operations
+├── workspace/           # 🗂️ Workspace package discovery
+├── compose/             # 🐳 Docker Compose parsing
+├── affected/            # 🔍 Affected package detection
+├── tag/                 # 🏷️ Git tag operations
+└── packages/            # 📦 Package management
 ```
 
 ### **Available Scripts**

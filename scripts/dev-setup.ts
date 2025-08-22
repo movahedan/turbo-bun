@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityCompose } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityCompose } from "./entities";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const devSetupConfig = {
 	name: "DevContainer Setup",
@@ -21,7 +20,8 @@ const devSetupConfig = {
 			long: "--skip-health-check",
 			description: "Skip health check verification",
 			required: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -36,8 +36,8 @@ const devSetup = createScript(devSetupConfig, async function main(args, xConsole
 	}
 
 	xConsole.log(colorify.cyan("\n💡 Services are running and available at:"));
-	const parsedCompose = await EntityCompose.parse("dev");
-	const devUrls = parsedCompose.serviceUrls();
+	const compose = new EntityCompose("./docker-compose.dev.yml");
+	const devUrls = await compose.getServiceUrls();
 	for (const [name, url] of Object.entries(devUrls)) {
 		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));
 	}
@@ -50,5 +50,5 @@ const devSetup = createScript(devSetupConfig, async function main(args, xConsole
 });
 
 if (import.meta.main) {
-	devSetup();
+	devSetup.run();
 }

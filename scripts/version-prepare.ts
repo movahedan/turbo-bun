@@ -1,8 +1,14 @@
 #!/usr/bin/env bun
 
-import { ChangelogManager, EntityPackageJson, EntityTag, EntityWorkspace } from "./entities";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import {
+	DefaultChangelogTemplate,
+	EntityChangelog,
+	EntityCompose,
+	EntityPackages,
+	EntityTag,
+	type VersionData,
+} from "@repo/intershell/entities";
 
 const scriptConfig = {
 	name: "Version Prepare",
@@ -19,21 +25,24 @@ const scriptConfig = {
 			long: "--package",
 			description: "Package name to process (default: all packages)",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-f",
 			long: "--from",
 			description: "Start commit/tag for changelog generation",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-t",
 			long: "--to",
 			description: "End commit/tag for changelog generation (default: HEAD)",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -48,14 +57,15 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 		`📝 Generating changelog from ${colorify.blue(fromCommit)} to ${colorify.blue(toCommit)}`,
 	);
 
-	let versionCommitMessage = `release: ${EntityTag.toTag(EntityPackageJson.getVersion("root"))}\n`;
+	let versionCommitMessage = "";
+	const packageVersionCommitMessages = [];
 
 	try {
 		let packagesToProcess: string[] = [];
 
 		if (processAll) {
 			xConsole.info("📦 Processing all packages in workspace...");
-			packagesToProcess = await EntityWorkspace.getAllPackages();
+			packagesToProcess = await EntityPackages.getAllPackages();
 			xConsole.info(`Found ${packagesToProcess.length} packages: ${packagesToProcess.join(", ")}`);
 		} else {
 			const packageName = args.package;
@@ -66,142 +76,126 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 			xConsole.info(`📦 Processing single package: ${colorify.blue(packageName)}`);
 		}
 
-		const results: Array<{
-			packageName: string;
-			needsBump: boolean;
-			currentVersion: string;
-			targetVersion: string;
-			bumpType: string;
-			commitCount: number;
-		}> = [];
+		const results: Array<
+			{
+				packageName: string;
+				commitCount: number;
+			} & VersionData
+		> = [];
 
 		let totalBumps = 0;
 		let totalCommits = 0;
 
 		for (const packageName of packagesToProcess) {
-			xConsole.info(`\n🔍 Processing package: ${colorify.blue(packageName)}`);
-
 			try {
-				const changelogManager = new ChangelogManager(packageName);
-				await changelogManager.setRange(fromCommit, toCommit);
-
-				if (!changelogManager.hasCommits()) {
-					xConsole.log(colorify.yellow(`⚠️ No commits found for ${packageName}`));
-					results.push({
-						packageName,
-						needsBump: false,
-						currentVersion: EntityPackageJson.getVersion(packageName),
-						targetVersion: EntityPackageJson.getVersion(packageName),
-						bumpType: "none",
-						commitCount: 0,
-					});
-					continue;
-				}
-
-				const snapshot = await changelogManager.snapshot();
-				const { currentVersion, targetVersion, bumpType } = snapshot.versionData;
-				const commitCount = changelogManager.getCommitCount();
-				const needsBump = targetVersion !== currentVersion;
+				const packageJson = new EntityPackages(packageName);
+				const template = new DefaultChangelogTemplate(packageName);
+				const changelog = new EntityChangelog(packageName, template);
+				await changelog.setRange(fromCommit, toCommit);
+				const commitCount = changelog.getCommitCount();
+				const versionData = changelog.getVersionData();
 
 				results.push({
 					packageName,
-					needsBump,
-					currentVersion,
-					targetVersion,
-					bumpType,
 					commitCount,
+					...versionData,
 				});
 
-				if (needsBump) {
-					totalBumps++;
+				if (commitCount === 0) {
 					xConsole.log(
-						`🎯 ${colorify.green("Version bump needed!")}\n` +
-							`📦 Package: ${colorify.blue(packageName)}\n` +
-							`🔄 Current: ${colorify.yellow(currentVersion)} → ${colorify.green(targetVersion)}\n` +
-							`📈 Type: ${colorify.blue(bumpType)}\n` +
-							`💡 Reason: New ${bumpType} version bump to ${targetVersion}\n`,
+						colorify.yellow(`📦 ${packageName}: ${colorify.yellow("No commits found")}`),
 					);
+					continue;
+				}
 
-					// Actually bump the version in package.json
-					await EntityPackageJson.bumpVersion(packageName, targetVersion);
+				if (versionData.shouldBump) {
+					totalBumps++;
+					if (args["dry-run"]) {
+						xConsole.log(
+							`🚧 Dry run mode! would write to ${packageJson.getJsonPath()} to bump to ${versionData.targetVersion}`,
+						);
+					} else {
+						await packageJson.writeVersion(versionData.targetVersion);
+					}
 
-					const log = `Bumped: ${packageName}: ${currentVersion} -> ${targetVersion} (${bumpType})`;
-					versionCommitMessage += `\n${log}`;
-					xConsole.log(colorify.green(log));
+					if (packageName === "root") {
+						versionCommitMessage += `release: ${EntityTag.toTag(versionData.targetVersion)}\n\n`;
+					}
+
+					const log = `📦 (${versionData.currentVersion} => ${versionData.targetVersion}) ${packageName}: ${versionData.bumpType} (${packageJson.getChangelogPath()})`;
+					packageVersionCommitMessages.push(log);
+					const coloredLog = `📦 (${colorify.yellow(versionData.currentVersion)} => ${colorify.green(versionData.targetVersion)}) ${colorify.blue(packageName)}: ${versionData.bumpType} (${colorify.green(packageJson.getChangelogPath())})`;
+					xConsole.log(coloredLog);
 				} else {
 					xConsole.log(
-						`✅ ${colorify.green("No version bump needed")}\n` +
-							`📦 Package: ${colorify.blue(packageName)}\n` +
-							`🔄 Current: ${colorify.yellow(currentVersion)}\n` +
-							"💡 Reason: Versions are the same\n",
+						`📦 (${colorify.yellow(versionData.currentVersion)} => ${colorify.green(versionData.targetVersion)}) ${colorify.blue(packageName)}: ${versionData.bumpType === "none" ? "none" : "synced"}`,
 					);
 				}
 
-				if (commitCount > 0) {
-					xConsole.info(`📚 Generating changelog for ${packageName}...`);
-					await changelogManager.generateChangelog();
-
-					const log = `Changelog generated for ${packageName}`;
-					versionCommitMessage += `\n${log}`;
-					xConsole.log(colorify.green(log));
-
-					totalCommits += commitCount;
+				totalCommits += commitCount;
+				const changelogContent = await changelog.generateMergedChangelog();
+				if (args["dry-run"]) {
+					xConsole.log(
+						`🚧 Dry run mode! would write to ${packageJson.getChangelogPath()} file with ${changelogContent.length} characters`,
+					);
+				} else {
+					await packageJson.writeChangelog(changelogContent);
 				}
 			} catch (error) {
 				xConsole.error(colorify.red(`❌ Failed to process package ${packageName}: ${error}`));
-				// Continue with other packages
 			}
 		}
 
-		// Summary
-		const summaryLog = "Version Preparation Summary:";
-		versionCommitMessage += `\n${summaryLog}`;
-		xConsole.log(colorify.green(summaryLog));
-		const totalPackagesLog = `📦 Total packages processed: ${packagesToProcess.length}`;
-		versionCommitMessage += `\n${totalPackagesLog}`;
-		xConsole.log(colorify.green(totalPackagesLog));
-		const totalBumpsLog = `🚀 Packages needing version bumps: ${totalBumps}`;
-		versionCommitMessage += `\n${totalBumpsLog}`;
-		xConsole.log(colorify.green(totalBumpsLog));
-		const totalCommitsLog = `📝 Total commits processed: ${totalCommits}`;
-		versionCommitMessage += `\n${totalCommitsLog}`;
-		xConsole.log(colorify.green(totalCommitsLog));
+		versionCommitMessage += packageVersionCommitMessages.join("\n");
+		versionCommitMessage += `\n\n📦 Total packages processed: ${packagesToProcess.length}`;
+		versionCommitMessage += `\n🚀 Packages needing version bumps: ${totalBumps}`;
+		versionCommitMessage += `\n📝 Commits re-generated in changelog: ${totalCommits}`;
 
-		if (totalBumps > 0) {
+		if (totalBumps > 0 || totalCommits > 0) {
 			xConsole.log(
 				"\n📝 Next steps:\n" +
 					"1. Review the generated changelogs\n" +
-					`2. Run ${colorify.blue("bun run version:apply")} to commit and tag the versions\n` +
-					`3. Push the changes: ${colorify.blue("git push && git push --tags")}`,
+					`2. Run ${colorify.blue("bun run version:apply")} to commit, tag and push the versions (you can turn it off using --no-push)`,
 			);
 		}
 
-		await Bun.write(".git/COMMIT_EDITMSG", versionCommitMessage);
+		if (!args["dry-run"]) {
+			await Bun.write(".git/COMMIT_EDITMSG", versionCommitMessage);
+			xConsole.log(
+				`${colorify.green("📝 Commit message written in")} ${colorify.blue(".git/COMMIT_EDITMSG")}:`,
+				`\n\t${versionCommitMessage.replace(/\n/g, "\n\t")}`,
+			);
+		} else {
+			xConsole.log(
+				colorify.yellow(
+					"🚧 Dry run mode! would write to .git/COMMIT_EDITMSG this message:\n" +
+						versionCommitMessage,
+				),
+			);
+		}
 
 		// Output packages that need deployment (for CI)
 		const packagesToDeploy = results
-			.filter((r) => r.needsBump)
+			.filter((r) => r.shouldBump)
 			.map((r) => r.packageName)
 			.join(",");
 
+		const services = await new EntityCompose("docker-compose.dev.yml").getServices();
+		const servicesToDeploy = services.filter((s) => packagesToDeploy.includes(s.name));
+		const servicesToDeployNames = servicesToDeploy.map((s) => s.name).join(",");
+
 		if (packagesToDeploy) {
-			// Set output for CI workflow (GitHub Actions syntax)
-			if (process.env.GITHUB_OUTPUT) {
-				// New GitHub Actions syntax
+			if (process.env.GITHUB_OUTPUT && !args["dry-run"]) {
 				const fs = await import("node:fs");
 				await fs.promises.appendFile(
 					process.env.GITHUB_OUTPUT,
-					`packages-to-deploy=${packagesToDeploy}\n`,
+					`packages-to-deploy=${servicesToDeployNames}\n`,
 				);
-			} else {
-				// Fallback for local development
-				console.log(`::set-output name=packages-to-deploy::${packagesToDeploy}`);
 			}
-			// Also log it for visibility
-			xConsole.log(`\n🚀 Packages to deploy: ${colorify.blue(packagesToDeploy)}`);
+			xConsole.log(`\n🚀 Packages to deploy: ${colorify.blue(servicesToDeployNames)}`);
 		}
 
-		xConsole.log(colorify.green("\n✅ Version preparation completed!"));
+		xConsole.log(colorify.green("✅ Version preparation completed!"));
 	} catch (error) {
 		xConsole.error(colorify.red(`❌ Version preparation failed: ${error}`));
 		process.exit(1);
@@ -209,5 +203,5 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 });
 
 if (import.meta.main) {
-	versionPrepare();
+	versionPrepare.run();
 }

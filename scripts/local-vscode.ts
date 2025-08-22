@@ -2,9 +2,9 @@
 
 import { exists, mkdir } from "node:fs/promises";
 import { join } from "node:path";
+import { createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityPackages } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityWorkspace } from "./entities";
-import { createScript, type ScriptConfig } from "./shell/create-scripts";
 
 const syncVscodeConfigScriptConfig = {
 	name: "Local VS Code Configuration Sync",
@@ -25,7 +25,7 @@ export const syncVscodeConfigScript = createScript(
 	async function main(args, xConsole) {
 		xConsole.log("🔄 Syncing VS Code configuration from devcontainer.json...");
 
-		const scopes = await EntityWorkspace.getAllPackages();
+		const scopes = await EntityPackages.getAllPackages();
 		xConsole.log(`📋 Generated scopes: ${scopes.join(", ")}`);
 
 		const {
@@ -80,7 +80,7 @@ export const syncVscodeConfigScript = createScript(
 
 // Run if called directly
 if (import.meta.main) {
-	syncVscodeConfigScript();
+	syncVscodeConfigScript.run();
 }
 
 /**

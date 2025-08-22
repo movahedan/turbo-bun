@@ -90,18 +90,18 @@ bun run dev:setup
 
 ### **Entity-Based Architecture**
 
-The script system uses modular, reusable components:
+The script system uses modular, reusable components from the `@repo/intershell` package:
 
 ```
-📁 scripts/entities/
-├── commit.ts            # 📝 Commit parsing and validation
-├── changelog.ts         # 📋 Changelog generation
-├── package-json.ts      # 📦 Package.json operations
-├── workspace.ts         # 🗂️ Workspace management
-├── compose.ts           # 🐳 Docker Compose parsing
-├── affected.ts          # 🔍 Affected package detection
-├── tag.ts               # 🏷️ Git tag operations
-└── changelog-manager.ts # 🎯 Changelog orchestration
+📁 packages/intershell/src/entities/
+├── commit/              # 📝 Commit parsing and validation
+├── changelog/           # 📋 Changelog generation
+├── package-json/        # 📦 Package.json operations
+├── workspace/           # 🗂️ Workspace management
+├── compose/             # 🐳 Docker Compose parsing
+├── affected/            # 🔍 Affected package detection
+├── tag/                 # 🏷️ Git tag operations
+└── packages/            # 📦 Package management
 ```
 
 ## 🔧 Development Workflows

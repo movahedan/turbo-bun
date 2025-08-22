@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
+import { createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const ciActConfig = {
 	name: "GitHub Actions Local Testing",
@@ -18,7 +18,8 @@ const ciActConfig = {
 			long: "--event",
 			description: "GitHub event to simulate (e.g., pull_request, push)",
 			required: true,
-			validator: validators.enum([
+			type: "string",
+			validator: createScript.validators.enum([
 				"pull_request",
 				"push",
 				"release",
@@ -31,7 +32,8 @@ const ciActConfig = {
 			long: "--workflow",
 			description: "Workflow file to test (e.g., .github/workflows/Check.yml)",
 			required: true,
-			validator: validators.fileExists,
+			type: "string",
+			validator: createScript.validators.fileExists,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -55,7 +57,7 @@ export const ciAct = createScript(ciActConfig, async function main(args) {
 });
 
 if (import.meta.main) {
-	ciAct();
+	ciAct.run();
 }
 
 // Cleanup function to stop and remove act containers

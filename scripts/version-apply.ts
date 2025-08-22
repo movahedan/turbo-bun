@@ -1,14 +1,8 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type InferArgs, type ScriptConfig } from "@repo/intershell/core";
+import { EntityPackages, EntityTag } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityPackageJson, EntityTag } from "./entities";
-import { colorify } from "./shell/colorify";
-import {
-	createScript,
-	type InferArgs,
-	type ScriptConfig,
-	validators,
-} from "./shell/create-scripts";
 
 const scriptConfig = {
 	name: "Version Apply",
@@ -25,7 +19,8 @@ const scriptConfig = {
 			long: "--message",
 			description: "Tag message",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-n",
@@ -33,13 +28,14 @@ const scriptConfig = {
 			description: "Don't push tag to remote after creation",
 			required: false,
 			defaultValue: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
 } as const satisfies ScriptConfig;
 
 export const versionApply = createScript(scriptConfig, async function main(args, xConsole) {
-	const version = EntityPackageJson.getVersion("root");
+	const version = await new EntityPackages("root").readVersion();
 
 	if (args["dry-run"]) {
 		xConsole.log(colorify.yellow("🔍 Dry run mode - would execute:"));
@@ -93,11 +89,7 @@ async function createTag(
 	xConsole.info(`🏷️ Creating tag: ${tagName}`);
 
 	try {
-		await EntityTag.createVersionTag(version, {
-			message: args.message || `Release version ${version}`,
-			force: false,
-			dryRun: false,
-		});
+		await EntityTag.createTag(tagName, args.message || `Release version ${version}`);
 
 		xConsole.log(`✅ Created tag: ${tagName}`);
 	} catch (error) {
@@ -120,7 +112,7 @@ async function commitVersionChanges(xConsole: typeof console): Promise<void> {
 		return;
 	}
 
-	const version = EntityPackageJson.getVersion("root");
+	const version = await new EntityPackages("root").readVersion();
 	const commitMessage = await Bun.file(".git/COMMIT_EDITMSG").text();
 
 	xConsole.log("📝 Commit message:");
@@ -134,5 +126,5 @@ async function commitVersionChanges(xConsole: typeof console): Promise<void> {
 }
 
 if (import.meta.main) {
-	versionApply();
+	versionApply.run();
 }

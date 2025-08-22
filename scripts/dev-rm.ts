@@ -1,9 +1,7 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { $ } from "bun";
-import { colorify } from "./shell/colorify";
-import type { ScriptConfig } from "./shell/create-scripts";
-import { createScript } from "./shell/create-scripts";
 
 const devRmConfig = {
 	name: "DevContainer Removal",
@@ -43,10 +41,10 @@ const devRm = createScript(devRmConfig, async (_, vConsole): Promise<void> => {
 
 	async function stepStopRemoveAllContainers() {
 		vConsole.log(colorify.yellow("🐳 Stopping all related containers..."));
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all down --volumes --remove-orphans`;
+		await $`docker compose -f ./docker-compose.dev.yml --profile all down --volumes --remove-orphans`;
 		await $`docker compose -f docker-compose.yml down --volumes --remove-orphans`;
 		vConsole.log(colorify.yellow("🗑️ Removing containers..."));
-		await $`docker compose -f .devcontainer/docker-compose.dev.yml --profile all rm -f --volumes`;
+		await $`docker compose -f ./docker-compose.dev.yml --profile all rm -f --volumes`;
 		await $`docker compose -f docker-compose.yml rm -f --volumes`;
 	}
 	await stepStopRemoveAllContainers();
@@ -62,5 +60,5 @@ const devRm = createScript(devRmConfig, async (_, vConsole): Promise<void> => {
 });
 
 if (import.meta.main) {
-	devRm();
+	devRm.run();
 }

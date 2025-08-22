@@ -2,7 +2,10 @@
 	"extends": "@repo/typescript-config/base.json",
 	"compilerOptions": {
 		"module": "esnext",
-		"target": "ES2022"
+		"target": "ES2022",
+		"paths": {
+			"@repo/intershell": ["../packages/intershell/src"]
+		}
 	},
 	"include": ["."],
 	"exclude": ["node_modules"]

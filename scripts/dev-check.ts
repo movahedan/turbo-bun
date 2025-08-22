@@ -1,10 +1,9 @@
 #!/usr/bin/env bun
 
 import { setTimeout } from "node:timers/promises";
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityCompose, type ServiceHealth, type ServiceInfo } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityCompose, type ServiceHealth, type ServiceInfo } from "./entities";
-import { colorify } from "./shell/colorify";
-import { createScript, type ScriptConfig, validators } from "./shell/create-scripts";
 
 const devCheckConfig = {
 	name: "DevContainer Health Check",
@@ -17,7 +16,8 @@ const devCheckConfig = {
 			long: "--shutdown",
 			description: "Shutdown services after checks complete",
 			required: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
 } as const satisfies ScriptConfig;
@@ -26,11 +26,11 @@ const devCheck = createScript(devCheckConfig, async function main(args, xConsole
 	xConsole.log(colorify.blue("🧪 Starting DevContainer Health Check..."));
 
 	await $`bun run dev:up --build`;
-	const compose = await EntityCompose.parse("dev");
-	await monitorServiceHealth(compose.serviceHealth, compose.exposedServices, xConsole);
+	const compose = new EntityCompose("./docker-compose.dev.yml");
+	await monitorServiceHealth(compose.getServiceHealth, compose.getServices, xConsole);
 
 	xConsole.log(colorify.blue("\n📊 Services are available at:"));
-	const devUrls = compose.serviceUrls();
+	const devUrls = await compose.getServiceUrls();
 	for (const [name, url] of Object.entries(devUrls)) {
 		xConsole.log(colorify.cyan(`   • ${name}: ${url}`));
 	}
@@ -48,24 +48,24 @@ const devCheck = createScript(devCheckConfig, async function main(args, xConsole
 });
 
 if (import.meta.main) {
-	devCheck();
+	devCheck.run();
 }
 
 const icons: Record<ServiceHealth["status"], string> = {
 	healthy: "✅",
 	starting: "🔄",
 	unhealthy: "❌",
-	none: "❓",
+	unknown: "❓",
 };
 const colors: Record<ServiceHealth["status"], (text: string) => string> = {
 	healthy: colorify.green,
 	starting: colorify.yellow,
 	unhealthy: colorify.red,
-	none: colorify.gray,
+	unknown: colorify.gray,
 };
 async function monitorServiceHealth(
 	serviceHealth: () => Promise<ServiceHealth[]>,
-	services: () => ServiceInfo[],
+	services: () => Promise<ServiceInfo[]>,
 	xConsole: typeof console,
 ) {
 	xConsole.log(colorify.yellow("⏳ Waiting for services to become healthy..."));
@@ -74,6 +74,7 @@ async function monitorServiceHealth(
 	const maxRetries = 6; // 6 * retryInterval = 30 seconds total
 	let retryCount = 0;
 	let allHealthy = false;
+	const serviceList = await services();
 
 	let healthResult: ServiceHealth[] | null = null;
 	while (retryCount < maxRetries && !allHealthy) {
@@ -90,7 +91,7 @@ async function monitorServiceHealth(
 
 		if (
 			healthResult.every((s) => s.status === "healthy") &&
-			healthResult.length === services.length
+			healthResult.length === serviceList.length
 		) {
 			allHealthy = true;
 		} else {
@@ -108,9 +109,8 @@ async function monitorServiceHealth(
 	for (const service of healthResult) {
 		const icon = icons[service.status];
 		const color = colors[service.status];
-		xConsole.log(
-			`${icon} ${color(service.name)}: ${service.status} ${service.port ? `(${service.port})` : ""}`,
-		);
+		const port = serviceList.find((s) => s.name === service.name)?.ports[0];
+		xConsole.log(`${icon} ${color(service.name)}: ${service.status} ${port ? `(${port})` : ""}`);
 	}
 
 	if (healthResult.some((s) => s.status === "unhealthy")) {

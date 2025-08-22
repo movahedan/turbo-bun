@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
 
+import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
+import { EntityBranch, EntityCommit } from "@repo/intershell/entities";
 import { $ } from "bun";
-import { EntityCommit, validBranchPrefixes } from "./entities";
-import { colorify } from "./shell/colorify";
-import { createScript, validators } from "./shell/create-scripts";
 
 const scriptConfig = {
 	name: "Commit Check",
@@ -24,14 +23,16 @@ const scriptConfig = {
 			long: "--message",
 			description: "Validate specific commit message string",
 			required: false,
-			validator: validators.nonEmpty,
+			type: "string",
+			validator: createScript.validators.nonEmpty,
 		},
 		{
 			short: "-f",
 			long: "--message-file",
 			description: "Read and validate message from file",
 			required: false,
-			validator: validators.fileExists,
+			type: "string",
+			validator: createScript.validators.fileExists,
 		},
 		{
 			short: "-b",
@@ -39,7 +40,8 @@ const scriptConfig = {
 			description: "Validate current branch name",
 			required: false,
 			defaultValue: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 		{
 			short: "-s",
@@ -47,10 +49,11 @@ const scriptConfig = {
 			description: "Validate staged files for policy violations",
 			required: false,
 			defaultValue: false,
-			validator: validators.boolean,
+			type: "boolean",
+			validator: createScript.validators.boolean,
 		},
 	],
-} as const;
+} as const satisfies ScriptConfig;
 
 export const commitCheck = createScript(scriptConfig, async (args, xConsole) => {
 	if (args["message-file"] || args.message) {
@@ -103,7 +106,7 @@ export const commitCheck = createScript(scriptConfig, async (args, xConsole) => 
 });
 
 if (import.meta.main) {
-	commitCheck();
+	commitCheck.run();
 }
 
 async function checkStagedFiles(): Promise<boolean> {
@@ -227,43 +230,24 @@ async function checkBranchName(): Promise<boolean> {
 		currentBranch.toString().trim() ||
 		"";
 
-	const patterns = validBranchPrefixes.reduce(
-		(acc, prefix) => {
-			acc[prefix] = new RegExp(`^${prefix}/([a-z0-9.-]+)$`);
-			return acc;
-		},
-		{} as Record<(typeof validBranchPrefixes)[number], RegExp>,
-	);
-
-	const isValidBranchName = (name: string): boolean => {
-		if (name === "main") {
-			return true;
-		}
-
-		console.log(colorify.blue(`🔍 Checking branch name: ${name}`));
-		return Object.values(patterns).some((pattern) => pattern.test(name));
-	};
+	const branchValidation = EntityBranch.validate(branchName);
 
 	// Skip branch name check in CI if we don't have a valid branch name
-	if (isCI && !isValidBranchName(branchName)) {
+	if (isCI && !branchValidation.isValid) {
 		console.log(colorify.yellow("⚠️  Skipping branch name check in CI environment"));
 		console.log(colorify.gray(`Branch name detected: ${branchName}`));
 		return true;
 	}
 
-	if (isValidBranchName(branchName)) {
+	if (branchValidation.isValid) {
 		console.log(colorify.green("✅ Branch name validation passed"));
 		return true;
 	}
 
 	console.error(colorify.red("❌ Invalid branch name!"));
 	console.error(colorify.red("\nBranch name should follow one of these patterns:"));
-	for (const prefix of validBranchPrefixes) {
-		if (prefix === "release") {
-			console.error(colorify.gray(`  - ${prefix}/1.0.0`));
-		} else {
-			console.error(colorify.gray(`  - ${prefix}/your-${prefix}-name`));
-		}
+	for (const error of branchValidation.errors) {
+		console.error(colorify.gray(`  - ${error}`));
 	}
 	return false;
 }
