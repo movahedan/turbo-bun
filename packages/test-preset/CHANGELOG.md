@@ -7,6 +7,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.3
+
+### 📦 [object Object] <img src="https://img.shields.io/badge/Dependency%20Updates-495057?style=flat" alt="Dependency Updates" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/173"><img src="https://img.shields.io/badge/%23173-blue?style=flat" alt="#173" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/7%20commits-green?style=flat" alt="7 commits" style="vertical-align: middle;" />
+
+#### 🎯 Overview
+This PR refactors the intershell package to improve performance, code quality, and maintainability through several key improvements.
+#### ✨ Key Changes
+- **Package Management**: Convert EntityPackages.readJson() from async to sync operations
+- **Changelog System**: Refactor changelog generation with improved range calculation methods
+- **Entity Improvements**: Enhanced branch, commit, and tag entity functionality
+- **Script Automation**: Add automatic dependency installation in version scripts
+- **Dependency Management**: Properly categorize test dependencies as devDependencies
+- **Code Quality**: Remove unused types, improve error handling, and clean up interfaces
+#### 🔧 Technical Notes
+- **Breaking Changes**: Some methods changed from async to sync (e.g., readJson, generateMergedChangelog)
+- **Performance**: Synchronous file operations replacing async operations
+- **Maintainability**: Cleaner APIs and better error handling
+- **Automation**: Version scripts now automatically run bun install after updates
+
+<details><summary><strong>📝 Commits</strong> (Click to expand)</summary>
+
+- <a href="https://github.com/movahedan/monobun/commit/564bfb446a7b52c92748422e682a72c0efd681bf"><img src="https://img.shields.io/badge/fix-(root)-EF4444?style=flat" alt="fix" style="vertical-align: middle;" /></a> add automatic dependency installation to version-prepare ([564bfb4](https://github.com/movahedan/monobun/commit/564bfb446a7b52c92748422e682a72c0efd681bf)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/0140afd816343beed7ad32cfeb9355da4beefd84"><img src="https://img.shields.io/badge/refactor-(root)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> improve commit-check with EntityBranch.getCurrentBranch() ([0140afd](https://github.com/movahedan/monobun/commit/0140afd816343beed7ad32cfeb9355da4beefd84)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/1b3ba809e3b2599139d9c400306e7c6e92ead2b7"><img src="https://img.shields.io/badge/fix-(@repo/test%20preset)-EF4444?style=flat" alt="fix" style="vertical-align: middle;" /></a> move test dependencies to devDependencies ([1b3ba80](https://github.com/movahedan/monobun/commit/1b3ba809e3b2599139d9c400306e7c6e92ead2b7)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/b97258df9c2376b0c0a9caf89d5b672e6eba617b"><img src="https://img.shields.io/badge/refactor-(root)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> update version scripts for new changelog methods ([b97258d](https://github.com/movahedan/monobun/commit/b97258df9c2376b0c0a9caf89d5b672e6eba617b)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/24331b330041e8672bde381470c0651200187c0e"><img src="https://img.shields.io/badge/refactor-(@repo/intershell)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> supporting entities with improved validation ([24331b3](https://github.com/movahedan/monobun/commit/24331b330041e8672bde381470c0651200187c0e)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/cd5f0ea0bd57e90e26287f02b3922309335748cf"><img src="https://img.shields.io/badge/refactor-(@repo/intershell)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> changelog system with improved range calculation ([cd5f0ea](https://github.com/movahedan/monobun/commit/cd5f0ea0bd57e90e26287f02b3922309335748cf)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/b7b535c761276bc40fbce2f1d5726cf760dcc521"><img src="https://img.shields.io/badge/refactor-(@repo/intershell)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> package reader funcs with synch operations ([b7b535c](https://github.com/movahedan/monobun/commit/b7b535c761276bc40fbce2f1d5726cf760dcc521)) by **Soheil Movahedan**
+
+</details>
+
 ## v0.0.2
 
 ### 🔄 custom-version-management <img src="https://img.shields.io/badge/Code%20Quality%20%26%20Refactoring-495057?style=flat" alt="Code Quality & Refactoring" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/154"><img src="https://img.shields.io/badge/%23154-blue?style=flat" alt="#154" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/37%20commits-green?style=flat" alt="37 commits" style="vertical-align: middle;" />
