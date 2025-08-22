@@ -1,3 +1,4 @@
+import type { ParsedBranch } from "../branch";
 import type { ParsedCommitData } from "./types";
 
 export type PRCategory =
@@ -21,7 +22,7 @@ export type PRInfo = {
 	prCategory: PRCategory;
 	prStats: PRStats;
 	prCommits: ParsedCommitData[];
-	prBranchName: string;
+	prBranchName: ParsedBranch;
 };
 
 export const prCategories: Record<PRCategory, { emoji: string; label: string }> = {

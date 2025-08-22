@@ -1,10 +1,10 @@
 import type { BranchConfig, BranchRule } from "./types";
 
 const defaultConfig: BranchConfig = {
+	defaultBranch: "main",
 	protectedBranches: ["main"],
 	prefix: {
 		list: [
-			"main",
 			"master",
 			"develop",
 			"development",
@@ -36,13 +36,17 @@ const defaultConfig: BranchConfig = {
 	},
 };
 
-class BranchRules {
+export class BranchRules {
 	private config: BranchConfig;
 	private rules: BranchRule[] = [];
 
 	constructor(config: BranchConfig = defaultConfig) {
 		this.config = this.mergeConfig(config);
 		this.rules = this.createRules();
+	}
+
+	getConfig(): BranchConfig {
+		return this.config;
 	}
 
 	getRules(): BranchRule[] {
@@ -112,5 +116,3 @@ class BranchRules {
 		];
 	}
 }
-
-export const branchRules = new BranchRules(defaultConfig).getRules();

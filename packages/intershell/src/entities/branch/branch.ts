@@ -1,8 +1,10 @@
 import { $ } from "bun";
-import { branchRules } from "./rules";
-import type { BranchValidationResult, ParsedBranch } from "./types";
+import { BranchRules } from "./rules";
+import type { BranchConfig, BranchRule, BranchValidationResult, ParsedBranch } from "./types";
 
 export * from "./types";
+
+const branchRules = new BranchRules();
 
 export const EntityBranch = {
 	parseByName(branchName: string): ParsedBranch {
@@ -13,9 +15,17 @@ export const EntityBranch = {
 		};
 	},
 
+	getConfig(): BranchConfig {
+		return branchRules.getConfig();
+	},
+
+	getRules(): BranchRule[] {
+		return branchRules.getRules();
+	},
+
 	validate(branch: string | ParsedBranch): BranchValidationResult {
 		const parsedBranch = typeof branch === "string" ? EntityBranch.parseByName(branch) : branch;
-		const rules = branchRules;
+		const rules = EntityBranch.getRules();
 		const errors = [];
 
 		for (const rule of rules) {

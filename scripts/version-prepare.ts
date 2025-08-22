@@ -9,6 +9,7 @@ import {
 	EntityTag,
 	type VersionData,
 } from "@repo/intershell/entities";
+import { $ } from "bun";
 
 const scriptConfig = {
 	name: "Version Prepare",
@@ -91,7 +92,7 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				const packageJson = new EntityPackages(packageName);
 				const template = new DefaultChangelogTemplate(packageName);
 				const changelog = new EntityChangelog(packageName, template);
-				await changelog.setRange(fromCommit, toCommit);
+				await changelog.calculateRange(fromCommit, toCommit);
 				const commitCount = changelog.getCommitCount();
 				const versionData = changelog.getVersionData();
 
@@ -133,7 +134,7 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				}
 
 				totalCommits += commitCount;
-				const changelogContent = await changelog.generateMergedChangelog();
+				const changelogContent = changelog.generateMergedChangelog();
 				if (args["dry-run"]) {
 					xConsole.log(
 						`🚧 Dry run mode! would write to ${packageJson.getChangelogPath()} file with ${changelogContent.length} characters`,
@@ -145,6 +146,9 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				xConsole.error(colorify.red(`❌ Failed to process package ${packageName}: ${error}`));
 			}
 		}
+
+		xConsole.log("🔄 Updating package dependencies in lockfile...");
+		await $`bun install`;
 
 		versionCommitMessage += packageVersionCommitMessages.join("\n");
 		versionCommitMessage += `\n\n📦 Total packages processed: ${packagesToProcess.length}`;

@@ -1,12 +1,3 @@
-export interface PackageDependencyGraph {
-	readonly packages: string[];
-	readonly dependencies: Record<string, string[]>;
-	readonly devDependencies: Record<string, string[]>;
-	readonly peerDependencies: Record<string, string[]>;
-	readonly order: string[];
-	readonly cycles: string[][];
-}
-
 export interface PackageJson {
 	name: string;
 	version: string;

@@ -2,7 +2,6 @@
 
 import { colorify, createScript, type ScriptConfig } from "@repo/intershell/core";
 import { EntityBranch, EntityCommit } from "@repo/intershell/entities";
-import { $ } from "bun";
 
 const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
 
@@ -90,7 +89,7 @@ export const commitCheck = createScript(scriptConfig, async (args, xConsole) => 
 			const branchName =
 				process.env.GITHUB_HEAD_REF ||
 				process.env.GITHUB_REF?.replace("refs/heads/", "") ||
-				(await $`git branch --show-current`).text().trim() ||
+				(await EntityBranch.getCurrentBranch()) ||
 				"";
 
 			const branchValidation = EntityBranch.validate(branchName);

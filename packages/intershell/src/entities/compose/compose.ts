@@ -14,6 +14,8 @@ import type {
 	ServiceInfo,
 } from "./types";
 
+const allPackages = await EntityPackages.getAllPackages();
+
 export class EntityCompose {
 	private readonly composePath: string;
 	private compose: Promise<ComposeData>;
@@ -138,8 +140,6 @@ export class EntityCompose {
 	async getAffectedServices(baseSha?: string, to?: string): Promise<EntityAffectedService[]> {
 		try {
 			const keys = await EntityAffected.getAffectedPackages(baseSha, to);
-
-			const allPackages = await EntityPackages.getAllPackages();
 
 			const serviceMap = new Map<string, EntityAffectedService>();
 			const affectedServices = new Set<string>();
