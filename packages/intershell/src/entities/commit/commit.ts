@@ -104,4 +104,42 @@ export const EntityCommit = {
 			);
 		}
 	},
+
+	async getStagedFiles(): Promise<{ stagedFiles: string[] }> {
+		const status = await $`git status --porcelain`.text();
+		const lines = status.split("\n").filter(Boolean);
+
+		return {
+			stagedFiles: lines
+				.filter((line) => line.startsWith("A ") || line.startsWith("M "))
+				.map((line) => line.substring(3)),
+		};
+	},
+
+	async validateStagedFiles(files: string[]): Promise<string[]> {
+		const errors: string[] = [];
+
+		// Process each file individually for proper ignore logic and error reporting
+		for (const file of files) {
+			for (const pattern of commitRules.getStagedConfig()) {
+				const fileNameMatches = pattern.filePattern.some((p) => p.test(file));
+				if (!fileNameMatches) continue;
+
+				const stagedDiff = await $`git diff --cached -- ${file}`.text();
+				const contentMatches = pattern.contentPattern?.some((p) => p.test(stagedDiff)) ?? true;
+
+				// Check if this is a new file and should be ignored
+				const isNewFile =
+					stagedDiff.includes("new file mode") || stagedDiff.includes("--- /dev/null");
+				const shouldIgnore = pattern.ignore?.mode === "create" && isNewFile;
+				const isDisabled = pattern.disabled;
+
+				if (contentMatches && !shouldIgnore && !isDisabled) {
+					errors.push(`${file}: ${pattern.description}`);
+				}
+			}
+		}
+
+		return errors;
+	},
 };

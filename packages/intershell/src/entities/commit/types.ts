@@ -93,3 +93,13 @@ export interface CommitTypeDefinition {
 	readonly badgeColor: string;
 	readonly breakingAllowed: boolean;
 }
+
+export type StagedConfig = {
+	filePattern: RegExp[];
+	contentPattern?: RegExp[];
+	description: string;
+	disabled?: boolean;
+	ignore?: {
+		mode: "create" | "update";
+	};
+}[];

@@ -1,7 +1,7 @@
 type Validator = (branch: ParsedBranch) => true | string;
 
 export interface BranchConfig {
-	readonly prefixes: {
+	readonly prefix: {
 		readonly list: readonly string[];
 		readonly validator?: Validator;
 	};

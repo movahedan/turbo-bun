@@ -489,7 +489,7 @@ The current entity system provides a modular, type-safe foundation:
 
 These entities are actively used in:
 
-- **Commit Validation**: `scripts/commit-check.ts` uses `EntityCommit` for staged file validation
+- **Commit Validation**: `scripts/commit-check.ts` uses `EntityCommit` for comprehensive staged file validation with configurable rules
 - **Version Management**: `scripts/version-prepare.ts` uses `EntityChangelog` for version bump detection
 - **Changelog Generation**: `scripts/version-apply.ts` uses `EntityChangelog` for changelog updates
 - **CI/CD Integration**: GitHub Actions workflows use entities for affected package detection
@@ -574,10 +574,59 @@ describe('WrapShell', () => {
 
 The InterShell entities are currently being used in production scripts:
 
-- **Commit Validation**: `bun run commit:check` - Uses `EntityCommit` for staged file validation
+- **Commit Validation**: `bun run commit:check` - Uses `EntityCommit` for comprehensive staged file validation with configurable rules
 - **Version Management**: `bun run version:prepare` - Uses `EntityChangelog` and `EntityTag` for version bump detection
 - **Changelog Generation**: `bun run version:apply` - Uses `EntityChangelog` and `EntityTag` for changelog updates
 - **Development Setup**: `bun run dev:setup` - Uses `EntityCompose` for Docker service management
+
+## 🔍 Staged File Validation
+
+The `EntityCommit` now provides advanced staged file validation capabilities:
+
+### **Configurable Validation Rules**
+
+```typescript
+// Example staged file validation configuration
+const stagedConfig = [
+  {
+    filePattern: [/\.vscode\/.*/, /coverage\/.*/, /dist\/.*/],
+    description: "development files should not be manually committed"
+  },
+  {
+    filePattern: [/CHANGELOG.md/],
+    contentPattern: [/^# @repo\/[^/]+$/m],
+    description: "CHANGELOG.md should be auto-generated"
+  },
+  {
+    filePattern: [/package.json/],
+    contentPattern: [/^[+-].*"version":\s*"[^"]+"/m],
+    ignore: { mode: "create" },
+    description: "package.json version should be auto-generated"
+  }
+];
+```
+
+### **Key Features**
+
+- **File Pattern Matching**: Regex-based file path validation
+- **Content Pattern Validation**: Check staged content against patterns
+- **Ignore Rules**: Skip validation for specific scenarios (e.g., new file creation)
+- **CI Environment Support**: Disable certain validations in CI environments
+- **Comprehensive Error Reporting**: Detailed feedback on validation failures
+
+### **Usage in Scripts**
+
+```typescript
+// Get staged files
+const { stagedFiles } = await EntityCommit.getStagedFiles();
+
+// Validate against rules
+const errors = await EntityCommit.validateStagedFiles(stagedFiles);
+
+if (errors.length > 0) {
+  throw new Error(errors.join('\n'));
+}
+```
 
 ## 🏗️ Architecture
 

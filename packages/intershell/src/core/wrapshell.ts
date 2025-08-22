@@ -298,7 +298,7 @@ class WrapShell<TConfig extends ScriptConfig> {
 					}
 
 					if (!context.args.debug) {
-						process.exit(1);
+						(error as Error).stack = undefined;
 					}
 
 					throw error;
