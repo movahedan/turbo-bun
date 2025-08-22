@@ -1,6 +1,7 @@
 import type { BranchConfig, BranchRule } from "./types";
 
 const defaultConfig: BranchConfig = {
+	protectedBranches: ["main"],
 	prefix: {
 		list: [
 			"main",
@@ -71,7 +72,12 @@ class BranchRules {
 				question: `🌿 What is the branch prefix?\n=> [${config.prefix.list.join(", ")}]`,
 				validator: (branch): true | string => {
 					const prefix = branch.prefix;
+					if (!prefix) return "branch name should have a prefix";
 					if (config.prefix.list.length === 0) return true;
+					if (config.protectedBranches.includes(prefix)) {
+						console.warn(`⚠️ Branch prefix "${prefix}" is protected`);
+						return true;
+					}
 					const exists = prefix ? config.prefix.list.includes(prefix) : true;
 
 					return (
@@ -87,6 +93,7 @@ class BranchRules {
 				question: "📝 Branch name validation",
 				validator: (branch): true | string => {
 					const length = branch.name.length;
+					if (config.protectedBranches.includes(branch.prefix ?? "")) return true;
 
 					if (length < config.name.minLength)
 						return `branch name should be at least ${config.name.minLength} characters long`;
