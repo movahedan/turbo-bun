@@ -9,6 +9,7 @@ import {
 	EntityTag,
 	type VersionData,
 } from "@repo/intershell/entities";
+import { $ } from "bun";
 
 const scriptConfig = {
 	name: "Version Prepare",
@@ -145,6 +146,9 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				xConsole.error(colorify.red(`❌ Failed to process package ${packageName}: ${error}`));
 			}
 		}
+
+		xConsole.log("🔄 Updating package dependencies in lockfile...");
+		await $`bun install`;
 
 		versionCommitMessage += packageVersionCommitMessages.join("\n");
 		versionCommitMessage += `\n\n📦 Total packages processed: ${packagesToProcess.length}`;
