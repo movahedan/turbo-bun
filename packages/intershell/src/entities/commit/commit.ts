@@ -6,7 +6,7 @@ import type { CommitMessageData, ParsedCommitData } from "./types";
 
 export * from "./types";
 
-const conventionalCommitRegex = /^([a-z]+)(\([a-zA-Z-,\s]+\))?(!)?:\s([a-z].{0,72})\s*/;
+const conventionalCommitRegex = /^([a-z]+)(\([a-zA-Z0-9@\-,\s/]+\))?(!)?:\s(.+)/;
 const depScopes = ["deps", "dependencies", "dep", "renovate", "dependabot"];
 const getIsMerge = (message: string) =>
 	message.startsWith("Merge pull request") || message.startsWith("Merge branch");
@@ -86,7 +86,7 @@ export const EntityCommit = {
 					date: date || undefined,
 				},
 				pr: message.isMerge
-					? await EntityPr.getPRInfo(EntityCommit.parseByHash, hash, subject, bodyLines)
+					? await EntityPr.getPRInfo(EntityCommit.parseByHash, hash, message)
 					: undefined,
 			};
 		} catch (error) {

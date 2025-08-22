@@ -2,12 +2,13 @@ import { $ } from "bun";
 import type { PRCategory, PRStats } from "./pr.types";
 import type { ParsedCommitData } from "./types";
 
+const defaultBranchName = "main";
+
 export const EntityPr = {
 	async getPRInfo(
 		parseByHash: (hash: string) => Promise<ParsedCommitData>,
 		hash: string,
-		message: string,
-		bodyLines: string[],
+		message: ParsedCommitData["message"],
 	): Promise<ParsedCommitData["pr"]> {
 		try {
 			const prNumber = extractPRNumber(message);
@@ -20,9 +21,10 @@ export const EntityPr = {
 
 			return {
 				prNumber: extractPRNumber(message) || "",
-				prCategory: categorizePR(prCommits, message, bodyLines),
+				prCategory: categorizePR(prCommits, message),
 				prStats: getPRStats(prCommits),
 				prCommits: prCommits.length > 0 ? prCommits : [],
+				prBranchName: getPrBranchName({ message }),
 			};
 		} catch (error) {
 			console.warn(`Failed to get PR info for commit ${hash}: ${error}`);
@@ -31,7 +33,7 @@ export const EntityPr = {
 	},
 };
 
-function extractPRNumber(mergeMessage: string): string | undefined {
+function extractPRNumber(mergeMessage: ParsedCommitData["message"]): string | undefined {
 	// Try different merge commit patterns
 	const patterns = [
 		/Merge pull request #(\d+)/, // "Merge pull request #123"
@@ -41,7 +43,7 @@ function extractPRNumber(mergeMessage: string): string | undefined {
 	];
 
 	for (const pattern of patterns) {
-		const match = mergeMessage.match(pattern);
+		const match = mergeMessage.description.match(pattern);
 		if (match) {
 			return match[1];
 		}
@@ -127,13 +129,12 @@ async function getPRCommits(
 
 function categorizePR(
 	prCommits: ParsedCommitData[],
-	mergeMessage: string,
-	prBodyLines: string[],
+	mergeMessage: ParsedCommitData["message"],
 ): PRCategory {
 	if (
-		mergeMessage.includes("renovate") ||
-		mergeMessage.includes("dependabot") ||
-		prBodyLines.some((line) => line.toLowerCase().includes("dependency"))
+		mergeMessage.description.includes("renovate") ||
+		mergeMessage.description.includes("dependabot") ||
+		mergeMessage.bodyLines.some((line) => line.toLowerCase().includes("dependency"))
 	) {
 		return "dependencies";
 	}
@@ -199,4 +200,34 @@ function getPRStats(prCommits: ParsedCommitData[]): PRStats {
 	return {
 		commitCount: prCommits.length,
 	};
+}
+
+function getPrBranchName({ message }: ParsedCommitData): string {
+	if (!message.isMerge) {
+		return defaultBranchName;
+	}
+
+	const mainMessage = message.bodyLines?.join("\n") || "";
+	if (!mainMessage.includes("from ")) {
+		return defaultBranchName;
+	}
+
+	const fromIndex = mainMessage.indexOf("from ");
+	const afterFrom = mainMessage.substring(fromIndex + 5);
+	const firstLine = afterFrom.split("\n")[0].trim();
+
+	if (firstLine.includes(":")) {
+		// Format: "user:branch-name"
+		const parts = firstLine.split(":");
+		return parts.length > 1 ? parts.slice(1).join(":") : defaultBranchName;
+	}
+
+	if (firstLine.includes("/")) {
+		// Format: "user/branch-name"
+		const parts = firstLine.split("/");
+		return parts.length > 1 ? parts.slice(1).join("/") : defaultBranchName;
+	}
+
+	// Fallback: use the full branch name
+	return firstLine || defaultBranchName;
 }

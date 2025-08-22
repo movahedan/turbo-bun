@@ -21,6 +21,7 @@ export type PRInfo = {
 	prCategory: PRCategory;
 	prStats: PRStats;
 	prCommits: ParsedCommitData[];
+	prBranchName: string;
 };
 
 export const prCategories: Record<PRCategory, { emoji: string; label: string }> = {
