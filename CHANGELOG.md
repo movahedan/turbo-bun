@@ -7,6 +7,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.1.0
+###### <a href="https://github.com/movahedan/monobun/commit/2516669d74bc53aba52b5a1f7477a7fbd52fec84"><img src="https://img.shields.io/badge/refactor-(root)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> streamline commit and version change ([2516669](https://github.com/movahedan/monobun/commit/2516669d74bc53aba52b5a1f7477a7fbd52fec84)) by **Soheil Movahedan**
+
+### 🔄 feature/staged-check <img src="https://img.shields.io/badge/Code%20Quality%20%26%20Refactoring-495057?style=flat" alt="Code Quality & Refactoring" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/172"><img src="https://img.shields.io/badge/%23172-blue?style=flat" alt="#172" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/2%20commits-green?style=flat" alt="2 commits" style="vertical-align: middle;" />
+
+Merge pull request #172 from movahedan/feature/staged-check
+
+## Overview
+This PR refactors the commit validation system to improve code organization and add comprehensive staged file validation capabilities.
+## Key Changes
+- Staged File Validation: Added getStagedFiles() and validateStagedFiles() methods to EntityCommit
+- Naming Consistency: Renamed prefixes to prefix throughout branch entity for better clarity
+- Code Organization: Moved staged file validation logic from scripts into the commit entity
+- Enhanced Validation: Added configurable validation rules with file patterns, content patterns, and ignore rules
+- CI Environment Support: Improved error handling and CI environment detection
+- Bug Fixes: Fixed duplicate error throwing in commit-check script
+## Technical Notes
+- No Breaking Changes: All public APIs remain compatible
+- Enhanced Validation: New StagedConfig type for configurable validation rules
+- Better Separation of Concerns: Validation logic moved from scripts to entities
+- Improved Error Reporting: More detailed error messages and better CI handling
+
+<details><summary><strong>📝 Commits</strong> (Click to expand)</summary>
+
+- <a href="https://github.com/movahedan/monobun/commit/f04724b8c57dcb1910e83e02283a886ee56a2b9e"><img src="https://img.shields.io/badge/refactor-(@repo/intershell)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> simplify branch parsing logic in EntityBranch ([f04724b](https://github.com/movahedan/monobun/commit/f04724b8c57dcb1910e83e02283a886ee56a2b9e)) by **Soheil Movahedan**
+- <a href="https://github.com/movahedan/monobun/commit/985900784f4459adc5eafe4d73b8920a8c55d3c5"><img src="https://img.shields.io/badge/refactor-(@repo/intershell)-007ACC?style=flat" alt="refactor" style="vertical-align: middle;" /></a> add staged-check to commit entity ([9859007](https://github.com/movahedan/monobun/commit/985900784f4459adc5eafe4d73b8920a8c55d3c5)) by **Soheil Movahedan**
+
+</details>
+
 ## v0.0.2
 
 ### 🐛 fix/improve-git-command-handling <img src="https://img.shields.io/badge/Bug%20Fixes%20%26%20Improvements-495057?style=flat" alt="Bug Fixes & Improvements" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/145"><img src="https://img.shields.io/badge/%23145-blue?style=flat" alt="#145" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/1%20commits-green?style=flat" alt="1 commits" style="vertical-align: middle;" />
