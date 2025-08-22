@@ -91,7 +91,7 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				const packageJson = new EntityPackages(packageName);
 				const template = new DefaultChangelogTemplate(packageName);
 				const changelog = new EntityChangelog(packageName, template);
-				await changelog.setRange(fromCommit, toCommit);
+				await changelog.calculateRange(fromCommit, toCommit);
 				const commitCount = changelog.getCommitCount();
 				const versionData = changelog.getVersionData();
 
@@ -133,7 +133,7 @@ export const versionPrepare = createScript(scriptConfig, async function main(arg
 				}
 
 				totalCommits += commitCount;
-				const changelogContent = await changelog.generateMergedChangelog();
+				const changelogContent = changelog.generateMergedChangelog();
 				if (args["dry-run"]) {
 					xConsole.log(
 						`🚧 Dry run mode! would write to ${packageJson.getChangelogPath()} file with ${changelogContent.length} characters`,

@@ -35,7 +35,8 @@ const scriptConfig = {
 } as const satisfies ScriptConfig;
 
 export const versionApply = createScript(scriptConfig, async function main(args, xConsole) {
-	const version = await new EntityPackages("root").readVersion();
+	const rootPackage = new EntityPackages("root");
+	const version = rootPackage.readVersion();
 
 	if (args["dry-run"]) {
 		xConsole.log(colorify.yellow("🔍 Dry run mode - would execute:"));
@@ -60,7 +61,7 @@ export const versionApply = createScript(scriptConfig, async function main(args,
 		return;
 	}
 
-	await commitVersionChanges(xConsole);
+	await commitVersionChanges(version, xConsole);
 	await createTag(version, args, xConsole);
 	await pushChanges(args, xConsole);
 
@@ -111,8 +112,7 @@ async function createTag(
 	}
 }
 
-async function commitVersionChanges(xConsole: typeof console): Promise<void> {
-	const version = await new EntityPackages("root").readVersion();
+async function commitVersionChanges(version: string, xConsole: typeof console): Promise<void> {
 	const commitMessage = await Bun.file(".git/COMMIT_EDITMSG").text();
 
 	xConsole.log("📝 Commit message:");
