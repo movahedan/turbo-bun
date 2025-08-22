@@ -22,7 +22,7 @@
       },
       "devDependencies": {
         "@repo/typescript-config": "workspace:*",
-        "@types/react": "19.1.10",
+        "@types/react": "19.1.11",
         "@types/react-dom": "19.1.7",
         "@vitejs/plugin-react": "4.7.0",
         "vite": "7.0.6",
@@ -80,13 +80,13 @@
       },
       "devDependencies": {
         "@repo/typescript-config": "workspace:*",
-        "@types/react": "19.1.10",
+        "@types/react": "19.1.11",
         "@types/react-dom": "19.1.7",
       },
     },
     "packages/intershell": {
       "name": "@repo/intershell",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "devDependencies": {
         "@repo/test-preset": "workspace:*",
         "@repo/typescript-config": "workspace:*",
@@ -95,7 +95,7 @@
     },
     "packages/test-preset": {
       "name": "@repo/test-preset",
-      "version": "0.0.3",
+      "version": "0.0.4",
       "devDependencies": {
         "@happy-dom/global-registrator": "18.0.1",
         "@repo/typescript-config": "workspace:*",
@@ -119,7 +119,7 @@
         "@radix-ui/react-label": "2.1.7",
         "@radix-ui/react-slot": "1.2.3",
         "@repo/utils": "workspace:*",
-        "@types/react": "19.1.10",
+        "@types/react": "19.1.11",
         "@types/react-dom": "19.1.7",
         "class-variance-authority": "0.7.1",
         "clsx": "2.1.1",
@@ -157,7 +157,7 @@
     },
   },
   "overrides": {
-    "@types/react": "19.1.10",
+    "@types/react": "19.1.11",
     "@types/react-dom": "19.1.7",
     "react": "19.1.1",
     "react-dom": "19.1.1",
@@ -607,7 +607,7 @@
 
     "@types/range-parser": ["@types/range-parser@1.2.7", "", {}, "sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ=="],
 
-    "@types/react": ["@types/react@19.1.10", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-EhBeSYX0Y6ye8pNebpKrwFJq7BoQ8J5SO6NlvNwwHjSj6adXJViPQrKlsyPw7hLBLvckEMO1yxeGdR82YBBlDg=="],
+    "@types/react": ["@types/react@19.1.11", "", { "dependencies": { "csstype": "^3.0.2" } }, "sha512-lr3jdBw/BGj49Eps7EvqlUaoeA0xpj3pc0RoJkHpYaCHkVK7i28dKyImLQb3JVlqs3aYSXf7qYuWOW/fgZnTXQ=="],
 
     "@types/react-dom": ["@types/react-dom@19.1.7", "", { "peerDependencies": { "@types/react": "^19.0.0" } }, "sha512-i5ZzwYpqjmrKenzkoLM2Ibzt6mAsM7pxB6BCIouEVVmgiqaMj1TjaK7hnA36hbW5aZv20kx7Lw6hWzPWg0Rurw=="],
 
