@@ -12,18 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔄 feature/staged-check <img src="https://img.shields.io/badge/Code%20Quality%20%26%20Refactoring-495057?style=flat" alt="Code Quality & Refactoring" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/172"><img src="https://img.shields.io/badge/%23172-blue?style=flat" alt="#172" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/2%20commits-green?style=flat" alt="2 commits" style="vertical-align: middle;" />
 
-Merge pull request #172 from movahedan/feature/staged-check
-
-## Overview
+#### 🎯 Overview
 This PR refactors the commit validation system to improve code organization and add comprehensive staged file validation capabilities.
-## Key Changes
+#### ✨ Key Changes
 - Staged File Validation: Added getStagedFiles() and validateStagedFiles() methods to EntityCommit
 - Naming Consistency: Renamed prefixes to prefix throughout branch entity for better clarity
 - Code Organization: Moved staged file validation logic from scripts into the commit entity
 - Enhanced Validation: Added configurable validation rules with file patterns, content patterns, and ignore rules
 - CI Environment Support: Improved error handling and CI environment detection
 - Bug Fixes: Fixed duplicate error throwing in commit-check script
-## Technical Notes
+#### 🔧 Technical Notes
 - No Breaking Changes: All public APIs remain compatible
 - Enhanced Validation: New StagedConfig type for configurable validation rules
 - Better Separation of Concerns: Validation logic moved from scripts to entities
@@ -39,8 +37,6 @@ This PR refactors the commit validation system to improve code organization and 
 ## v0.0.0
 
 ### 📦 feature/intershell <img src="https://img.shields.io/badge/Dependency%20Updates-495057?style=flat" alt="Dependency Updates" style="vertical-align: middle;" /> <a href="https://github.com/movahedan/monobun/pull/171"><img src="https://img.shields.io/badge/%23171-blue?style=flat" alt="#171" style="vertical-align: middle;" /></a> <img src="https://img.shields.io/badge/24%20commits-green?style=flat" alt="24 commits" style="vertical-align: middle;" />
-
-Merge pull request #171 from movahedan/feature/intershell
 
 #### 🎯 Overview
 This PR introduces a major architectural refactoring by creating the new  CLI framework package and reorganizing the development infrastructure.
