@@ -393,8 +393,8 @@ class WrapShell<TConfig extends ScriptConfig> {
 				}
 			},
 			info: (...props: Parameters<typeof console.info>) => {
-				if ("verbose" in args && args.verbose && !("quiet" in args || args.quiet)) {
-					originalConsole.info(...props);
+				if (!("quiet" in args) || !args.quiet) {
+					originalConsole.warn(...props);
 				}
 			},
 			warn: (...props: Parameters<typeof console.warn>) => {

@@ -21,30 +21,19 @@ export class ChangelogTemplate implements TemplateEngine {
 	}
 
 	generateContent(changelogData: TemplateEngineData): string {
-		let changelog = ChangelogTemplate.getChangelogHeader(this.packageName);
-		const sortedVersions = Object.keys(changelogData).sort((a, b) => this.sortVersions(b, a));
+		let changelog = this.generateChangelogHeader(this.packageName);
 
+		const sortedVersions = Array.from(changelogData.keys()).sort((a, b) => this.sortVersions(b, a));
 		for (const version of sortedVersions) {
-			const versionData = changelogData.get(version);
-			if (typeof versionData === "string") {
-				changelog += versionData;
+			const commits = changelogData.get(version) || [];
+			if (typeof commits === "string") {
+				changelog += `\n${commits}`;
 				continue;
 			}
 
-			const versionHeader = ChangelogTemplate.getChangelogVersionHeader(version);
+			const versionHeader = this.generateChangelogVersionHeader(version);
 			changelog += versionHeader;
-
-			for (const commit of versionData?.mergeCommits || []) {
-				if (commit.pr?.prNumber) {
-					changelog += ChangelogTemplate.formatPRSection(
-						commit,
-						commit.pr.prCommits || [commit],
-						repoUrl,
-					);
-				}
-			}
-
-			changelog += ChangelogTemplate.formatOrphanCommits(versionData?.orphanCommits || [], repoUrl);
+			changelog += commits.map((commit) => this.generateCommitSection(commit, repoUrl)).join("\n");
 		}
 
 		return changelog;
@@ -70,7 +59,20 @@ export class ChangelogTemplate implements TemplateEngine {
 				if (currentVersion) {
 					versions.set(currentVersion, currentContent.join("\n"));
 				}
-				currentVersion = line;
+
+				// Extract clean version number from the header line
+				let cleanVersion = line;
+				if (line.includes("[Unreleased]")) {
+					cleanVersion = "[Unreleased]";
+				} else {
+					// Extract version from "## v1.2.3" format
+					const versionMatch = line.match(/## (v?\d+\.\d+\.\d+)/);
+					if (versionMatch) {
+						cleanVersion = versionMatch[1].replace(prefix, "");
+					}
+				}
+
+				currentVersion = cleanVersion;
 				currentContent = [line];
 			} else {
 				currentContent.push(line);
@@ -84,43 +86,33 @@ export class ChangelogTemplate implements TemplateEngine {
 		return versions;
 	}
 
-	sortVersions(a: string, b: string): number {
-		if (a.includes("[Unreleased]")) return -1;
-		if (b.includes("[Unreleased]")) return 1;
+	sortVersions(versionA: string, versionB: string): number {
+		const partsA = versionA.split(".").map(Number);
+		const partsB = versionB.split(".").map(Number);
 
-		const extractVersion = (header: string) => {
-			const match = header.match(/## (?:\[)?(v?\d+\.\d+\.\d+)(?:\])?/);
-			if (!match) return "";
-			return match[1];
-		};
+		while (partsA.length < 3) partsA.push(0);
+		while (partsB.length < 3) partsB.push(0);
 
-		const versionA = extractVersion(a);
-		const versionB = extractVersion(b);
+		if (partsA[0] !== partsB[0]) {
+			return partsA[0] - partsB[0]; // Descending order (newest first)
+		}
 
-		return versionA.localeCompare(versionB);
+		if (partsA[1] !== partsB[1]) {
+			return partsA[1] - partsB[1]; // Descending order
+		}
+
+		return partsA[2] - partsB[2]; // Descending order
 	}
 
-	protected static getChangelogHeader(_packageName: string): string {
+	protected generateChangelogHeader(_packageName: string): string {
 		return "";
 	}
 
-	protected static getChangelogVersionHeader(_version: string): string {
+	protected generateChangelogVersionHeader(_version: string): string {
 		return "";
 	}
 
-	protected static formatPRSection(
-		_commit: ParsedCommitData,
-		_allCommits: ParsedCommitData[],
-		_repoUrl: string,
-	): string {
-		return "";
-	}
-
-	protected static formatOrphanCommits(_commits: ParsedCommitData[], _repoUrl: string): string {
-		return "";
-	}
-
-	protected static getOrphanHeader() {
+	protected generateCommitSection(_commit: ParsedCommitData, _repoUrl: string): string {
 		return "";
 	}
 }

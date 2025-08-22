@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/complexity/noUselessConstructor: it's a simple util class */
 import { $ } from "bun";
 import type { ParsedCommitData } from "../commit";
 import { EntityCommit } from "../commit";
@@ -9,6 +8,7 @@ import type { ChangelogData, VersionAction, VersionBumpType, VersionData } from 
 
 export class EntityChangelog {
 	private packageName: string;
+	private packagePath: string;
 	private fromSha?: string;
 	private toSha?: string;
 
@@ -21,6 +21,7 @@ export class EntityChangelog {
 		this.packageName = packageName;
 		this.templateEngine = templateEngine;
 		this.versionMode = versionMode;
+		this.packagePath = new EntityPackages(this.packageName).getPath();
 	}
 
 	async setRange(from: string, to?: string): Promise<void> {
@@ -29,15 +30,29 @@ export class EntityChangelog {
 		if (!this.fromSha || !this.toSha) {
 			throw new Error("Range not set. Call setRange() first.");
 		}
+
 		const unreleasedCommits = await this.getCommitsInRange(
 			await EntityTag.getBaseTagSha(),
 			this.toSha,
 		);
-		const versionAction = await this.determineVersionAction(unreleasedCommits);
+
+		const { version: currentVersion } = (await EntityTag.getPackageVersionAtTag(
+			await EntityTag.getBaseTagSha(),
+			this.packageName,
+		)) || { version: "0.0.0" };
+
+		if (!currentVersion) {
+			throw new Error(
+				`Could not get current version for package ${this.packageName} at tag ${await EntityTag.getBaseTagSha()}`,
+			);
+		}
+
+		const versionAction = await this.determineVersionAction(currentVersion, unreleasedCommits);
 
 		const changelogData: ChangelogData = new Map();
 
 		const tagsInRange = await EntityTag.getTagsInRange(this.fromSha, this.toSha);
+
 		const versionTags = tagsInRange;
 		if (versionAction.shouldBump) {
 			versionTags.push({
@@ -58,6 +73,9 @@ export class EntityChangelog {
 						),
 					),
 			);
+			const sortedCommits = [...mergeCommits, ...orphanCommits].sort(
+				(a, b) => new Date(a.info?.date || "0").getTime() - new Date(b.info?.date || "0").getTime(),
+			);
 
 			const packageVersion = await EntityTag.getPackageVersionAtTag(tag.tag, this.packageName);
 			if (!packageVersion) {
@@ -66,17 +84,16 @@ export class EntityChangelog {
 				);
 			}
 
-			changelogData.set(this.versionMode ? packageVersion.version : "[Unreleased]", {
-				mergeCommits,
-				orphanCommits,
-			});
+			changelogData.set(this.versionMode ? packageVersion.version : "[Unreleased]", sortedCommits);
 		}
+
+		const versionOnDisk = await new EntityPackages(this.packageName).readVersion();
 
 		this.changelogData = changelogData;
 		this.versionData = {
 			currentVersion: versionAction.currentVersion,
-			bumpType: versionAction.bumpType,
-			shouldBump: versionAction.shouldBump,
+			bumpType: versionOnDisk === versionAction.targetVersion ? "synced" : versionAction.bumpType,
+			shouldBump: versionOnDisk === versionAction.targetVersion ? false : versionAction.shouldBump,
 			targetVersion: versionAction.targetVersion,
 			reason: versionAction.reason,
 		};
@@ -99,6 +116,7 @@ export class EntityChangelog {
 
 		const existingChangelog = await packageInstance.readChangelog();
 		const existingChangelogData = this.templateEngine.parseVersions(existingChangelog);
+
 		for (const [version, content] of existingChangelogData) {
 			mergedChangelogData.set(version, content);
 		}
@@ -143,24 +161,20 @@ export class EntityChangelog {
 		if (!this.changelogData) {
 			throw new Error("Data not analyzed. Call setRange() first.");
 		}
-		return this.changelogData
-			.values()
-			.reduce(
-				(acc, curr) =>
-					acc +
-					(typeof curr === "object"
-						? curr.mergeCommits.length +
-							curr.mergeCommits.reduce((acc, curr) => acc + (curr.pr?.prCommits?.length ?? 0), 0) +
-							curr.orphanCommits.length
-						: 0),
-				0,
+		return this.changelogData.values().reduce((acc, curr) => {
+			return (
+				acc +
+				(Array.isArray(curr)
+					? curr.reduce((acc, curr) => acc + 1 + (curr.pr?.prCommits?.length ?? 0), 0)
+					: 0)
 			);
+		}, 0);
 	}
 
-	private async determineVersionAction(commits: ParsedCommitData[]): Promise<VersionAction> {
-		const packageInstance = new EntityPackages(this.packageName);
-		const currentVersion = await packageInstance.readVersion();
-
+	private async determineVersionAction(
+		currentVersion: string,
+		commits: ParsedCommitData[],
+	): Promise<VersionAction> {
 		// If no commits, no version change needed
 		if (commits.length === 0) {
 			return {
@@ -272,8 +286,8 @@ export class EntityChangelog {
 			let commitHashes: string[];
 
 			if (this.packageName === "root") {
-				const rootHashes = await this.getGitLogLines(gitRange, {
-					exclude: ["apps/*", "packages/*"],
+				// For root package, include ALL commits in the repository
+				const allHashes = await this.getGitLogLines(gitRange, {
 					path: ".",
 				});
 
@@ -281,12 +295,10 @@ export class EntityChangelog {
 					merges: true,
 				});
 
-				commitHashes = [...new Set([...rootHashes, ...mergeHashes])];
+				commitHashes = [...new Set([...allHashes, ...mergeHashes])];
 			} else {
-				const packagePath = new EntityPackages(this.packageName).getPath();
-
 				const packageHashes = await this.getGitLogLines(gitRange, {
-					path: packagePath,
+					path: this.packagePath,
 				});
 				const mergeHashes = await this.getGitLogLines(gitRange, {
 					merges: true,
@@ -295,7 +307,7 @@ export class EntityChangelog {
 				const relevantMergeHashes: string[] = [];
 				for (const hash of mergeHashes) {
 					const prCommitsResult = await this.getGitLogLines(`${hash}^..${hash}^2`, {
-						path: packagePath,
+						path: this.packagePath,
 					});
 
 					if (prCommitsResult.length > 0) {

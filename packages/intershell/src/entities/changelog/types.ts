@@ -1,15 +1,8 @@
 import type { ParsedCommitData } from "../commit";
 
-export type ChangelogData = Map<
-	string,
-	| string
-	| {
-			readonly mergeCommits: ParsedCommitData[];
-			readonly orphanCommits: ParsedCommitData[];
-	  }
->;
+export type ChangelogData = Map<string, string | ParsedCommitData[]>;
 
-export type VersionBumpType = "major" | "minor" | "patch" | "none";
+export type VersionBumpType = "major" | "minor" | "patch" | "none" | "synced";
 
 export interface VersionData {
 	readonly currentVersion: string;
