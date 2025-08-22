@@ -53,8 +53,8 @@ export class DefaultChangelogTemplate extends ChangelogTemplate {
 
 		const prMessages = mainCommit.message.isMerge
 			? [
-					mainCommit.message.bodyLines[0], // First line: "Merge pull request #154 from feature/custom-version-management"
-					"", // Empty line for separation
+					// mainCommit.message.bodyLines[0], // We don't want the first line: "Merge pull request #154 from feature/custom-version-management"
+					// "", // Empty line for separation, if you added the first line above, uncomment this line as well
 					...mainCommit.message.bodyLines.slice(1), // Rest of the lines: "Refactors the version management system..."
 				]
 			: [mainCommit.message.description, "", ...mainCommit.message.bodyLines];
