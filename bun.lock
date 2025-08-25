@@ -108,7 +108,7 @@
       "name": "@repo/typescript-config",
       "version": "0.0.3",
       "peerDependencies": {
-        "bun-types": "1.2.20",
+        "bun-types": "1.2.21",
         "typescript": "5.8.3",
       },
     },
